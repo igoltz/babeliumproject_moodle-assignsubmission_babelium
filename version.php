@@ -18,14 +18,14 @@
  * This file contains the version information for the babelium submission plugin
  *
  * @package    assignsubmission_babelium
- * @copyright  2012 Babelium Project {@link http://babeliumproject.com}
+ * @copyright  2013 Babelium Project {@link http://babeliumproject.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2012090600;
-$plugin->release   = '0.9.6 (Build: 2012090600)';
+$plugin->version   = 2013072900;
+$plugin->release   = '0.9.7 (Build: 2013072900)';
 
 $plugin->requires  = 2012062500;  // moodle 2.3
 
