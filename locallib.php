@@ -186,7 +186,7 @@ class assign_submission_babelium extends assign_submission_plugin {
 	    $mform->setType('edit', PARAM_INT);
 
 	    $mform->addElement('hidden', 'responseid');
-	    //$mform->setType('data1', PARAM_INT);
+	    $mform->setType('responseid', PARAM_RAW);
 
 	    $mform->addElement('hidden', 'responsehash');
 	    $mform->setType('responsehash', PARAM_TEXT);
@@ -198,7 +198,9 @@ class assign_submission_babelium extends assign_submission_plugin {
 	    $mform->setType('recordedRole', PARAM_TEXT);
 
 	    $mform->addElement('hidden', 'subtitleId', $exsubs[0]['subtitleId']);
+	    $mform->setType('subtitleId', PARAM_RAW);
 	    $mform->addElement('hidden', 'exerciseDuration', $exinfo['duration']);
+	    $mform->setType('exerciseDuration', PARAM_RAW);
 
 	    //Returns a string with all the html and script tags needed to init the babelium widget
 	    $html_content = babeliumsubmission_html_output(!empty($data->responsehash),$exinfo,$exsubs);
