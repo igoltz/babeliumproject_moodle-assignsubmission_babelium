@@ -63,37 +63,39 @@ class assign_submission_babelium extends assign_submission_plugin {
     public function get_settings(MoodleQuickForm $mform) {
         global $CFG, $COURSE;
 
-	$defaultexerciseid = $this->get_config('exerciseid') > 0 ? $this->get_config('exerciseid') : 0;  	
+		$defaultexerciseid = $this->get_config('exerciseid') > 0 ? $this->get_config('exerciseid') : 0;  	
 
-	$exercises = array();
-	$exercisesMenu = array();
+		$exercises = array();
+		$exercisesMenu = array();
 
-        try {
-	$exercises = babeliumsubmission_get_available_exercise_list();
-        } catch (Exception $e) {
-            $msg = html_writer::span($e->getMessage(), 'error');
-            $mform->addElement('static', 'assignsubmission_babelium_servererror', '', $msg);
-        }
-	if($exercises && count($exercises) > 0){
-		foreach ($exercises as $exercise) {
-			$exercisesMenu[$exercise['id']] = $exercise['title'];
+		try {
+			$exercises = babeliumsubmission_get_available_exercise_list();
+				
+			if($exercises && count($exercises) > 0){
+				foreach ($exercises as $exercise) {
+					$exercisesMenu[$exercise['id']] = $exercise['title'];
+				}
+			}
+			if(count($exercisesMenu)>0){
+				$mform->addElement('select', 'assignsubmission_babelium_exerciseid', get_string('babeliumAvailableRecordableExercises','assignsubmission_babelium'), $exercisesMenu);
+				$mform->addHelpButton('assignsubmission_babelium_exerciseid', 'babeliumAvailableRecordableExercises', 'assignsubmission_babelium');
+				$mform->setDefault('assignsubmission_babelium_exerciseid', $defaultexerciseid);
+				$mform->disabledIf('assignsubmission_babelium_exerciseid', 'assignsubmission_babelium_enabled', 'eq', 0);
+				$mform->addElement('hidden', 'noexerciseavailable', 0);
+			} else {
+				$mform->addElement('static', 'noexercisemessage',
+						get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'),
+						get_string('babeliumNoExerciseAvailable', 'assignsubmission_babelium'));
+				$mform->addElement('hidden', 'noexerciseavailable', 1);
+			}
+			$mform->setType('noexerciseavailable', PARAM_INT);
+		} catch (Exception $e) {
+			//html_writer::span() shortcut function is not available in Moodle versions prior to 2.5
+			//$msg = html_writer::span($e->getMessage(), 'error');
+			$classattribute = array('class' => 'error');
+			$msg = html_writer::tag('span', $e->getMessage(), $classattribute);
+			$mform->addElement('static', 'assignsubmission_babelium_servererror', '', $msg);
 		}
-	}
-	if(count($exercisesMenu)>0){
-		$mform->addElement('select', 'assignsubmission_babelium_exerciseid', 
-				   get_string('babeliumAvailableRecordableExercises', 
-				   'assignsubmission_babelium'), $exercisesMenu);
-		$mform->addHelpButton('assignsubmission_babelium_exerciseid', 'babeliumAvailableRecordableExercises', 'assignsubmission_babelium');
-		$mform->setDefault('assignsubmission_babelium_exerciseid', $defaultexerciseid);
-		$mform->disabledIf('assignsubmission_babelium_exerciseid', 'assignsubmission_babelium_enabled', 'eq', 0);
-		$mform->addElement('hidden', 'noexerciseavailable', 0);
-	} else {
-		$mform->addElement('static', 'noexercisemessage', 
-				   get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'), 
-				   get_string('babeliumNoExerciseAvailable', 'assignsubmission_babelium'));
-		$mform->addElement('hidden', 'noexerciseavailable', 1);
-	}
-        $mform->setType('noexerciseavailable', PARAM_INT);
   }
 
     /**
@@ -119,39 +121,39 @@ class assign_submission_babelium extends assign_submission_plugin {
      */
     public function get_form_elements($submission, MoodleQuickForm $mform, stdClass $data) {
 
-        if (($exerciseid = $this->get_config('exerciseid')) <= 0) {
-            return false;
-        }
+    	if (($exerciseid = $this->get_config('exerciseid')) <= 0) {
+    		return false;
+    	}
 
-	$submissionid = $submission ? $submission->id : 0;
+    	$submissionid = $submission ? $submission->id : 0;
 
-        if (!isset($data->responseid)) {
-            $data->responseid = '';
-        }
-        if (!isset($data->responsehash)) {
-            $data->responsehash = '';
-        }
+    	if (!isset($data->responseid)) {
+    		$data->responseid = '';
+    	}
+    	if (!isset($data->responsehash)) {
+    		$data->responsehash = '';
+    	}
 
-        if ($submission) {
-            $babeliumsubmission = $this->get_babelium_submission($submission->id);
-            if ($babeliumsubmission) {
-                $data->responseid = $babeliumsubmission->responseid;
-                $data->responsehash = $babeliumsubmission->responsehash;
-            }
+    	if ($submission) {
+    		$babeliumsubmission = $this->get_babelium_submission($submission->id);
+    		if ($babeliumsubmission) {
+    			$data->responseid = $babeliumsubmission->responseid;
+    			$data->responsehash = $babeliumsubmission->responsehash;
+    		}
 
-        }
+    	}
 
-	$exercise_data = !empty($data->responsehash) ? 
-			 babeliumsubmission_get_response_data($data->responseid) : babeliumsubmission_get_exercise_data($exerciseid);
-	if(!$exercise_data)
-            throw new dml_exception("Error while retrieving Babelium external data");
+    	$exercise_data = !empty($data->responsehash) ?
+    	babeliumsubmission_get_response_data($data->responseid) : babeliumsubmission_get_exercise_data($exerciseid);
+    	if(!$exercise_data)
+    		throw new dml_exception("Error while retrieving Babelium external data");
 
- 	$this->get_babelium_form_elements($mform, array($data, 
-						        $exercise_data['info'], 
-						        $exercise_data['roles'], 
-						        $exercise_data['languages'], 
-						        $exercise_data['subtitles']));
-	return true;
+    	$this->get_babelium_form_elements($mform, array($data,
+    			$exercise_data['info'],
+    			$exercise_data['roles'],
+    			$exercise_data['languages'],
+    			$exercise_data['subtitles']));
+    	return true;
     }
 
     /**
@@ -240,40 +242,51 @@ class assign_submission_babelium extends assign_submission_plugin {
         global $USER, $DB;
 
         $babeliumsubmission = $this->get_babelium_submission($submission->id);
+        
+        //plagiarism code event trigger when files are uploaded
+        $eventdata = new stdClass();
+        $eventdata->modulename = 'assign';
+        $eventdata->cmid = $this->assignment->get_course_module()->id;
+        $eventdata->itemid = $submission->id;
+        $eventdata->courseid = $this->assignment->get_course()->id;
+        $eventdata->userid = $USER->id;
+        $eventdata->content = $babeliumsubmission->responsehash;
+        events_trigger('assessable_content_uploaded', $eventdata);
+
 
         if ($babeliumsubmission) {
-            if($babeliumsubmission->responsehash != $data->responsehash){
-		$responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'), 
-							              $data->exerciseDuration, 
-							              $data->subtitleId, 
-							              $data->recordedRole, 
-							              $data->responsehash);
-		if(!$responsedata)
-			throw new moodle_exception('babeliumErrorSavingResponse','assignsubmission_babelium');
-	        $babeliumsubmission->responseid = $responsedata['responseId'];
-            } else {
-	        $babeliumsubmission->responseid = $data->responseid;
-            }
-	    $babeliumsubmission->responsehash = $data->responsehash;
+        	if($babeliumsubmission->responsehash != $data->responsehash){
+        		$responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'),
+        				$data->exerciseDuration,
+        				$data->subtitleId,
+        				$data->recordedRole,
+        				$data->responsehash);
+        		if(!$responsedata)
+        			throw new moodle_exception('babeliumErrorSavingResponse','assignsubmission_babelium');
+        		$babeliumsubmission->responseid = $responsedata['responseId'];
+        	} else {
+        		$babeliumsubmission->responseid = $data->responseid;
+        	}
+        	$babeliumsubmission->responsehash = $data->responsehash;
 
-            return $DB->update_record('assignsubmission_babelium', $babeliumsubmission);
+        	return $DB->update_record('assignsubmission_babelium', $babeliumsubmission);
         } else {
-            $babeliumsubmission = new stdClass();
-            $babeliumsubmission->responsehash = $data->responsehash;
+        	$babeliumsubmission = new stdClass();
+        	$babeliumsubmission->responsehash = $data->responsehash;
 
-	    $responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'), 
-							          $data->exerciseDuration, 
-							          $data->subtitleId, 
-							          $data->recordedRole, 
-							          $data->responsehash);
-	    if(!$responsedata)
-			throw new moodle_exception('babeliumErrorSavingResponse','assignsubmission_babelium');
-	    $babeliumsubmission->responseid = $responsedata['responseId'];
+        	$responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'),
+        			$data->exerciseDuration,
+        			$data->subtitleId,
+        			$data->recordedRole,
+        			$data->responsehash);
+        	if(!$responsedata)
+        		throw new moodle_exception('babeliumErrorSavingResponse','assignsubmission_babelium');
+        	$babeliumsubmission->responseid = $responsedata['responseId'];
 
 
-	    $babeliumsubmission->submission = $submission->id;
-            $babeliumsubmission->assignment = $this->assignment->get_instance()->id;
-            return $DB->insert_record('assignsubmission_babelium', $babeliumsubmission) > 0;
+        	$babeliumsubmission->submission = $submission->id;
+        	$babeliumsubmission->assignment = $this->assignment->get_instance()->id;
+        	return $DB->insert_record('assignsubmission_babelium', $babeliumsubmission) > 0;
         }
     }
 
@@ -448,8 +461,9 @@ class assign_submission_babelium extends assign_submission_plugin {
      * @param stdClass $submission
      */
     public function is_empty(stdClass $submission) {
-	return empty($submission->responsehash);
-        //return $this->count_files($submission->id, ASSIGNSUBMISSION_BABELIUM_FILEAREA) == 0;
+    	$babeliumsubmission = $this->get_babelium_submission($submission->id);
+	
+    	return empty($babeliumsubmission->responsehash);
     }
 
     /**
