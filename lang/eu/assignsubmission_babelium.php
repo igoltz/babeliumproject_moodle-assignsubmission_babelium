@@ -15,53 +15,52 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'assignsubmission_babelium', language 'es'
+ * Strings for component 'assignsubmission_babelium', language 'eu'
  *
  * @package   assignsubmission_babelium
  * @copyright 2012 Babelium Project {@link http://babeliumproject.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['default'] = 'Habilitado por defecto';
-$string['default_help'] = 'Si se activa la opción, este método de entrega estará habilitado por omisión para todas las tareas nuevas.';
-$string['enabled'] = 'Entrega Babelium';
-$string['enabled_help'] = 'Si está habilitado, los estudiantes pueden grabar respuestas en vídeo y/o audio para sus entregas siguiendo el ejercicio planteado.';
-$string['pluginname'] = 'Entrega Babelium';
-$string['babelium'] = 'Entrega Babelium';
-$string['loginfo'] = 'Babelium IdGrabación: {$a->responseid}, HashGrabación: {$a->responsehash}'; 
+$string['default'] = 'Berez gaituta';
+$string['default_help'] = 'Ezarriz gero, bidalketa-metodo hau berez gaituko da zeregin berri guztietan';
+$string['enabled'] = 'Babelium bidalketa';
+$string['enabled_help'] = 'Ezarriz gero, ikasleek beraien bidalketan bideo edo/eta audio erantzunak grabatu ditzakete proposatutako ariketa jarraituz.';
+$string['pluginname'] = 'Babelium bidalketa';
+$string['babelium'] = 'Babelium bidalketa';
+$string['loginfo'] = 'Babelium GrabaketaId: {$a->responseid}, GrabaketaHash: {$a->responsehash}'; 
 
-$string['serverdomain'] = 'Dominio del servidor';
-$string['serverdomain_help'] = 'El dominio del servidor Babelium en el que se guardaran tanto los ejercicios como las grabaciones';
-$string['serverport'] = 'Puerto del servidor';
-$string['serverport_help'] = 'El número de puerto por el que se accede al servidor';
-$string['apidomain'] = 'Dominio del API';
-$string['apidomain_help'] = 'El dominio del API-RPC que permite al usuario acceder a los datos almacenados en el servidor Babelium';
-$string['apiendpoint'] = 'Endpoint del API';
-$string['apiendpoint_help'] = 'Una ruta que pertenece al dominio del API y que se usa para gestionar todas las peticiones';
-$string['accesskey'] = 'Clave de acceso';
-$string['accesskey_help'] = 'Una clave única que identifica todas las peticiones que el usuario realiza al API-RPC del servidor Babelium';
-$string['secretaccesskey'] = 'Clave de acceso secreta';
-$string['secretaccesskey_help'] = 'La clave secreta se utiliza para validar la identidad del usuario en las peticiones. Nunca debe usarse sin algún mecanismo encriptación en scripts locales';
+$string['serverdomain'] = 'Zerbitzari domeinua';
+$string['serverdomain_help'] = 'Ariketak zein grabazioak gordetzeko erabiliko den Babelium zerbitzariaren domeinua';
+$string['serverport'] = 'Zerbitzari portua';
+$string['serverport_help'] = 'Zerbitzarira atzitzeko erabiltzen den portu zenbakia';
+$string['apidomain'] = 'API domeinua';
+$string['apidomain_help'] = 'Erabiltzaileari Babelium zerbitzarian dauden datuak atzitzea ahalbidetzen duen RPC-APIaren domeinua';
+$string['apiendpoint'] = 'APIaren endpointa';
+$string['apiendpoint_help'] = 'Eskaera guztiak kudeatzeko erabiltzen den APIaren domeinuaren barneko helbidea';
+$string['accesskey'] = 'Atzipen gakoa';
+$string['accesskey_help'] = 'Erabiltzaileak Babelium zerbitzariaren aurka RPC-APIaren bitartez egiten dituen eskaera guztiak identifikatzen dituen gako unibokoa';
+$string['secretaccesskey'] = 'Atzipen gako sekretua';
+$string['secretaccesskey_help'] = 'Eskaeretan erabiltzailearen identitatea balioztatzeko erabiltzen da gako sekretua. Ez da inoiz skript lokaletan enkriptatu gabe erabili behar';
 
-$string['babeliumAvailableRecordableExercises'] = 'Ejercicios disponibles';
-$string['babeliumAvailableRecordableExercises_help'] = 'Escoge el ejercicio que deseas asignar a tus estudiantes para su posterior evaluación';
-$string['babeliumNoExerciseAvailable'] = 'No hay ejercicios disponibles';
-$string['babeliumChooseRole']='Escoge un rol';
-$string['babeliumChooseSubLang']='Escoge un idioma de subtítulos';
-$string['babeliumChooseRecMethod']='Escoge un método de grabación';
-$string['babeliumMicOnly']='Sólo micrófono';
-$string['babeliumWebcamMic']='Cámara web y micrófono';
-$string['babeliumStartRecording']='Empezar a Grabar';
-$string['babeliumStopRecording']='Parar Grabación';
-$string['babeliumViewRecording']='Ver Grabación';
-$string['babeliumRecordAgain']='Grabar de Nuevo';
-$string['babeliumViewExercise']='Ver Ejercicio';
+$string['babeliumAvailableRecordableExercises'] = 'Babelium ariketak';
+$string['babeliumAvailableRecordableExercises_help'] = 'Aukera ezazu zure ikasleei geroago ebaluatuak izateko esleituko diezun ariketa';
+$string['babeliumNoExerciseAvailable'] = 'Ez dago ariketa eskuragarririk';
+$string['babeliumChooseRole']='Rol bat aukeratu';
+$string['babeliumChooseSubLang']='Azpitituluen hizkuntza aukeratu';
+$string['babeliumChooseRecMethod']='Grabaketa metodoa aukeratu';
+$string['babeliumMicOnly']='Mikrofonoa soilik';
+$string['babeliumWebcamMic']='Web-kamera eta mikrofonoa';
+$string['babeliumStartRecording']='Grabatzen Hasi';
+$string['babeliumStopRecording']='Grabaketa Eten';
+$string['babeliumViewRecording']='Grabaketa Ikusi';
+$string['babeliumRecordAgain']='Berriz Grabatu';
+$string['babeliumViewExercise']='Ariketa Ikusi';
 
 //Error messages
-$string['babeliumErrorConfigParameters']='Parámetros de configuración de Babelium no establecidos';
-$string['babeliumApiErrorCode200']='Babelium Error 200. Respuesta malformada';
-$string['babeliumApiErrorCode400']='Babelium Error 400. Petición malformada';
-$string['babeliumApiErrorCode403']='Babelium Error 403. Credenciales de autorización incorrectas';
-$string['babeliumApiErrorCode404']='Babelium Error 404. Método no encontrado. Parámetros no válidos';
-$string['babeliumApiErrorCode500']='Babelium Error 500. Error interno del servidor';
-
+$string['babeliumErrorConfigParameters']='Babeliumeko konfigurazio parametroak ez daude ezarrita';
+$string['babeliumApiErrorCode200']='Babelium 200 Errorea. Erantzun gaizki eraikia';
+$string['babeliumApiErrorCode400']='Babelium 400 Errorea. Eskaera gaizki eraikia';
+$string['babeliumApiErrorCode403']='Babelium 403 Errorea. Autorizazio kredentzial desegokia';
+$string['babeliumApiErrorCode404']='Babelium 404 Errorea. Metodoa ezezaguna. Baliogabeko parametroak';
+$string['babeliumApiErrorCode500']='Babelium 500 Errorea. Zerbitzariko barne errorea';

@@ -43,7 +43,7 @@ $string['accesskey_help'] = 'A unique key that identifies all your RPC-API reque
 $string['secretaccesskey'] = 'Babelium secret access key';
 $string['secretaccesskey_help'] = 'The secret key that is used to validate your identity. Should never be put in the clear on useragent scripts';
 
-$string['babeliumAvailableRecordableExercises'] = 'Available exercises';
+$string['babeliumAvailableRecordableExercises'] = 'Babelium exercises';
 $string['babeliumAvailableRecordableExercises_help'] = 'Choose the exercise you wish to assign to your students for later evaluation';
 $string['babeliumNoExerciseAvailable'] = 'No exercises available';
 $string['babeliumChooseRole']='Choose a role';
