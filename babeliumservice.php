@@ -3,7 +3,7 @@
 /**
  * Babelium Project open source collaborative second language oral practice - http://www.babeliumproject.com
  *
- * Copyright (c) 2012 GHyM and by respective authors (see below).
+ * Copyright (c) 2013 GHyM and by respective authors (see below).
  *
  * This file is part of Babelium Project.
  *
@@ -127,12 +127,10 @@ class babeliumservice{
 		*/
 		foreach($BCFG as $prop=>$value){
 			if(empty($value)){
-				print_r("Empty settings". $prop);
 				$this->display_error('babeliumErrorConfigParameters');
 			}
 			if(($prop == 'babelium_babeliumApiAccessKey' && strlen($value)!=20) ||
 			   ($prop == 'babelium_babeliumApiSecretAccessKey' && strlen($value)!=40)){
-				print_r("Wrong setting lengths");
 				$this->display_error('babeliumErrorConfigParameters');
 			}
 		}

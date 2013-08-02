@@ -17,7 +17,7 @@
 /**
  * This file contains the definition for the library class for babelium submission plugin
  *
- * @package assignsubmission_babelium
+ * @package   assignsubmission_babelium
  * @copyright 2013 Babelium Project {@link http://babeliumproject.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -63,38 +63,57 @@ class assign_submission_babelium extends assign_submission_plugin {
     public function get_settings(MoodleQuickForm $mform) {
         global $CFG, $COURSE;
 
-	$defaultexerciseid = $this->get_config('exerciseid') > 0 ? $this->get_config('exerciseid') : 0;  	
+        $defaultexerciseid = $this->get_config('exerciseid') > 0 ? $this->get_config('exerciseid') : 0;  	
 
-	$exercises = array();
-	$exercisesMenu = array();
-
+        $exercises = array();
+        $exercisesMenu = array();
+        $classattribute = array('class' => 'error');
+        
         try {
-	$exercises = babeliumsubmission_get_available_exercise_list();
+        	$exercises = babeliumsubmission_get_available_exercise_list();
+        
+        	if($exercises && count($exercises) > 0){
+        		foreach ($exercises as $exercise) {
+        			$exercisesMenu[$exercise['id']] = $exercise['title'];
+        		}
+        	}
+        	if(count($exercisesMenu)>0){
+        		$mform->addElement('select', 'assignsubmission_babelium_exerciseid', get_string('babeliumAvailableRecordableExercises','assignsubmission_babelium'), $exercisesMenu);
+        		$mform->addHelpButton('assignsubmission_babelium_exerciseid', 'babeliumAvailableRecordableExercises', 'assignsubmission_babelium');
+        		$mform->setDefault('assignsubmission_babelium_exerciseid', $defaultexerciseid);
+        
+        		//Moodle 2.5 uses a checkbox to enable different submission plugins whereas prior versions use a select
+        		//control. This is a dirty hack to check the version and apply a different conditional rule to each version.
+        		if($CFG->version < 2013051400){
+        			$mform->disabledIf('assignsubmission_babelium_exerciseid', 'assignsubmission_babelium_enabled', 'eq', 0);
+        		}else{
+        			$mform->disabledIf('assignsubmission_babelium_exerciseid', 'assignsubmission_babelium_enabled', 'notchecked');
+        		}
+        		$mform->addElement('hidden', 'noexerciseavailable', 0);
+        	} else {
+        		$msg = html_writer::tag('span', get_string('babeliumNoExerciseAvailable', 'assignsubmission_babelium'), $classattribute);
+        		$mform->addElement('static',
+        				'noexercisemessage',
+        				get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'),
+        				$msg);
+        		$mform->addElement('hidden', 'noexerciseavailable', 1);
+        	}
         } catch (Exception $e) {
-            $msg = html_writer::span($e->getMessage(), 'error');
-            $mform->addElement('static', 'assignsubmission_babelium_servererror', '', $msg);
+        	//html_writer::span() shortcut function is not available in Moodle versions prior to 2.5
+        	//$msg = html_writer::span($e->getMessage(), 'error');
+        	$msg = html_writer::tag('span', $e->getMessage(), $classattribute);
+        	$mform->addElement('static',
+        			'assignsubmission_babelium_servererror',
+        			get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'),
+        			$msg);
+        
+        	//This is a dirty hack, but it should avoid enabling Babelium submissions when server auth
+        	//goes wrong for some reason.
+        	$mform->addElement('hidden', 'noexerciseavailable', 1);
         }
-	if($exercises && count($exercises) > 0){
-		foreach ($exercises as $exercise) {
-			$exercisesMenu[$exercise['id']] = $exercise['title'];
-		}
-	}
-	if(count($exercisesMenu)>0){
-		$mform->addElement('select', 'assignsubmission_babelium_exerciseid', 
-				   get_string('babeliumAvailableRecordableExercises', 
-				   'assignsubmission_babelium'), $exercisesMenu);
-		$mform->addHelpButton('assignsubmission_babelium_exerciseid', 'babeliumAvailableRecordableExercises', 'assignsubmission_babelium');
-		$mform->setDefault('assignsubmission_babelium_exerciseid', $defaultexerciseid);
-		$mform->disabledIf('assignsubmission_babelium_exerciseid', 'assignsubmission_babelium_enabled', 'eq', 0);
-		$mform->addElement('hidden', 'noexerciseavailable', 0);
-	} else {
-		$mform->addElement('static', 'noexercisemessage', 
-				   get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'), 
-				   get_string('babeliumNoExerciseAvailable', 'assignsubmission_babelium'));
-		$mform->addElement('hidden', 'noexerciseavailable', 1);
-	}
         $mform->setType('noexerciseavailable', PARAM_INT);
-  }
+        $mform->disabledIf('assignsubmission_babelium_enabled', 'noexerciseavailable', 'eq', 1);
+    }
 
     /**
      * Save the settings for babelium submission plugin
@@ -123,7 +142,7 @@ class assign_submission_babelium extends assign_submission_plugin {
             return false;
         }
 
-	$submissionid = $submission ? $submission->id : 0;
+        $submissionid = $submission ? $submission->id : 0;
 
         if (!isset($data->responseid)) {
             $data->responseid = '';
@@ -141,17 +160,17 @@ class assign_submission_babelium extends assign_submission_plugin {
 
         }
 
-	$exercise_data = !empty($data->responsehash) ? 
-			 babeliumsubmission_get_response_data($data->responseid) : babeliumsubmission_get_exercise_data($exerciseid);
-	if(!$exercise_data)
+        $exercise_data = !empty($data->responsehash) ?
+            babeliumsubmission_get_response_data($data->responseid) : babeliumsubmission_get_exercise_data($exerciseid);
+        if(!$exercise_data)
             throw new dml_exception("Error while retrieving Babelium external data");
 
- 	$this->get_babelium_form_elements($mform, array($data, 
-						        $exercise_data['info'], 
-						        $exercise_data['roles'], 
-						        $exercise_data['languages'], 
-						        $exercise_data['subtitles']));
-	return true;
+        $this->get_babelium_form_elements($mform, array($data, 
+                                          $exercise_data['info'], 
+                                          $exercise_data['roles'], 
+                                          $exercise_data['languages'], 
+                                          $exercise_data['subtitles']));
+        return true;
     }
 
     /**
@@ -161,72 +180,72 @@ class assign_submission_babelium extends assign_submission_plugin {
      * @param mixed $formdata 
      */
     public function get_babelium_form_elements(MoodleQuickForm $mform, $formdata){
-	    global $PAGE;
-	    $PAGE->requires->string_for_js('babeliumViewRecording', 'assignsubmission_babelium');
-	    $PAGE->requires->string_for_js('babeliumViewExercise', 'assignsubmission_babelium');
-	    $PAGE->requires->string_for_js('babeliumStartRecording', 'assignsubmission_babelium');
-	    $PAGE->requires->string_for_js('babeliumStopRecording', 'assignsubmission_babelium');
+        global $PAGE;
+        $PAGE->requires->string_for_js('babeliumViewRecording', 'assignsubmission_babelium');
+        $PAGE->requires->string_for_js('babeliumViewExercise', 'assignsubmission_babelium');
+        $PAGE->requires->string_for_js('babeliumStartRecording', 'assignsubmission_babelium');
+        $PAGE->requires->string_for_js('babeliumStopRecording', 'assignsubmission_babelium');
 
-	    list($data, $exinfo, $exroles, $exlangs, $exsubs) = $formdata;
+        list($data, $exinfo, $exroles, $exlangs, $exsubs) = $formdata;
 
-	    $roleMenu = array();
-	    if($exroles && count($exroles) > 0){
-		    foreach ($exroles as $exrole) {
-			    if(isset($exrole['characterName']) && $exrole['characterName'] != "NPC"){
-				    $roleMenu[$exrole['characterName']] = $exrole['characterName'];
-			    }
-		    }
-	    }
+        $roleMenu = array();
+        if($exroles && count($exroles) > 0){
+            foreach ($exroles as $exrole) {
+                if(isset($exrole['characterName']) && $exrole['characterName'] != "NPC"){
+                    $roleMenu[$exrole['characterName']] = $exrole['characterName'];
+                }
+            }
+        }
 
-	    // hidden params
-	    $mform->addElement('hidden', 'id');
-	    $mform->setType('id', PARAM_INT);
+        // hidden params
+        $mform->addElement('hidden', 'id');
+        $mform->setType('id', PARAM_INT);
 
-	    $mform->addElement('hidden', 'edit');
-	    $mform->setType('edit', PARAM_INT);
+        $mform->addElement('hidden', 'edit');
+        $mform->setType('edit', PARAM_INT);
 
-	    $mform->addElement('hidden', 'responseid');
-	    $mform->setType('responseid', PARAM_RAW);
+        $mform->addElement('hidden', 'responseid');
+        $mform->setType('responseid', PARAM_RAW);
 
-	    $mform->addElement('hidden', 'responsehash');
-	    $mform->setType('responsehash', PARAM_TEXT);
-	    //$mform->addRule('responsehash','You cannot save the assignment without recording something','required');
-	    $mform->addRule('responsehash', get_string('required'), 'required', null, 'client');
+        $mform->addElement('hidden', 'responsehash');
+        $mform->setType('responsehash', PARAM_TEXT);
+        //$mform->addRule('responsehash','You cannot save the assignment without recording something','required');
+        $mform->addRule('responsehash', get_string('required'), 'required', null, 'client');
 
-	    //The role selected in the combobox the last time the user pushed the 'Start Recording' button 
-	    $mform->addElement('hidden', 'recordedRole');
-	    $mform->setType('recordedRole', PARAM_TEXT);
+        //The role selected in the combobox the last time the user pushed the 'Start Recording' button 
+        $mform->addElement('hidden', 'recordedRole');
+        $mform->setType('recordedRole', PARAM_TEXT);
 
-	    $mform->addElement('hidden', 'subtitleId', $exsubs[0]['subtitleId']);
-	    $mform->setType('subtitleId', PARAM_RAW);
-	    $mform->addElement('hidden', 'exerciseDuration', $exinfo['duration']);
-	    $mform->setType('exerciseDuration', PARAM_RAW);
+        $mform->addElement('hidden', 'subtitleId', $exsubs[0]['subtitleId']);
+        $mform->setType('subtitleId', PARAM_RAW);
+        $mform->addElement('hidden', 'exerciseDuration', $exinfo['duration']);
+        $mform->setType('exerciseDuration', PARAM_RAW);
 
-	    //Returns a string with all the html and script tags needed to init the babelium widget
-	    $html_content = babeliumsubmission_html_output(!empty($data->responsehash),$exinfo,$exsubs);
+        //Returns a string with all the html and script tags needed to init the babelium widget
+        $html_content = babeliumsubmission_html_output(!empty($data->responsehash),$exinfo,$exsubs);
 
-	    $mform->addElement('html',$html_content);
-	    $mform->addElement('select', 'roleCombo', get_string('babeliumChooseRole', 'assignsubmission_babelium'), $roleMenu);
+        $mform->addElement('html',$html_content);
+        $mform->addElement('select', 'roleCombo', get_string('babeliumChooseRole', 'assignsubmission_babelium'), $roleMenu);
 
-	    //TODO Currently, we only allow one language for the subtitles so this element is not needed for now
-	    //$mform->addElement('select', 'localeCombo', get_string('babeliumChooseSubLang', 'assignment_babelium'), $localeMenu);
+        //TODO Currently, we only allow one language for the subtitles so this element is not needed for now
+        //$mform->addElement('select', 'localeCombo', get_string('babeliumChooseSubLang', 'assignment_babelium'), $localeMenu);
 
-	    $recmethods=array();
-	    $recmethods[] = $mform->createElement('radio', 'recmethod','none', get_string('babeliumMicOnly','assignsubmission_babelium'), 0);
-	    $recmethods[] = $mform->createElement('radio', 'recmethod','none', get_string('babeliumWebcamMic','assignsubmission_babelium'), 1);
-	    $mform->addGroup($recmethods, 'radioar', get_string('babeliumChooseRecMethod','assignsubmission_babelium'), array(' '), false);
-	    
-	    //TODO check how the help dynamic popups retrieve their texts to apply the same principle to the label of these two buttons
-	    $babeliumactions=array();
-	    $babeliumactions[] = $mform->createElement('button', 'startStopRecordingBtn', 
-						       get_string('babeliumStartRecording','assignsubmission_babelium'));
-	    $babeliumactions[] = $mform->createElement('button', 'viewRecordingBtn', 
-						       get_string('babeliumViewRecording', 'assignsubmission_babelium'), 
-						       empty($data->responsehash) ? 'style="display:none;"' : null);
-	    $babeliumactions[] = $mform->createElement('button', 'viewExerciseBtn', 
-						       get_string('babeliumViewExercise', 'assignsubmission_babelium'), 
-						       empty($data->responsehash) ? 'style="display:none;"' : null);
-	    $mform->addGroup($babeliumactions, 'babeliumActions', '', '', false);
+        $recmethods=array();
+        $recmethods[] = $mform->createElement('radio', 'recmethod','none', get_string('babeliumMicOnly','assignsubmission_babelium'), 0);
+        $recmethods[] = $mform->createElement('radio', 'recmethod','none', get_string('babeliumWebcamMic','assignsubmission_babelium'), 1);
+        $mform->addGroup($recmethods, 'radioar', get_string('babeliumChooseRecMethod','assignsubmission_babelium'), array(' '), false);
+
+        //TODO check how the help dynamic popups retrieve their texts to apply the same principle to the label of these two buttons
+        $babeliumactions=array();
+        $babeliumactions[] = $mform->createElement('button', 'startStopRecordingBtn', 
+                get_string('babeliumStartRecording','assignsubmission_babelium'));
+        $babeliumactions[] = $mform->createElement('button', 'viewRecordingBtn', 
+                get_string('babeliumViewRecording', 'assignsubmission_babelium'), 
+                empty($data->responsehash) ? 'style="display:none;"' : null);
+        $babeliumactions[] = $mform->createElement('button', 'viewExerciseBtn', 
+                get_string('babeliumViewExercise', 'assignsubmission_babelium'), 
+                empty($data->responsehash) ? 'style="display:none;"' : null);
+        $mform->addGroup($babeliumactions, 'babeliumActions', '', '', false);
     }
 
     /**
@@ -241,37 +260,48 @@ class assign_submission_babelium extends assign_submission_plugin {
 
         $babeliumsubmission = $this->get_babelium_submission($submission->id);
 
+        //plagiarism code event trigger when files are uploaded
+        $eventdata = new stdClass();
+        $eventdata->modulename = 'assign';
+        $eventdata->cmid = $this->assignment->get_course_module()->id;
+        $eventdata->itemid = $submission->id;
+        $eventdata->courseid = $this->assignment->get_course()->id;
+        $eventdata->userid = $USER->id;
+        $eventdata->content = $data->responsehash;
+        events_trigger('assessable_content_uploaded', $eventdata);
+
+
         if ($babeliumsubmission) {
             if($babeliumsubmission->responsehash != $data->responsehash){
-		$responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'), 
-							              $data->exerciseDuration, 
-							              $data->subtitleId, 
-							              $data->recordedRole, 
-							              $data->responsehash);
-		if(!$responsedata)
-			throw new moodle_exception('babeliumErrorSavingResponse','assignsubmission_babelium');
-	        $babeliumsubmission->responseid = $responsedata['responseId'];
+                $responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'), 
+                                                                      $data->exerciseDuration, 
+                                                                      $data->subtitleId, 
+                                                                      $data->recordedRole, 
+                                                                      $data->responsehash);
+                if(!$responsedata)
+                    throw new moodle_exception('babeliumErrorSavingResponse','assignsubmission_babelium');
+                $babeliumsubmission->responseid = $responsedata['responseId'];
             } else {
-	        $babeliumsubmission->responseid = $data->responseid;
+                $babeliumsubmission->responseid = $data->responseid;
             }
-	    $babeliumsubmission->responsehash = $data->responsehash;
+            $babeliumsubmission->responsehash = $data->responsehash;
 
             return $DB->update_record('assignsubmission_babelium', $babeliumsubmission);
         } else {
             $babeliumsubmission = new stdClass();
             $babeliumsubmission->responsehash = $data->responsehash;
 
-	    $responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'), 
-							          $data->exerciseDuration, 
-							          $data->subtitleId, 
-							          $data->recordedRole, 
-							          $data->responsehash);
-	    if(!$responsedata)
-			throw new moodle_exception('babeliumErrorSavingResponse','assignsubmission_babelium');
-	    $babeliumsubmission->responseid = $responsedata['responseId'];
+            $responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'), 
+                                                                  $data->exerciseDuration, 
+                                                                  $data->subtitleId, 
+                                                                  $data->recordedRole, 
+                                                                  $data->responsehash);
+            if(!$responsedata)
+                throw new moodle_exception('babeliumErrorSavingResponse','assignsubmission_babelium');
+            $babeliumsubmission->responseid = $responsedata['responseId'];
 
 
-	    $babeliumsubmission->submission = $submission->id;
+            $babeliumsubmission->submission = $submission->id;
             $babeliumsubmission->assignment = $this->assignment->get_instance()->id;
             return $DB->insert_record('assignsubmission_babelium', $babeliumsubmission) > 0;
         }
@@ -288,8 +318,9 @@ class assign_submission_babelium extends assign_submission_plugin {
         $fs = get_file_storage();
 
         $files = $fs->get_area_files($this->assignment->get_context()->id, 
-				     'assignsubmission_babelium', ASSIGNSUBMISSION_BABELIUM_FILEAREA, 
-				     $submission->id, "timemodified", false);
+                                     'assignsubmission_babelium', 
+                                     ASSIGNSUBMISSION_BABELIUM_FILEAREA, 
+                                     $submission->id, "timemodified", false);
 
         foreach ($files as $file) {
             $result[$file->get_filename()] = $file;
@@ -305,19 +336,19 @@ class assign_submission_babelium extends assign_submission_plugin {
      * @return string
      */
     public function view_summary(stdClass $submission, & $showviewlink) {
-	$babeliumsubmission = $this->get_babelium_submission($submission->id);
+        $babeliumsubmission = $this->get_babelium_submission($submission->id);
         // always show the view link
         $showviewlink = true;
 
         if ($babeliumsubmission) {
-	    $output = '<div class="no-overflow">';
-	    $thumbnailpath = 'http://'.get_config('assignsubmission_babelium','serverdomain').
-			     '/resources/images/thumbs/'.$babeliumsubmission->responsehash.'/default.jpg';
+            $output = '<div class="no-overflow">';
+            $thumbnailpath = 'http://'.get_config('assignsubmission_babelium','serverdomain').
+                             '/resources/images/thumbs/'.$babeliumsubmission->responsehash.'/default.jpg';
             $thumbnail = '<img src="'.$thumbnailpath.'" alt="'.get_string('babelium','assignsubmission_babelium').'" border="0" height="45" width="60"/>';
-	    $output .= $thumbnail;
-	    $output .= '</div>';
-	    return $output;
-	}
+            $output .= $thumbnail;
+            $output .= '</div>';
+            return $output;
+        }
         return '';
     }
 
@@ -328,18 +359,18 @@ class assign_submission_babelium extends assign_submission_plugin {
      * @return string
      */
     public function view(stdClass $submission) {
-	$result = '';
+        $result = '';
 
         $babeliumsubmission = $this->get_babelium_submission($submission->id);
         if ($babeliumsubmission) {
-		$result = '<div class="no-overflow">';
-		$babeliumcontent = '';
-		$response_data = babeliumsubmission_get_response_data($babeliumsubmission->responseid);
-                if($response_data)
-                        $babeliumcontent = babeliumsubmission_html_output(0,$response_data['info'],$response_data['subtitles']);
-		$result .= $babeliumcontent;
-		$result .= '</div>';
-	}
+            $result = '<div class="no-overflow">';
+            $babeliumcontent = '';
+            $response_data = babeliumsubmission_get_response_data($babeliumsubmission->responseid);
+            if($response_data)
+                $babeliumcontent = babeliumsubmission_html_output(0,$response_data['info'],$response_data['subtitles']);
+            $result .= $babeliumcontent;
+            $result .= '</div>';
+        }
 
         return $result;
     }
@@ -353,7 +384,7 @@ class assign_submission_babelium extends assign_submission_plugin {
      * @return bool True if upgrade is possible
      */
     public function can_upgrade($type, $version) {
-	if ($type == 'babelium' && $version >= 2011112900) {
+        if ($type == 'babelium' && $version >= 2011112900) {
             return true;
         }
         return false;
@@ -373,7 +404,7 @@ class assign_submission_babelium extends assign_submission_plugin {
         if ($oldassignment->assignmenttype == 'babelium') {
             $this->set_config('exerciseid', $oldassignment->var1);
             return true;
-	}
+        }
     }
 
     /**
@@ -387,7 +418,7 @@ class assign_submission_babelium extends assign_submission_plugin {
      * @return bool true or false - false will trigger a rollback
      */
     public function upgrade(context $oldcontext, stdClass $oldassignment, stdClass $oldsubmission, stdClass $submission, & $log) {
-    	global $DB;
+        global $DB;
 
         $babeliumsubmission = new stdClass();
         $babeliumsubmission->responseid = $oldsubmission->data1;
@@ -434,11 +465,11 @@ class assign_submission_babelium extends assign_submission_plugin {
      */
     public function format_for_log(stdClass $submission) {
 
-	// format the info for each submission plugin add_to_log
+        // format the info for each submission plugin add_to_log
         $babeliumsubmission = $this->get_babelium_submission($submission->id);
         $babeliumloginfo = '';
         $babeliumloginfo .= get_string('loginfo', 'assignsubmission_babelium', 
-			    array('responseid'=>$babeliumsubmission->responseid, 'responsehash'=>$babeliumsubmission->responsehash));
+                array('responseid'=>$babeliumsubmission->responseid, 'responsehash'=>$babeliumsubmission->responsehash));
 
         return $babeliumloginfo;
     }
@@ -448,8 +479,9 @@ class assign_submission_babelium extends assign_submission_plugin {
      * @param stdClass $submission
      */
     public function is_empty(stdClass $submission) {
-	return empty($submission->responsehash);
-        //return $this->count_files($submission->id, ASSIGNSUBMISSION_BABELIUM_FILEAREA) == 0;
+        $babeliumsubmission = $this->get_babelium_submission($submission->id);
+
+        return empty($babeliumsubmission->responsehash);
     }
 
     /**

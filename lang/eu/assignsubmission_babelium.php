@@ -43,7 +43,7 @@ $string['accesskey_help'] = 'Erabiltzaileak Babelium zerbitzariaren aurka RPC-AP
 $string['secretaccesskey'] = 'Atzipen gako sekretua';
 $string['secretaccesskey_help'] = 'Eskaeretan erabiltzailearen identitatea balioztatzeko erabiltzen da gako sekretua. Ez da inoiz skript lokaletan enkriptatu gabe erabili behar';
 
-$string['babeliumAvailableRecordableExercises'] = 'Ariketa eskuragarriak';
+$string['babeliumAvailableRecordableExercises'] = 'Babelium ariketak';
 $string['babeliumAvailableRecordableExercises_help'] = 'Aukera ezazu zure ikasleei geroago ebaluatuak izateko esleituko diezun ariketa';
 $string['babeliumNoExerciseAvailable'] = 'Ez dago ariketa eskuragarririk';
 $string['babeliumChooseRole']='Rol bat aukeratu';

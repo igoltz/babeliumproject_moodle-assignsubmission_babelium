@@ -43,7 +43,7 @@ $string['accesskey_help'] = 'Una clave única que identifica todas las peticione
 $string['secretaccesskey'] = 'Clave de acceso secreta';
 $string['secretaccesskey_help'] = 'La clave secreta se utiliza para validar la identidad del usuario en las peticiones. Nunca debe usarse sin algún mecanismo encriptación en scripts locales';
 
-$string['babeliumAvailableRecordableExercises'] = 'Ejercicios disponibles';
+$string['babeliumAvailableRecordableExercises'] = 'Ejercicios Babelium';
 $string['babeliumAvailableRecordableExercises_help'] = 'Escoge el ejercicio que deseas asignar a tus estudiantes para su posterior evaluación';
 $string['babeliumNoExerciseAvailable'] = 'No hay ejercicios disponibles';
 $string['babeliumChooseRole']='Escoge un rol';
