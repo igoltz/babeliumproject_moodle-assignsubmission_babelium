@@ -159,14 +159,52 @@ class babeliumservice{
 		$referer = $commProtocol . $api_domain . '/' . $api_endpoint;
 		$query_string = $referer . '?' . $method;
 		
+        //Check if proxy (if used) should be bypassed for this url
+		$proxybypass = function_exists('is_proxybypass') ? is_proxybypass($query_string) : false;
+		
 		//Prepare the cURL request
-		$ch = curl_init();
+		if (!$ch = curl_init($url)) {
+			debugging('Can not init curl.');
+			return false;
+		}
+		
 		curl_setopt($ch, CURLOPT_URL, $query_string);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_HEADER, 1);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_REFERER, $referer);
+		
+		//Check for proxy configuration		
+		if (!empty($CFG->proxyhost) and !$proxybypass) {
+			// SOCKS supported in PHP5 only
+			if (!empty($CFG->proxytype) and ($CFG->proxytype == 'SOCKS5')) {
+				if (defined('CURLPROXY_SOCKS5')) {
+					curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+				} else {
+					curl_close($ch);
+					debugging("SOCKS5 proxy is not supported in PHP4.", DEBUG_ALL);
+					return false;
+				}
+			}
+
+			curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, false);
+
+			if (empty($CFG->proxyport)) {
+				curl_setopt($ch, CURLOPT_PROXY, $CFG->proxyhost);
+			} else {
+				curl_setopt($ch, CURLOPT_PROXY, $CFG->proxyhost.':'.$CFG->proxyport);
+			}
+				
+			if (!empty($CFG->proxyuser) and !empty($CFG->proxypassword)) {
+				curl_setopt($ch, CURLOPT_PROXYUSERPWD, $CFG->proxyuser.':'.$CFG->proxypassword);
+				if (defined('CURLOPT_PROXYAUTH')) {
+					// any proxy authentication if PHP 5.1
+					curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC | CURLAUTH_NTLM);
+				}
+			}
+		}
+		
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
