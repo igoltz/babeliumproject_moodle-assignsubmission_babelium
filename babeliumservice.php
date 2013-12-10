@@ -145,8 +145,13 @@ class babeliumservice{
 		
 		//Date timestamp formated following one of the standards allowed for HTTP 1.1 date headers (DATE_RFC1123)
 		$date = date("D, d M Y H:i:s O");
+		$referer = $_SERVER['HTTP_REFERER'];
+		$pieces = parse_url($referer);
+		$originhost = $_SERVER['HTTP_HOST']; 
+		$origin = $pieces['scheme'] . "://" . $originhost;
+		
 		$request['header']['date'] = $date;
-		$signature = "BMP ".$BCFG->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $BCFG->babelium_babeliumApiSecretAccessKey);
+		$signature = "BMP ".$BCFG->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $BCFG->babelium_babeliumApiSecretAccessKey);
 		$request['header']['authorization'] = $signature;
 		
 		//See this workaround if the query parameters are written with &amp; : http://es.php.net/manual/es/function.http-build-query.php#102324
@@ -156,10 +161,10 @@ class babeliumservice{
 		$web_domain = $BCFG->babelium_babeliumWebDomain;
 		$api_domain = $BCFG->babelium_babeliumApiDomain;
 		$api_endpoint = $BCFG->babelium_babeliumApiEndPoint;
-		$referer = $commProtocol . $api_domain . '/' . $api_endpoint;
-		$query_string = $referer . '?' . $method;
+		$api_url = $commProtocol . $api_domain . '/' . $api_endpoint;
+		$query_string = $api_url . '?' . $method;
 		
-        //Check if proxy (if used) should be bypassed for this url
+		//Check if proxy (if used) should be bypassed for this url
 		$proxybypass = function_exists('is_proxybypass') ? is_proxybypass($query_string) : false;
 		
 		//Prepare the cURL request
@@ -174,6 +179,7 @@ class babeliumservice{
 		curl_setopt($ch, CURLOPT_HEADER, 1);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_REFERER, $referer);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Origin: $origin"));
 		
 		//Check for proxy configuration		
 		if (!empty($CFG->proxyhost) and !$proxybypass) {
@@ -237,9 +243,9 @@ class babeliumservice{
 	 * @return String $signature
 	 * 		The authorization header of the request
 	 */
-	private function generateAuthorization($method, $date, $skey){
+	private function generateAuthorization($method, $date, $origin, $skey){
 		//global $BCFG;
-		$stringtosign = utf8_encode($method . "\n" . $date . "\n" . $_SERVER['HTTP_HOST']);
+		$stringtosign = utf8_encode($method . "\n" . $date . "\n" . $origin);
 		    	
 		$digest = hash_hmac("sha256", $stringtosign, /*$BCFG->babelium_babeliumApiSecretAccessKey*/ $skey, false);
 		$signature = base64_encode($digest);	
