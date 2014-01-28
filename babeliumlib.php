@@ -75,9 +75,9 @@ function babeliumsubmission_html_output($mode, $info, $subs){
  * @return mixed $result
  * 		An array of exercise data if successful or false on error/when empty query results
  */
-function babeliumsubmission_get_available_exercise_list(){	
+function babeliumsubmission_get_available_exercise_list($lisdata){	
 	$g = new babeliumservice();
-	$result = $g->newServiceCall('getRecordableExercises');
+	$result = $g->newServiceCall($lisdata, 'getRecordableExercises');
 	return $result;
 }
 
@@ -88,10 +88,10 @@ function babeliumsubmission_get_available_exercise_list(){
  * @return mixed $exercise
  * 		An associative array with the info, the roles, the languages and the subtitle lines of the exercise, or false on error/when empty query results
  */
-function babeliumsubmission_get_exercise_data($exerciseid){
+function babeliumsubmission_get_exercise_data($lisdata, $exerciseid){
 	//global $BCFG;
 	$g = new babeliumservice();
-	$exerciseInfo = $g->newServiceCall('getExerciseById', array("id"=>$exerciseid));
+	$exerciseInfo = $g->newServiceCall($lisdata, 'getExerciseById', array("id"=>$exerciseid));
 
 	if(is_array($exerciseInfo)){
 		$exerciseInfo = array(
@@ -103,9 +103,9 @@ function babeliumsubmission_get_exercise_data($exerciseid){
 		);
 	}
 	
-	$exerciseSubtitleLanguages = $g->newServiceCall('getExerciseLocales', array("exerciseId"=>$exerciseid));
+	$exerciseSubtitleLanguages = $g->newServiceCall($lisdata, 'getExerciseLocales', array("exerciseId"=>$exerciseid));
 	//TODO in future versions this should be replaced. We should retrieve all the available subtitle locales instead and change with js combo selection
-	$exerciseSubtitleLines = $g->newServiceCall('getSubtitleLines', array("exerciseId"=>$exerciseid, "language"=>$exerciseSubtitleLanguages[0]['locale']));
+	$exerciseSubtitleLines = $g->newServiceCall($lisdata, 'getSubtitleLines', array("exerciseId"=>$exerciseid, "language"=>$exerciseSubtitleLanguages[0]['locale']));
 	
 	$exerciseRoles = array();
 	foreach($exerciseSubtitleLines as $subline){
@@ -130,10 +130,10 @@ function babeliumsubmission_get_exercise_data($exerciseid){
  * @return mixed $response
  * 		An associative array with the info, the roles, the languages and the subtitle lines of the response, or false on error/when empty query results
  */
-function babeliumsubmission_get_response_data($responseid){
+function babeliumsubmission_get_response_data($lisdata, $responseid){
 	$g = new babeliumservice();
-	$responseInfo = $g->newServiceCall('admGetResponseById', array("responseId"=>$responseid));
-	$responseSubtitleLines = $g->newServiceCall('getSubtitleLines', array("id"=>$responseInfo['subtitleId'],"language"=>''));
+	$responseInfo = $g->newServiceCall($lisdata, 'admGetResponseById', array("responseId"=>$responseid));
+	$responseSubtitleLines = $g->newServiceCall($lisdata, 'getSubtitleLines', array("id"=>$responseInfo['subtitleId'],"language"=>''));
 
 	if (!$responseSubtitleLines)
 		return;
@@ -169,7 +169,7 @@ function babeliumsubmission_get_response_data($responseid){
  * @return mixed $responseData
  * 		Array with information about the newly saved response, or false on error
  */
-function babeliumsubmission_save_response_data($exerciseId, $exerciseDuration, $subtitleId, $recordedRole, $responseName){
+function babeliumsubmission_save_response_data($lisdata, $exerciseId, $exerciseDuration, $subtitleId, $recordedRole, $responseName){
 	$g = new babeliumservice();
 	$parameters = array(
 				"exerciseId" => $exerciseId,
@@ -178,6 +178,6 @@ function babeliumsubmission_save_response_data($exerciseId, $exerciseDuration, $
 				"characterName" => $recordedRole,
 				"fileIdentifier" => $responseName 
 				);
-	return $responsedata = $g->newServiceCall('admSaveResponse', $parameters);
+	return $responsedata = $g->newServiceCall($lisdata, 'admSaveResponse', $parameters);
 }
 

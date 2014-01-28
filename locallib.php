@@ -54,6 +54,81 @@ class assign_submission_babelium extends assign_submission_plugin {
     }
 
     /**
+     * Get LTI user role archetype for the provided context
+     *
+     * @param stdClass $user
+     * @param int $cmid
+     * @param int $courseid
+     * @return mixed $roles
+     */
+    private function get_user_role($user, $cmid, $courseid){
+        $roles = array();
+
+        if (empty($cmid)) {
+            //If no cmid is passed, check if the user is a teacher in the course
+            $coursecontext = context_course::instance($courseid);
+
+            if (has_capability('moodle/course:manageactivities', $coursecontext)) {
+                array_push($roles, 'Instructor');
+            } else {
+                array_push($roles, 'Learner');
+            }
+        } else {
+            $context = context_module::instance($cmid);
+
+            //The only assign module capability teachers and non-editing teachers have
+            if (has_capability('mod/assign:grade', $context)) {
+                array_push($roles, 'Instructor');
+            } else {
+                array_push($roles, 'Learner');
+            }
+        }
+
+        if (is_siteadmin($user)) {
+            array_push($roles, 'Administrator');
+        }
+
+        return join(',', $roles);
+    }
+
+    /**
+     * Build a 'fake' lis header until we support IMS-LTI in our tool provider.
+     * 
+     * @param stdClass $instance
+     * @param stdClass $course
+     */
+    private function build_lis_request($instance, $course){
+        global $USER, $CFG;
+
+        if (empty($instance->cmid)) {
+            $instance->cmid = 0;
+        }
+
+        $role = $this->get_user_role($USER, $instance->cmid, $course->id);
+
+        //Basic data
+        $requestparams = array(
+            'resource_link_id' => isset($instance->id) ? $instance->id : '',
+            'resource_link_title' => isset($instance->name) ? $instance->name : '',
+            'resource_link_description' => isset($instance->intro) ? $instance->intro : '',
+            'user_id' => $USER->id,
+            'roles' => $role,
+            'context_id' => $course->id,
+            'context_label' => $course->shortname,
+            'context_title' => $course->fullname,
+            'launch_presentation_locale' => current_language()
+        );
+
+        //Additional data
+        $requestparams['lis_person_name_given'] =  $USER->firstname;
+        $requestparams['lis_person_name_family'] =  $USER->lastname;
+        $requestparams['lis_person_name_full'] =  $USER->firstname." ".$USER->lastname;
+        $requestparams['lis_person_contact_email_primary'] = $USER->email;
+    
+        return $requestparams;
+    }
+
+    /**
      * Get the default setting for babelium submission plugin. 
      * This form is displayed in the Submission settings area when creating a new assignment
      *
@@ -70,7 +145,8 @@ class assign_submission_babelium extends assign_submission_plugin {
         $classattribute = array('class' => 'error');
         
         try {
-            $exercises = babeliumsubmission_get_available_exercise_list();
+            $lisdata = $this->build_lis_request($this->assignment, $COURSE);
+            $exercises = babeliumsubmission_get_available_exercise_list($lisdata);
 
             if($exercises && count($exercises) > 0){
                 foreach ($exercises as $exercise) {
@@ -137,7 +213,7 @@ class assign_submission_babelium extends assign_submission_plugin {
      * @return bool
      */
     public function get_form_elements($submission, MoodleQuickForm $mform, stdClass $data) {
-
+        global $COURSE;
         if (($exerciseid = $this->get_config('exerciseid')) <= 0) {
             return false;
         }
@@ -159,9 +235,9 @@ class assign_submission_babelium extends assign_submission_plugin {
             }
 
         }
-
+        $lisdata = $this->build_lis_request($this->assignment, $COURSE);
         $exercise_data = !empty($data->responsehash) ?
-            babeliumsubmission_get_response_data($data->responseid) : babeliumsubmission_get_exercise_data($exerciseid);
+            babeliumsubmission_get_response_data($lisdata, $data->responseid) : babeliumsubmission_get_exercise_data($lisdata, $exerciseid);
         if(!$exercise_data)
             throw new dml_exception("Error while retrieving Babelium external data");
 
@@ -256,7 +332,7 @@ class assign_submission_babelium extends assign_submission_plugin {
      * @return bool
      */
     public function save(stdClass $submission, stdClass $data) {
-        global $USER, $DB;
+        global $USER, $DB, $COURSE;
 
         $babeliumsubmission = $this->get_babelium_submission($submission->id);
 
@@ -270,10 +346,11 @@ class assign_submission_babelium extends assign_submission_plugin {
         $eventdata->content = $data->responsehash;
         events_trigger('assessable_content_uploaded', $eventdata);
 
-
+        $lisdata = $this->build_lis_request($this->assignment, $COURSE);
         if ($babeliumsubmission) {
             if($babeliumsubmission->responsehash != $data->responsehash){
-                $responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'), 
+                $responsedata = babeliumsubmission_save_response_data($lisdata,
+                                                                      $this->get_config('exerciseid'), 
                                                                       $data->exerciseDuration, 
                                                                       $data->subtitleId, 
                                                                       $data->recordedRole, 
@@ -291,7 +368,8 @@ class assign_submission_babelium extends assign_submission_plugin {
             $babeliumsubmission = new stdClass();
             $babeliumsubmission->responsehash = $data->responsehash;
 
-            $responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'), 
+            $responsedata = babeliumsubmission_save_response_data($lisdata,
+                                                                  $this->get_config('exerciseid'), 
                                                                   $data->exerciseDuration, 
                                                                   $data->subtitleId, 
                                                                   $data->recordedRole, 
@@ -359,13 +437,14 @@ class assign_submission_babelium extends assign_submission_plugin {
      * @return string
      */
     public function view(stdClass $submission) {
+        global $CFG, $COURSE;
         $result = '';
-
         $babeliumsubmission = $this->get_babelium_submission($submission->id);
         if ($babeliumsubmission) {
             $result = '<div class="no-overflow">';
             $babeliumcontent = '';
-            $response_data = babeliumsubmission_get_response_data($babeliumsubmission->responseid);
+            $lisdata = $this->build_lis_request($this->assignment, $COURSE);
+            $response_data = babeliumsubmission_get_response_data($lisdata, $babeliumsubmission->responseid);
             if($response_data)
                 $babeliumcontent = babeliumsubmission_html_output(0,$response_data['info'],$response_data['subtitles']);
             $result .= $babeliumcontent;

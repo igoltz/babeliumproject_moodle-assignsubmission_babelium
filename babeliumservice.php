@@ -99,7 +99,7 @@ class babeliumservice{
 	 * @throws moodle_exception
 	 * 		The required configuration parameters of the API are not set
 	 */
-	public function newServiceCall($method,$parameters = null){
+	public function newServiceCall($lisheader, $method, $parameters = null){
 
 		global $USER, $CFG;
 		//global $BCFG;
@@ -153,6 +153,7 @@ class babeliumservice{
 		$request['header']['date'] = $date;
 		$signature = "BMP ".$BCFG->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $BCFG->babelium_babeliumApiSecretAccessKey);
 		$request['header']['authorization'] = $signature;
+		$request['header']['lisdata'] = serialize($lisheader);
 		
 		//See this workaround if the query parameters are written with &amp; : http://es.php.net/manual/es/function.http-build-query.php#102324
 		$request = http_build_query($request,'', '&');
@@ -180,6 +181,7 @@ class babeliumservice{
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_REFERER, $referer);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Origin: $origin"));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Expect:"));
 		
 		//Check for proxy configuration		
 		if (!empty($CFG->proxyhost) and !$proxybypass) {
@@ -211,12 +213,14 @@ class babeliumservice{
 			}
 		}
 		
+
+
 		$result = curl_exec($ch);
 		curl_close($ch);
 		
 		//Parses the response output to separate the headers from the body of the response
 		$this->parseCurlOutput($result);
-		
+
 		//Add the service call to the activity log to better track down possible problems
 		$this->activity_log($USER->id,$USER->username, "service_call",$query_string, $method, is_array($parameters)?implode('&',$parameters):$parameters, $date, $_SERVER['HTTP_HOST'], $signature, $this->_curlHeaderHttpStatusCode, $this->_curlHeaderHttpStatusMessage);
 		
