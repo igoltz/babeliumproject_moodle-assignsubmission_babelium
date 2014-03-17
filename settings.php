@@ -40,6 +40,11 @@ $settings->add(new admin_setting_configtext('assignsubmission_babelium/serverpor
 					    '80',
 					    PARAM_INT));
 
+$settings->add(new admin_setting_configcheckbox('assignsubmission_babelium/forcertmpt',
+					new lang_string('forcertmpt', 'assignsubmission_babelium'),
+					new lang_string('forcertmpt_help', 'assignsubmission_babelium'),
+					0));
+
 $settings->add(new admin_setting_configtext('assignsubmission_babelium/apidomain',
 					    new lang_string('apidomain','assignsubmission_babelium'),
 					    new lang_string('apidomain_help','assignsubmission_babelium'),

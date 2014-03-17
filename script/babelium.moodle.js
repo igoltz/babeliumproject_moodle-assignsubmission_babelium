@@ -6,7 +6,7 @@ var exerciseSubs = null;
 var responseInfo = null;
 var respponseSubs = null;
 
-function init(babeliumDomain, locale, exInfo, exSubs, rInfo, rSubs){
+function init(babeliumDomain, locale, forcertmpt, exInfo, exSubs, rInfo, rSubs){
 	
 	if(exInfo && exSubs){
 		exerciseInfo = exInfo;
@@ -18,7 +18,7 @@ function init(babeliumDomain, locale, exInfo, exSubs, rInfo, rSubs){
 	}
 	
 	//Load flash object
-	flashLoader(babeliumDomain,locale,"");
+	flashLoader(babeliumDomain,locale,forcertmpt,"");
 }
 
 //This function is top-level until finding a way to route ExternalInterface.call() to object encapsulation
@@ -28,26 +28,29 @@ function onConnectionReady(playerid){
 		Alert("There was a problem while loading the video player.");
 		return;
 	}
-	//console.log("Streaming connection established.");
+	console.log("Streaming connection established.");
 	bpExercises = new exercise();
-	if(exerciseInfo && exerciseSubs)
+	if(exerciseInfo && exerciseSubs){
 		bpExercises.loadExerciseStatic(bpPlayer, exerciseInfo, exerciseSubs);
-	if(responseInfo && responseSubs)
+	}
+	if(responseInfo && responseSubs){
 		bpExercises.loadResponseStatic(bpPlayer, responseInfo, responseSubs);
+	}
 }
 
 
-function flashLoader(babeliumDomain, locale, jsCallbackObj){
+function flashLoader(babeliumDomain, locale, forcertmpt, jsCallbackObj){
 	// For version detection, set to min. required Flash Player version, or 0 (or 0.0.0), for no version detection. 
-	var swfVersionStr = "10.2.0";
+	var swfVersionStr = "11.1.0";
 	// To use express install, set to playerProductInstall.swf, otherwise the empty string. 
 	var xiSwfUrlStr = "http://"+babeliumDomain+"/playerProductInstall.swf";
 	var flashvars = {};
-	flashvars.locale = locale; //Overrides the default locale thats established via system info, to the specified locale
+	flashvars.locale = locale; //Overrides the default locale that's established via system info, to the specified locale
+	flashvars.forcertmpt = forcertmpt;
 	flashvars.jsCallbackObj = jsCallbackObj; //Where to point the ExternalInterface.call() methods to avoid global scope methods
 	var params = {};
 	params.quality = "high";
-	params.bgcolor = "#ffffff";
+	params.bgcolor = "#000000"; //Use black background
 	params.allowscriptaccess = "always"; //The swf file is stored in a different domain
 	params.allowfullscreen = "true";
 	params.wmode = "window";

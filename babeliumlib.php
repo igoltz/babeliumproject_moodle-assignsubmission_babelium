@@ -55,18 +55,23 @@ function babeliumsubmission_html_output($mode, $info, $subs){
 	$html_content.='<script src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/swfobject.js" language="javascript"></script>';
 	$html_content.='<script src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/babelium.moodle.js" language="javascript"></script>';
 	$html_content.='<div id="flashContent">
-			 <p>To view this page ensure that Adobe Flash Player version 10.2.0 or greater is installed. </p>
+			 <p>To view this page ensure that Adobe Flash Player version 11.1.0 or greater is installed. </p>
 			 <script type="text/javascript"> 
 				var pageHost = ((document.location.protocol == "https:") ? "https://" : "http://"); 
 				document.write("<a href=\'http://www.adobe.com/go/getflashplayer\'><img src=\'" 
 						+ pageHost + "www.adobe.com/images/shared/download_buttons/get_flash_player.gif\' alt=\'Get Adobe Flash player\' /></a>" ); 
 			</script> 
 			</div>     
-			<noscript><p>Either scripts and active content are not permitted to run or Adobe Flash Player version 10.2.0 or greater is not installed.</p></noscript>';
-	$lang = isset($SESSION->lang) ? $SESSION->lang : '';
+			<noscript><p>Either scripts and active content are not permitted to run or Adobe Flash Player version 11.1.0 or greater is not installed.</p></noscript>';
+	
+	//$lang = isset($SESSION->lang) ? $SESSION->lang : '';
+	$domain = get_config('assignsubmission_babelium','serverdomain');
+	$forcertmpt = get_config('assignsubmission_babelium','forcertmpt');
+	$lang = current_language();
+	
 	$html_content .= '<script language="javascript" type="text/javascript">
-				init("'.get_config('assignsubmission_babelium','serverdomain').'", "'.$lang.'", '.$exinfo.', '.$exsubs.', '. $rsinfo .', '. $rssubs .');
-			  </script>';
+						init("'.$domain.'", "'.$lang.'", "'.$forcertmpt.'", '.$exinfo.', '.$exsubs.', '. $rsinfo .', '. $rssubs .');
+					  </script>';
 	return $html_content;
 }
 
