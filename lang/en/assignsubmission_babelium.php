@@ -31,7 +31,7 @@ $string['babelium'] = 'Babelium submissions';
 $string['loginfo'] = 'Submission responseID: {$a->responseid}, responseHash: {$a->responsehash}';
 
 $string['forcertmpt'] = 'Force RTMPT';
-$string['forcertmpt_help'] = 'Enabling this option forces the player to use RTMPT (encapsulated RTMP) by default. Otherwise, the player first attempts to connect using the RTMP port (1935).';
+$string['forcertmpt_help'] = 'Enabling this option forces the player to use RTMPT (encapsulated RTMP) by default. Otherwise, the player first attempts to connect using the RTMP port (1935)';
 
 $string['serverdomain'] = 'Babelium server domain';
 $string['serverdomain_help'] = 'The domain of the Babelium server in which the resources are going to be stored';

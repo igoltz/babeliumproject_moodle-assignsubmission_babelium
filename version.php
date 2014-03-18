@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2013072900;
-$plugin->release   = '0.9.7 (Build: 2013072900)';
+$plugin->version   = 2014031800;
+$plugin->release   = '0.9.8 (Build: 2014031800)';
 
 // Moodle 2.4 changed the header of the function get_files() 
 // of mod/assign/assignmentplugin.php  after its initial release to fix 
