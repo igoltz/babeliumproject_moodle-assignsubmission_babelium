@@ -30,6 +30,9 @@ $string['pluginname']='Aufgabe Babelium';
 $string['babelium']='Aufgabe Babelium';
 $string['loginfo']='Babelium IdAufnahme: {$a->geantwortet}, HashAufnahme: {$a->Antworthash}';
 
+$string['forcertmpt'] = 'RTMPT erzwingen';
+$string['forcertmpt_help'] = 'Wenn diese Option markiert ist, versucht der Player eine Verbindung über RTMPT aufzubauen (gekapseltes RTMP). Ansonsten versucht der Player zunächst sich über den RTMP Port zu verbinden. (1935)';
+
 $string['serverdomain']='Server Domain';
 $string['serverdomain_help']='Die Babelium Server Domain, in der beide Übungen wie Aufnahmen gespeichert werden';
 $string['serverport']='Server-Port';
