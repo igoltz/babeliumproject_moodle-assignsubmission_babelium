@@ -28,7 +28,10 @@ $string['enabled'] = 'Entrega Babelium';
 $string['enabled_help'] = 'Si está habilitado, los estudiantes pueden grabar respuestas en vídeo y/o audio para sus entregas siguiendo el ejercicio planteado.';
 $string['pluginname'] = 'Entrega Babelium';
 $string['babelium'] = 'Entrega Babelium';
-$string['loginfo'] = 'Babelium IdGrabación: {$a->responseid}, HashGrabación: {$a->responsehash}'; 
+$string['loginfo'] = 'Babelium IdGrabación: {$a->responseid}, HashGrabación: {$a->responsehash}';
+
+$string['forcertmpt'] = 'Forzar RTMPT';
+$string['forcertmpt_help'] = 'Activar esta opción fuerza al reproductor a usar RTMPT (RTMP encapsulado) por defecto. De otra manera, el reproductor primero intenta conectarse utilizando el puerto RTMP (1935)';
 
 $string['serverdomain'] = 'Dominio del servidor';
 $string['serverdomain_help'] = 'El dominio del servidor Babelium en el que se guardaran tanto los ejercicios como las grabaciones';

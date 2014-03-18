@@ -28,7 +28,10 @@ $string['enabled'] = 'Babelium bidalketa';
 $string['enabled_help'] = 'Ezarriz gero, ikasleek beraien bidalketan bideo edo/eta audio erantzunak grabatu ditzakete proposatutako ariketa jarraituz.';
 $string['pluginname'] = 'Babelium bidalketa';
 $string['babelium'] = 'Babelium bidalketa';
-$string['loginfo'] = 'Babelium GrabaketaId: {$a->responseid}, GrabaketaHash: {$a->responsehash}'; 
+$string['loginfo'] = 'Babelium GrabaketaId: {$a->responseid}, GrabaketaHash: {$a->responsehash}';
+
+$string['forcertmpt'] = 'RTMPT Derrigortu';
+$string['forcertmpt_help'] = 'Aukera hau gaitzeak erreproduzigailua defektuz RTMPT (kapsulatutako RMTP) erabiltzera derrigortzen du. Bestela, erreproduzigailua lehendabizi RTMP portua erabiliz konektatzen saiatzen da (1935)';
 
 $string['serverdomain'] = 'Zerbitzari domeinua';
 $string['serverdomain_help'] = 'Ariketak zein grabazioak gordetzeko erabiliko den Babelium zerbitzariaren domeinua';
