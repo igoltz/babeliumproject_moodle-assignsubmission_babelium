@@ -6,6 +6,14 @@ var exerciseSubs = null;
 var responseInfo = null;
 var respponseSubs = null;
 
+//Enable debugging messages
+var debug = !1;
+
+function logMessage(message){
+	//IE9 and prior versions don't work well with console. Make sure it is available
+    if(debug && window.console) console.log(message);
+}
+
 function init(babeliumDomain, locale, forcertmpt, exInfo, exSubs, rInfo, rSubs){
 	
 	if(exInfo && exSubs){
@@ -28,7 +36,7 @@ function onConnectionReady(playerid){
 		Alert("There was a problem while loading the video player.");
 		return;
 	}
-	console.log("Streaming connection established.");
+	logMessage("Streaming connection established.");
 	bpExercises = new exercise();
 	if(exerciseInfo && exerciseSubs){
 		bpExercises.loadExerciseStatic(bpPlayer, exerciseInfo, exerciseSubs);
@@ -249,13 +257,13 @@ function onPlaybackCuePoint(cue, videoPlayer, dg)
 	this.execute = function(){
 		if (this.cue){
 			this.VP.setSubtitle(this.cue.text,this.cue.textColor);
-			//console.log("Show subtitle");
+			//logMessage("Show subtitle");
 			//var index:int = CuePointManager.getInstance().getCueIndex(cue);
 			//if(dg != null && dg.rowCount > index)
 			//	dg.selectedIndex = index;
 		} else {
 			this.VP.setSubtitle('',0x000000);
-			//console.log("Stop Other Role/Hide subtitle");
+			//logMessage("Stop Other Role/Hide subtitle");
 		}
 	};
 }
@@ -273,7 +281,7 @@ function onRecordingOtherRoleCuePoint(cue, VP)
 		this.VP.setSubtitle(this.cue.text, this.cue.textColor);
 		this.VP.startTalking(this.cue.role, time);
 		this.VP.highlight(false);
-		//console.log("Start Other Role");
+		//logMessage("Start Other Role");
 	};
 }
 
@@ -290,7 +298,7 @@ function onRecordingSelectedRoleStartCuePoint(cue, VP){
 		this.VP.setSubtitle(this.cue.text, this.cue.textColor);
 		this.VP.startTalking(this.cue.role, time);
 		this.VP.highlight(true);
-		//console.log("Start Recording your role");
+		//logMessage("Start Recording your role");
 	};
 }
 
@@ -303,7 +311,7 @@ function onRecordingSelectedRoleStopCuePoint(VP){
 		this.VP.muteVideo(false);
 		this.VP.setSubtitle('',0x000000);
 		this.VP.highlight(false);
-		//console.log("Stop Recording your role");
+		//logMessage("Stop Recording your role");
 	};
 }
 
@@ -447,7 +455,7 @@ function exercise() {
 
 	this.onResponseSelected = function(response) {
 		this.currentResponse = response;
-		console.log(this.currentResponse);
+		logMessage(this.currentResponse);
 		this.cueManagerReady = false;
 		this.resetCueManager();
 		this.prepareResponse();
@@ -579,7 +587,7 @@ function exercise() {
 		//mform.elements["responseid"].value = responseId;
 		mform.elements["responsehash"].value = recFilename;
 
-		console.log("Response recording ended");
+		logMessage("Response recording ended");
 
 		
 		// Set the videoplayer to playback both the exercise and the
@@ -629,7 +637,7 @@ function exercise() {
 	};
 
 	this.showArrows = function() {
-		console.log("showArrows was called")
+		logMessage("showArrows was called")
 		this.bpPlayer.arrows(true);
 		this.bpPlayer.setArrows(this.cueManager.cues2rolearray(), this.selectedRole);
 	};
@@ -904,7 +912,7 @@ function services(){
 		var errorObj = $.parseJSON(xhr.responseText);
 		if(!errorObj)
 			errorObj = { "response": { "message": errorThrown} };
-		console.log("Request error: " + errorObj.response.message);
+		logMessage("Request error: " + errorObj.response.message);
 	};
 	
 	this.createRandomSalt = function(){
@@ -921,7 +929,7 @@ function services(){
 		var salt = this.createRandomSalt();
 		var t = hex_sha1(method + ":" + this.commToken + ":" + this.statToken + ":" + salt);
 		var s = salt + t;
-		//console.log('Method:' + method + ', CommToken: ' + this.commToken + ', StatToken: ' + this.statToken + ', Salt: '+salt);
+		//logMessage('Method:' + method + ', CommToken: ' + this.commToken + ', StatToken: ' + this.statToken + ', Salt: '+salt);
 		return s;
 	};	
 }
