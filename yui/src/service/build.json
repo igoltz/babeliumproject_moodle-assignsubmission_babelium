@@ -1,0 +1,10 @@
+{
+  "name": "moodle-assignsubmission_babelium-service",
+  "builds": {
+    "moodle-assignsubmission_babelium-service": {
+      "jsfiles": [
+        "service.js"
+      ]
+    }
+  }
+}

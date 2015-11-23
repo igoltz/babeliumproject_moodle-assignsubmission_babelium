@@ -15,7 +15,7 @@ function logMessage(message){
 }
 
 function init(babeliumDomain, locale, forcertmpt, exInfo, exSubs, rInfo, rSubs){
-	
+
 	if(exInfo && exSubs){
 		exerciseInfo = exInfo;
 		exerciseSubs = exSubs;
@@ -24,33 +24,15 @@ function init(babeliumDomain, locale, forcertmpt, exInfo, exSubs, rInfo, rSubs){
 		responseInfo = rInfo;
 		responseSubs = rSubs;
 	}
-	
+
 	//Load flash object
 	flashLoader(babeliumDomain,locale,forcertmpt,"");
 }
 
-//This function is top-level until finding a way to route ExternalInterface.call() to object encapsulation
-function onConnectionReady(playerid){
-	var bpPlayer = document.getElementById(playerid);
-	if (!bpPlayer) {
-		Alert("There was a problem while loading the video player.");
-		return;
-	}
-	logMessage("Streaming connection established.");
-	bpExercises = new exercise();
-	if(exerciseInfo && exerciseSubs){
-		bpExercises.loadExerciseStatic(bpPlayer, exerciseInfo, exerciseSubs);
-	}
-	if(responseInfo && responseSubs){
-		bpExercises.loadResponseStatic(bpPlayer, responseInfo, responseSubs);
-	}
-}
-
-
 function flashLoader(babeliumDomain, locale, forcertmpt, jsCallbackObj){
-	// For version detection, set to min. required Flash Player version, or 0 (or 0.0.0), for no version detection. 
+	// For version detection, set to min. required Flash Player version, or 0 (or 0.0.0), for no version detection.
 	var swfVersionStr = "11.1.0";
-	// To use express install, set to playerProductInstall.swf, otherwise the empty string. 
+	// To use express install, set to playerProductInstall.swf, otherwise the empty string.
 	var xiSwfUrlStr = "http://"+babeliumDomain+"/playerProductInstall.swf";
 	var flashvars = {};
 	flashvars.locale = locale; //Overrides the default locale that's established via system info, to the specified locale
@@ -71,270 +53,385 @@ function flashLoader(babeliumDomain, locale, forcertmpt, jsCallbackObj){
 	swfobject.createCSS("#flashContent", "display:block;text-align:left;");
 };
 
-
-function cuePointManager(){
-	
-	this.cpm_cuelist=[];//new ArrayCollection();
-	this.cpm_exerciseId=-1;
-	this.cpm_subtitleId=-1;
-	
-	this.roleColors = [0xffffff, 0xfffd22, 0x69fc00, 0xfd7200, 0x056cf9, 0xff0f0b, 0xc314c9, 0xff6be5];
-	this.colorDictionary = [];
-
-	this.threshold = 0.08; //the amount of looseness we allow in the time polling
-
-	// http://stackoverflow.com/questions/4818615/using-getjson-with-callback-within-a-javascript-object
-	var instance = this;
-	
-	this.reset = function(){
-		cpm_exerciseId=-1;
-		cpm_subtitleId=-1;
-		cpm_cuelist = [];
-	};
-	
-
-	this.setVideo = function(videoId){
-		this.cpm_exerciseId=videoId;
-	};
-	
-
-	this.currentSubtitle = function(){
-		return this.cpm_subtitleId;
-	};
-	
-	this.addCue = function(cueobj){
-		this.cpm_cuelist.push(cueobj);
-		this.cpm_cuelist.sort(this.sortByStartTime);
-	};
-
-	this.setCueAt = function(cueobj, pos){
-		this.cpm_cuelist.setItemAt(cueobj, pos);
-	};
-
-	this.getCueAt = function(pos){
-		return this.cpm_cuelist[pos];
-	};
-
-	this.removeCueAt = function(pos){
-		return this.cpm_cuelist.removeItemAt(pos);
-	};
-
-	this.getCueIndex = function(cueobj){
-		return this.cpm_cuelist.getItemIndex(cueobj);
-	};
-
-	this.removeAllCue = function(){
-		this.cpm_cuelist = [];
-	};
-
-	this.setCueList = function (cuelist){
-		this.cpm_cuelist=cuelist;
-	};
-	
-	this.getCuelist = function(){
-		return this.cpm_cuelist;
-	};
-	
-	this.sortByStartTime = function(a,b){
-		if (a.startTime > b.startTime) return 1;
-		if (a.startTime < b.startTime) return -1;
-		return 0;
-	};
-	
-	this.sortByEndTime = function(a,b){
-		if (a.endTime > b.endTime) return 1;
-		if (a.endTime < b.endTime) return -1;
-		return 0;
-	};
-
-	this.setCueListStartCommand = function(command){
-		for (var i in this.cpm_cuelist){
-			this.cpm_cuelist[i].setStartCommand(command);
-		}
-	};
-
-	this.setCueListEndCommand = function(command){	
-		for (var i in this.cpm_cuelist){
-			this.cpm_cuelist[i].setEndCommand(command);
-		}
-	};
-
-	/**
-	 * ActionScript callback function - OnEnterFrame
-	 *
-	 **/
-	this.monitorCuePoints = function(time){
-		var curTime=time;
-		for (var i in this.cpm_cuelist){
-			if (((curTime - this.threshold) < this.cpm_cuelist[i].startTime && this.cpm_cuelist[i].startTime < (curTime + this.threshold))){
-				this.cpm_cuelist[i].executeStartCommand();
-				break;
-			}
-			if (((curTime - this.threshold) < this.cpm_cuelist[i].endTime && this.cpm_cuelist[i].endTime < (curTime + this.threshold))){
-				this.cpm_cuelist[i].executeEndCommand();
-				break;
-			}
-		}
-	};
-
-	this.addCueFromSubtitleLine = function(subline){
-		var found = false;
-		var color = this.roleColors[0];
-		for(var i=0; i < this.colorDictionary.length; i++){
-			if(this.colorDictionary[i] == subline.exerciseRoleId){
-				found = true;
-				color = this.roleColors[i];
-				break;
-			}
-		}
-		if(!found){
-			this.colorDictionary.push(subline.exerciseRoleId);
-			color = this.roleColors[this.colorDictionary.length-1];
-		}
-		
-		var cueObj=new cueObject(subline.subtitleId, subline.showTime, subline.hideTime, subline.text, subline.exerciseRoleId, subline.exerciseRoleName,null,null,color);
-		this.addCue(cueObj);
-	};
-
-	/**
-	 * Return cuepoint list in array mode with startTime and role
-	 **/
-	this.cues2rolearray = function(){
-		var arrows = [];
-		var cuelist = this.getCuelist();
-		for (var i in cuelist)
-			arrows.push({'startTime': cuelist[i].startTime, 'endTime': cuelist[i].endTime, 'role': cuelist[i].role});
-
-		return arrows;
-	};
+//This function is top-level until finding a way to route ExternalInterface.call() to object encapsulation
+function onConnectionReady(playerid){
+	var bpPlayer = document.getElementById(playerid);
+	if (!bpPlayer) {
+		Alert("There was a problem while loading the video player.");
+		return;
+	}
+	logMessage("Streaming connection established.");
+	bpExercises = new exercise();
+	if(exerciseInfo && exerciseSubs){
+		bpExercises.loadExerciseStatic(bpPlayer, exerciseInfo, exerciseSubs);
+	}
+	if(responseInfo && responseSubs){
+		bpExercises.loadResponseStatic(bpPlayer, responseInfo, responseSubs);
+	}
 }
 
+function exercise2(){
 
-function cueObject(subtitleId, startTime, endTime, text, roleId, role, startCommand, endCommand, textColor)
-{
-	this.defaultParamValues = [0,-1,-1,null,0,null,null,null,0xffffff];
-	
-	this.subtitleId=subtitleId;
-	this.startTime=startTime;
-	this.endTime=endTime;
-	this.text=text;
-	this.roleId=roleId;
-	this.role=role;
-	this.startCommand=startCommand;
-	this.endCommand=endCommand;
-	if(textColor == null)
-		this.textColor=defaultParamValues[9];
-	else
-		this.textColor=textColor;
-		
-	this.executeStartCommand = function(){
-		this.startCommand.execute();
-	};
-		
-	this.executeEndCommand = function(){
-		this.endCommand.execute();
-	};
-		
-	this.setStartCommand = function(command){
-		this.startCommand = command;
-	};
-		
-	this.setEndCommand = function(command){
-		this.endCommand = command;
-	};
+  var instance = this;
+
+  //Reference to player object
+  this.bpPlayer = null;
+
+  this.currentExercise=null;
+  this.currentMediaData=null;
+  this.primaryMediaData=null;
+  this.modelMediaData=null;
+  this.recordMediaData=null;
+  this.currentCaptions=null;
+  this.currentTimeMarkers=null;
+
+  //this.exerciseTitle='';
+  //this.exerciseSelected=!1;
+  this.characterNames=null;
+  this.roles=null;
+  this.mediaId=0;
+  this.subtitleId=0;
+
+  this.exerciseStartedPlaying=!1;
+  this.rolesReady=!1;
+  this.selectedRole='';
+  this.videoPlayerReady=!1;
+  this.recordingAttempts=null;
+  this.isRecording=!1;
+
+  //on init
+  setupVideoPlayer();
+  setRecordingButtonGroupVisibility();
+
+  // Helper function to separate captions by role tags
+  this.separateByRole = function(collection) {
+    'use strict';
+    if (!collection) {
+        return null;
+    }
+    var s = {};
+    collection.forEach(function (cv) {
+        if (!s.hasOwnProperty(cv.exerciseRoleName)) {
+        	s[cv.exerciseRoleName]=[];
+        }
+		s[cv.exerciseRoleName].push(cv);
+    });
+    return s;
+  }
+
+  //The preload functions rig the player without making additional service calls
+  this.preloadPlayback=function(playerObj,mediaData,captions){
+
+  }
+
+  this.preloadParallel=function(){
+
+  }
+
+  this.setupVideoPlayer = function(){
+    this.bpPlayer.addEventListener('onVideoPlayerError','bpExercises.onVideoPlayerError');
+    this.bpPlayer.addEventListener('onVideoPlayerReady', 'bpExercises.onVideoPlayerReady');
+    this.bpPlayer.addEventListener('onRecordingEnd', 'bpExercises.onRecordingEnd');
+    this.bpPlayer.addEventListener('onUserDeviceAccessDenied', 'bpExercises.onUserDeviceAccessDenied');
+  }
+
+  this.onVideoPlayerReady = function(event){
+    this.videoPlayerReady=!0;
+
+    //Set 'Start recording' button's state
+    $('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
+  }
+
+  this.onRolesRetrieved = function(data){
+    this.roles = null;
+    this.characterNames = [];
+    $('#id_roleCombo option:selected').hide();
+
+    if(data.availableExerciseRoles){
+      this.roles = data.availableExerciseRoles;
+      var code=0;
+      for(var role in this.roles){
+        if(role != "NPC"){
+          code++;
+          this.characterNames.push({"code": code, "label": role});
+        }
+      }
+    }
+
+    var numVoices = this.characterNames.length;
+    if(!numVoices){
+      //Remove all children <option> from <select> control
+      $('#id_startStopRecordingBtn').empty();
+      this.rolesReady=!1;
+    } else {
+      var elem =$('#id_startStopRecordingBtn');
+      $.each(this.characterNames, function(item){
+        elem.append($("<option />").val(item.code).text(item.label));
+      });
+      this.rolesReady=!0;
+      if(numVoices > 1){
+        $('#id_startStopRecordingBtn').show();
+      }
+    }
+
+    //Set 'Start recording' button's state
+    $('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
+  }
+
+
+
+  this.exerciseDataRetrieved = function(data){
+    if(data.watchExerciseData){
+      this.currentExercise = data.watchExerciseData;
+
+      /* These fields are for setting the visual components
+      this.exerciseTitle = currentExercise.title;
+      exerciseTitleInput.text=this.exerciseTitle;
+      usernameLbl.text=this.currentExercise.userName;
+      difficultyLbl.text=ExerciseRenderUtils.getLevelLabel(this.currentExercise.difficulty);
+      timecreatedLbl.text=ExerciseRenderUtils.formatTimestamp(this.currentExercise.timecreated, 'medium', 'none');
+      langImg.src=ExerciseRenderUtils.getFlagSource(this.currentExercise);
+      exerciseDetailedData.exerciseData = this.currentExercise;
+      */
+
+      this.primaryMediaData=this.modelMediaData=null;
+      if(this.currentExercise.hasOwnProperty('media')){
+        if(this.currentExercise instanceof Array){
+          var media=this.currentExercise.media;
+          for(var item in media){
+            var level=parseInt(item.level);
+            if(level==1 && !this.primaryMediaData){
+              this.primaryMediaData=item;
+              continue;
+            }
+            if(level==2 && !this.modelMediaData){
+              this.modelMediaData=item;
+              continue;
+            }
+          }
+        } else if (this.currentExercise.media instanceof Object){
+          this.primaryMediaData=this.currentExercise.media;
+        }
+      }
+
+      this.loadSelectedMedia(primaryMediaData);
+    }
+  }
+
+  this.loadSelectedMedia = function(media){
+    this.recordingAttempts=null;
+    this.setRecordingButtonGroupVisibility();
+
+    this.currentMediaData=media;
+    var param=this.currentMediaData;
+    this.bpPlayer.loadVideoByUrl(param);
+
+    this.rolesReady=!1;
+
+    //Set 'Start recording' button's state
+    $('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
+
+    //this.exerciseSelected=true;
+
+    var args={};
+    args.mediaid=this.currentMediaData.id;
+
+    //subtitleEvent get exercise subtitle lines, args)
+  }
+
+  this.exerciseSubtitlesRetrieved = function(value){
+    if(this.initialized){
+      if(data.availableSubtitleLines){
+        this.currentCaptions=data.availableSubtitleLines;
+        var ccollection=this.currentCaptions;
+        var item=ccollection && ccollection.length ? ccollection[0] : null;
+
+        this.subtitleId = item.subtitleId;
+        this.bpPlayer.setCaptions(this.currentCaptions);
+      }
+    }
+  }
+
+  this.checkRoleSelected = function(){
+    //Get the selected role name
+    this.selectedRole = $('#id_roleCombo option:selected').text();
+    if(this.selectedRole){
+      var mform = document.forms['mform1'];
+      mform.elements["recordedRole"].value = this.selectedRole;
+
+      this.isRecording=!0;
+      this.setRecordingButtonGroupVisibility();
+    }
+  }
+
+  this.requestRecordingSlot = function(){
+    //new exercise event request recording slot
+  }
+
+  this.prepareRecording = function(){
+    this.statisticRecAttempt();
+    var media={};
+    media.playbackMedia=this.currentMediaData;
+    media.recordMedia=this.recordMediaData;
+
+    var useWebcam=$("input[name=recmethod]:checked").val() == 1;
+
+    this.currentTimeMarkers=this.roles[this.selectedRole];
+
+    this.bpPlayer.recordVideo(media, useWebcam, this.currentTimeMarkers);
+  }
+
+  this.recordMediaSlotHandler = function(){
+    if(initialized){
+      this.recordMediaData=null;
+      if(data.recordMediaData){
+        var tmp=data.recordMediaData;
+        this.recordMediaData={};
+        this.recordMediaData.netConnectionUrl=tmp.netConnectionUrl || null;
+        this.recordMediaData.mediaUrl=tmp.mediaUrl || null;
+        this.recordMediaData.maxDuration=tmp.duration || 0;
+
+        this.prepareRecording();
+      }
+    }
+  }
+
+  this.onRecordingEnd = function(event){
+    this.isRecording=!1;
+
+    if(!this.recordingAttempts){
+      this.recordingAttempts=[];
+    }
+    this.recordingAttempts.push(this.recordMediaData);
+
+    this.setupRecordingButtonGroupVisibility();
+
+    var parallelmedia={};
+    parallelmedia.leftMedia=this.currentMediaData;
+    parallelmedia.rightMedia=this.recordMediaData;
+
+    this.bpPlayer.disableAutoPlay();
+    this.bpPlayer.loadVideoByUrl(parallelmedia, this.currentTimeMarkers);
+  }
+
+  this.onUserDeviceAccessDenied = function(event){
+    this.restorePlaybackView();
+
+    this.bpPlayer.loadVideoByUrl(this.currentMediaData);
+  }
+
+  this.onVideoPlayerError = function(event){
+    this.restorePlaybackView();
+  }
+
+  this.restorePlaybackView = function(){
+    this.isRecording=!1;
+    this.videoPlayerReady=!1;
+
+    this.setupRecordingButtonGroupVisibility();
+
+    //Set 'Start recording' button's state
+    $('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
+  }
+
+  this.setRecordingButtonGroupVisibility=function(){
+    if(this.isRecording){
+  		$('#id_viewRecordingBtn').hide();
+  		$('#id_viewExerciseBtn').hide();
+    } else {
+      var ra=this.recordingAttempts ? 1 : !1;
+      if(ra){
+        $('#id_viewRecordingBtn').show();
+  		  $('#id_viewExerciseBtn').show();
+      }
+    }
+  }
+
+  this.onStartStopRecordingClicked = function(){
+    if(this.isRecording){
+      this.restorePlaybackView();
+      this.bpPLayer.loadVideoByUrl(this.currentMediaData);
+    } else {
+      this.checkRoleSelected();
+    }
+  }
+
+  this.onWatchResponse = function(event){
+    var parallelmedia = {};
+
+    //The right-side media is the last successfully recorded response
+    var lastSuccessfulResponse=this.recordingAttempts[this.recordingAttempts.length-1];
+
+    parallelmedia.leftMedia=this.currentMediaData;
+    parallelmedia.rightMedia=lastSuccessfulResponse;
+
+    this.bpPlayer.enableAutoPlay();
+    this.bpPlayer.loadVideoByUrl(this.currentMediaData);
+  }
+
+  this.onWatchExercise = function(event){
+    this.bpPlayer.enableAutoPlay();
+    this.loadVideoByUrl(this.currentMediaData);
+  }
+
+  /*
+  this.saveResponseClickHandler=function(event){
+    var responseData={};
+    repsonseData.exerciseId=this.currentExercise.id;
+    responseData.mediaId=this.currentMediaData.id;
+    responseData.characterName=this.selectedRole;
+    responseData.recordMedia=this.recordingAttempts[this.recordingAttempts.length-1];
+
+    //new response event responseData
+  }
+
+  this.responseSuccessfullySavedRetrieved = function(value){
+    if(this.initialized){
+      if(data.savedResponseId){
+        this.bpPlayer.resetComponent();
+        this.bpPlayer.enableAutoPlay();
+
+        if(this.modelMediaData && (this.modelMediaData != this.currentMediaData)){
+          //prompt user if she wants to view the model media
+        } else {
+          //redirect to browse section
+        }
+      }
+    }
+  }
+
+  this.statisticRecAttempt = function(){
+    var params={};
+    params.responseAttempt=true;
+    params.exerciseId=this.currentExercise.id;
+    params.subtitlesAreUsed=this.bpPlayer.areCaptionsDisplayed();
+    params.subtitleId=this.subtitleId;
+    params.exerciseRoleName=this.selectedRole;
+
+    //Dispatch event UserVideoHistoryEvent.stat_attempt_response, params
+  }
+
+  this.statisticRecSave = function(value){
+    if(data.savedResponseId){
+      var params={};
+      params.responseAttempt=false;
+      params.responseId=data.savedResponseId;
+      params.exerciseId=this.currentExercise.id;
+      params.subtitlesAreUsed=this.bpPlayer.areCaptionsDisplayed();
+      params.subtitleId=this.subtitleId;
+      params.exerciseRoleName=this.selectedRole;
+
+      //Dispatch event UserVideoHistory.stat_save_response, params
+    }
+  }
+  */
+
 
 }
-
-
-function onPlaybackCuePoint(cue, videoPlayer, dg)
-{
-	//Retrieve the videoPlayer object using DOM
-	this.VP=videoPlayer;
-	//This object should reflect a DataGrid of ActionScript or an HTML table
-	//this.dg=dg;
-	this.cue=cue;
-
-	this.execute = function(){
-		if (this.cue){
-			this.VP.setSubtitle(this.cue.text,this.cue.textColor);
-			//logMessage("Show subtitle");
-			//var index:int = CuePointManager.getInstance().getCueIndex(cue);
-			//if(dg != null && dg.rowCount > index)
-			//	dg.selectedIndex = index;
-		} else {
-			this.VP.setSubtitle('',0x000000);
-			//logMessage("Stop Other Role/Hide subtitle");
-		}
-	};
-}
-
-
-function onRecordingOtherRoleCuePoint(cue, VP)
-{
-	//Retrieve the videoPlayer object using DOM
-	this.VP = VP;
-	this.cue = cue;
-
-	this.execute = function()
-	{
-		var time = this.cue.endTime - this.cue.startTime;
-		this.VP.setSubtitle(this.cue.text, this.cue.textColor);
-		this.VP.startTalking(this.cue.role, time);
-		this.VP.highlight(false);
-		//logMessage("Start Other Role");
-	};
-}
-
-
-function onRecordingSelectedRoleStartCuePoint(cue, VP){
-	
-	this.VP=VP;
-	this.cue = cue;
-
-	this.execute = function(){
-		var time= this.cue.endTime - this.cue.startTime;
-		this.VP.muteVideo(true);
-		this.VP.muteRecording(false);
-		this.VP.setSubtitle(this.cue.text, this.cue.textColor);
-		this.VP.startTalking(this.cue.role, time);
-		this.VP.highlight(true);
-		//logMessage("Start Recording your role");
-	};
-}
-
-
-function onRecordingSelectedRoleStopCuePoint(VP){
-	this.VP=VP;
-
-	this.execute = function(){
-		this.VP.muteRecording(true);
-		this.VP.muteVideo(false);
-		this.VP.setSubtitle('',0x000000);
-		this.VP.highlight(false);
-		//logMessage("Stop Recording your role");
-	};
-}
-
-
-function onReplayRecordingCuePoint(cue, subHolder)
-{
-	this.VP = subHolder;
-	this.cue = cue;
-
-	this.execute = function(){
-		if(this.cue){
-			this.VP.setSubtitle(this.cue.text, this.cue.textColor);
-			var time = this.cue.endTime - this.cue.startTime;
-			this.VP.startTalking(this.cue.role, time);
-		} else
-			this.VP.setSubtitle('',0x000000);
-	};	
-}
-
 
 function exercise() {
 
-	// http://stackoverflow.com/questions/4818615/using-getjson-with-callback-within-a-javascript-object	
+	// http://stackoverflow.com/questions/4818615/using-getjson-with-callback-within-a-javascript-object
 	var instance = this;
 
 	this.bpPlayer = null;
@@ -363,7 +460,7 @@ function exercise() {
 		// bpPlayer.addEventListener('onVideoStartedPlaying','videoStartedPlayingListener');
 		this.bpPlayer.addEventListener('onRecordingAborted','bpExercises.recordingAbortedListener');
 		this.bpPlayer.addEventListener('onRecordingFinished','bpExercises.recordingFinishedListener');
-		
+
 		//onExerciseSelected part
 		this.exerciseName = mediaInfo.exerciseName;
 		this.exerciseTitle = mediaInfo.exerciseTitle;
@@ -371,7 +468,7 @@ function exercise() {
 		this.recordedFilename = mediaInfo.responseName;
 		this.selectedRole = mediaInfo.responseRole;
 		this.currentMedia = mediaInfo;
-	
+
 		this.cueManagerReady = false;
 		this.cueManager = new cuePointManager();
 		for(var i in exerciseSubs) {
@@ -388,7 +485,7 @@ function exercise() {
 
 		this.bpPlayer.removeEventListener('onEnterFrame', 'bpExercises.enterFrameListener');
 		this.bpPlayer.addEventListener('onEnterFrame', 'bpExercises.enterFrameListener');
-		this.setupPlayCommands();		
+		this.setupPlayCommands();
 	};
 
 	this.loadResponseStatic = function(videoPlayer, mediaInfo, subtitleInfo){
@@ -396,7 +493,7 @@ function exercise() {
 		// bpPlayer.addEventListener('onVideoStartedPlaying','videoStartedPlayingListener');
 		this.bpPlayer.addEventListener('onRecordingAborted','bpExercises.recordingAbortedListener');
 		this.bpPlayer.addEventListener('onRecordingFinished','bpExercises.recordingFinishedListener');
-		
+
 		//onExerciseSelected part
 		this.exerciseName = mediaInfo.exerciseName;
 		this.exerciseTitle = mediaInfo.exerciseTitle;
@@ -410,7 +507,7 @@ function exercise() {
 		for(var i in subtitleInfo) {
 			this.cueManager.addCueFromSubtitleLine(subtitleInfo[i]);
 		}
-		this.bpPlayer.addEventListener('onEnterFrame', 'bpExercises.enterFrameListener');	
+		this.bpPlayer.addEventListener('onEnterFrame', 'bpExercises.enterFrameListener');
 		this.setupRecordingCommands();
 		this.bpPlayer.exerciseSource(this.exerciseName);
 		this.bpPlayer.setState(this.bpPlayerStates.PLAY_BOTH_STATE);
@@ -418,8 +515,8 @@ function exercise() {
 		this.bpPlayer.seek(false);
 		//Delay the call to show arrows until the metadata of the video is acquired
 		this.bpPlayer.addEventListener('onMetadataRetrieved', 'bpExercises.onMetadataRetrieved');
-		//this.showArrows();	
-	}	
+		//this.showArrows();
+	}
 
 	this.loadExercise = function(videoPlayer, ex) {
 		this.bpPlayer = videoPlayer;
@@ -432,7 +529,7 @@ function exercise() {
 		this.bpPlayer = videoPlayer;
 		this.cueManager = new cuePointManager();
 		this.onResponseSelected(resp);
-	};	
+	};
 
 	this.setupVideoPlayer = function() {
 		// bpPlayer.addEventListener('onVideoPlayerReady','videoPlayerReadyListener');
@@ -468,7 +565,7 @@ function exercise() {
 	};
 
 	this.prepareResponse = function() {
-		
+
 		this.prepareCueManagerEvaluation();
 	};
 
@@ -495,7 +592,7 @@ function exercise() {
 
 	/**
 	 * ActionScript callback
-	 * It is called each time the flash object refreshes its display list (around 20 times per second on average computers with standard cpu usage)  
+	 * It is called each time the flash object refreshes its display list (around 20 times per second on average computers with standard cpu usage)
          */
 	this.enterFrameListener = function(event) {
 		this.cueManager.monitorCuePoints(event);
@@ -589,7 +686,7 @@ function exercise() {
 
 		logMessage("Response recording ended");
 
-		
+
 		// Set the videoplayer to playback both the exercise and the
 		// last response.
 		this.setupRecordingCommands();
@@ -616,9 +713,9 @@ function exercise() {
 		this.recordingError();
 		this.prepareExercise();
 
-		this.bpPlayer.addEventListener('onEnterFrame', 'bpExercises.enterFrameListener');	
+		this.bpPlayer.addEventListener('onEnterFrame', 'bpExercises.enterFrameListener');
 		this.setupPlayCommands();
-			
+
 		$('#id_startStopRecordingBtn').val(M.str.assignsubmission_babelium.babeliumStartRecording);
 		if(this.recordedFilename){
 			//$('#id_viewRecordingExerciseBtn').val(M.str.assignsubmission_babelium.babeliumViewRecording);
@@ -647,77 +744,15 @@ function exercise() {
 		this.bpPlayer.removeArrows();
 	};
 
-	/**
-	 * Dynamic service call
-	 * Stores how many times the user played the video during the session
-	 */
-	/* TODO
-	this.videoStartedPlayingListener = function() {
-		this.exerciseStartedPlaying = true;
-		if (this.cueManagerReady && this.exerciseStartedPlaying) {
-			this.exerciseStartedPlaying = false;
-			var subtitlesAreUsed = this.bpPlayer.subtitlePanelVisible;
-			var subtitleId = this.cueManager.currentSubtitle;
-			var parameters = {
-				'id' : 0,
-				'userSessionId' : 0,
-				'exerciseId' : this.exerciseId,
-				'responseAttempt' : false,
-				'responseId' : 0,
-				'incidenceDate' : '',
-				'subtitlesAreUsed' : subtitlesAreUsed,
-				'subtitleId' : subtitleId,
-				'exerciseRoleId' : 0
-			};
-			if (this.exerciseId > 0 && subtitleId > 0)
-				bpServices.send(false, 'watchExercise', parameters, null);
-		}
-	};
-	*/
-
-	/**
-	 * Dynamic service call
-	 * Stores how many recording attemps the user made during the session
-	 */
-	/* TODO
-	this.statisticRecAttempt = function() {
-		var subtitlesAreUsed = this.bpPlayer.subtitlePanelVisible();
-		var subtitleId = this.cueManager.currentSubtitle();
-		var roleId = 0;
-		var roles = this.roles;
-		for ( var i in roles) {
-			if (roles[i].characterName == this.selectedRole) {
-				roleId = roles[i].id;
-				break;
-			}
-		}
-
-		// Ajax call to the appointed REST service
-		var parameters = {
-			'id' : 0,
-			'userSessionId' : 0,
-			'exerciseId' : this.exerciseId,
-			'responseAttempt' : true,
-			'responseId' : 0,
-			'incidenceDate' : '',
-			'subtitlesAreUsed' : subtitlesAreUsed,
-			'subtitleId' : subtitleId,
-			'exerciseRoleId' : roleId
-		};
-
-		bpServices.send(false,'exerciseAttemptResponse', parameters, function(data){});
-	};
-	*/
-		
 	this.startStopRecordingClickHandler = function(){
-		
+
 		//We are currently in the middle of a recording process, pressing the button should abort the recording
 		if(this.bpPlayer.getState() == this.bpPlayerStates.RECORD_MIC_STATE || this.bpPlayer.getState() == this.bpPlayerStates.RECORD_BOTH_STATE){
 			this.recordingError();
 			this.prepareExercise();
-			this.bpPlayer.addEventListener('onEnterFrame', 'bpExercises.enterFrameListener');	
+			this.bpPlayer.addEventListener('onEnterFrame', 'bpExercises.enterFrameListener');
 			this.setupPlayCommands();
-			
+
 			$('#id_startStopRecordingBtn').val(M.str.assignsubmission_babelium.babeliumStartRecording);
 			if(this.recordedFilename){
 				//$('#id_viewRecordingExerciseBtn').val(M.str.assignsubmission_babelium.babeliumViewRecording);
@@ -725,15 +760,15 @@ function exercise() {
 				$('#id_viewRecordingBtn').show();
 				$('#id_viewExerciseBtn').show();
 			}
-		} else {	
+		} else {
 			//Determine which role the user is going to impersonate
 			this.selectedRole = $('#id_roleCombo option:selected').text();
 			var mform = document.forms['mform1'];
 			mform.elements["recordedRole"].value = this.selectedRole;
-	
+
 			//This is just in case a previous state changed the primary video of the videoplayer
-			//instance.bpPlayer.exerciseSource(instance.exerciseName);	
-	
+			//instance.bpPlayer.exerciseSource(instance.exerciseName);
+
 			//Prepare the cuepoints for the recording
 			this.setupRecordingCommands();
 
@@ -743,7 +778,7 @@ function exercise() {
 			} else {
 				this.bpPlayer.setState(instance.bpPlayerStates.RECORD_BOTH_STATE);
 			}
-		
+
 			//Show the arrows for the selected role
 			this.showArrows();
 
@@ -758,26 +793,6 @@ function exercise() {
 		}
 	};
 
-	/*
-	this.viewRecordingExerciseClickHandler = function(){
-		if(this.bpPlayer.getState() == this.bpPlayerStates.PLAY_BOTH_STATE){
-			this.recordingError();
-			this.prepareExercise();
-			this.bpPlayer.addEventListener('onEnterFrame', 'bpExercises.enterFrameListener');	
-			this.setupPlayCommands();
-			$('#id_viewRecordingExerciseBtn').val(M.str.assignsubmission_babelium.babeliumViewRecording);
-		} else {
-			this.setupRecordingCommands();
-			this.bpPlayer.exerciseSource(instance.exerciseName);
-			this.bpPlayer.setState(instance.bpPlayerStates.PLAY_BOTH_STATE);
-			this.bpPlayer.secondSource(instance.recordedFilename);
-			this.bpPlayer.seek(false);
-			this.showArrows();	
-			$('#id_viewRecordingExerciseBtn').val(M.str.assignsubmission_babelium.babeliumViewExercise);
-		}
-	};
-	*/
-	
 	this.viewRecordingClickHandler = function(){
 		this.setupRecordingCommands();
 		this.bpPlayer.exerciseSource(instance.exerciseName);
@@ -786,25 +801,13 @@ function exercise() {
 		this.bpPlayer.seek(false);
 		this.showArrows();
 	}
-	
+
 	this.viewExerciseClickHandler = function(){
 		this.recordingError();
 		this.prepareExercise();
-		this.bpPlayer.addEventListener('onEnterFrame', 'bpExercises.enterFrameListener');	
+		this.bpPlayer.addEventListener('onEnterFrame', 'bpExercises.enterFrameListener');
 		this.setupPlayCommands();
 	}
-
-	/*
-	this.watchResponseClickHandler = function(){
-		instance.showArrows();
-		isntance.setupReplayCommands();
-
-		instance.bpPlayer.responseSource(instance.recordedFilename);
-		instance.bpPlayer.setState(instance.bpPlayerStates.PLAY_STATE);
-
-		instance.bpPlayer.seek(false);
-	};
-	*/
 
 	/*
 	//This shouldn't be necessary because YUI JS should be linked at the end of DOM's body, but just in case
@@ -821,116 +824,8 @@ function exercise() {
 
 	$(document).ready(function() {
 		$('#id_startStopRecordingBtn').click(function(){ instance.startStopRecordingClickHandler(); });
-		//$('#id_viewRecordingExerciseBtn').click(function() { instance.viewRecordingExerciseClickHandler(); });
 		$('#id_viewRecordingBtn').click(function() { instance.viewRecordingClickHandler(); });
 		$('#id_viewExerciseBtn').click(function() { instance.viewExerciseClickHandler(); });
 	});
 }
-
-
-function services(){
-	this.protocol = 'http://';
-	this.host = bpConfig.apiHost;
-	this.endpoint = bpConfig.apiEndpoint;
-	this.lastRandomizer = '';
-	this.statToken = 'myMusicFightsAgainstTheSystemThatTeachesToLiveAndDie'; //Bob Marley's Quote
-	this.commToken = '';
-	this.authToken = '';
-	this.token = '';
-
-	//This variable will be accesible in the callback and points to the right scope
-	var instance = this;
-	
-	/**
-	 * The way callback should be passed is uncertain maybe we should pass it as a String and then use eval() to fetch the actual function. Also since this function
-	 * is to be nested inside a class we must prepend the class instance name, in this case should be something like "services.theFunction"
-	 */
-	this.send = function(secured,method,parameters,callback){
-		this.protocol = secured ? 'https://' : 'http://';
-		var qs = this.protocol + this.host + '/' + this.endpoint + '?' + method;
-		var data = {};
-		var cb = callback;
-		data.method = method;
-		if(parameters != null)
-			data.parameters = parameters;
-		if(cb == null){
-			cb = instance.onServiceSuccess; 		
-		}
-		this.token = this.generateToken(method);
-		data.header = {"token":this.token,"session":bpConfig.sessionID,"uuid":bpConfig.uuid};
-		// Fix for Internet Explorer 'No Transport' error. This error is apparently caused by an cross-domain request attempt.
-		// With the following statetement we force jQuery to support cross-origin resource sharing by default. Solution found at:
-		// http://blueonionsoftware.com/blog.aspx?p=03aff202-4198-4606-b9d6-686fd13697ee
-		$.support.cors = true;
-		$.ajax({
-			type: "POST",
-			url: qs,
-			data: data,
-			success: cb,
-			dataType: "json",
-			//error: function(error){
-			//	instance.onServiceError(error);
-			//},
-			error: function (xhr, status, errorThrown){
-				instance.onServiceError(xhr,status,errorThrown);
-			},
-			xhrFields: {
-				withCredentials: true
-			},
-			crossDomain: true
-			
-			});	
-
-	};
-	
-	this.getCommunicationToken = function(){
-		method = 'getCommunicationToken';
-		this.protocol = 'http://';
-		var qs = this.protocol + this.host + this.endpoint + '?' + method;
-		
-		var data = {};
-		data.method = method;
-		data.parameters = {'secretKey': hex_md5(bpConfig.sessionID)};
-		data.header = {"session":bpConfig.sessionID,"uuid":bpConfig.uuid};
-		
-	    $.post(qs, data, bpServices.onCommunicationTokenSuccess, "json").error(function(error){ instance.onServiceError(error); });
-	};
-	
-	this.onCommunicationTokenSuccess = function(data){
-		//The request to the server was successful, now we should check if the response is right or not
-		//Retrieve the communicationToken and store it for future use
-		instance.commToken = data.response;
-		onCommunicationReady();
-	};
-	
-	this.onServiceSuccess = function(success){
-		//Do sth with this data;
-	};
-
-	this.onServiceError = function(xhr, status, errorThrown){
-		//Display an error message noticing the user that the request to the server was not successful.
-		var errorObj = $.parseJSON(xhr.responseText);
-		if(!errorObj)
-			errorObj = { "response": { "message": errorThrown} };
-		logMessage("Request error: " + errorObj.response.message);
-	};
-	
-	this.createRandomSalt = function(){
-		var randomizer = '';
-		var charsGenerated = 0;
-		while (charsGenerated < 6){
-			randomizer = randomizer + (Math.floor(Math.random() * 16)).toString(16);
-			charsGenerated++;
-		}
-		return randomizer !== this.lastRandomizer ? (randomizer) : (createRandomSalt());
-	};
-
-	this.generateToken = function (method){
-		var salt = this.createRandomSalt();
-		var t = hex_sha1(method + ":" + this.commToken + ":" + this.statToken + ":" + salt);
-		var s = salt + t;
-		//logMessage('Method:' + method + ', CommToken: ' + this.commToken + ', StatToken: ' + this.statToken + ', Salt: '+salt);
-		return s;
-	};	
 }
-

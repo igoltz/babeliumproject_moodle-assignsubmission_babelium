@@ -1,24 +1,10 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * This file contains the definition for the library class for babelium submission plugin
  *
  * @package   assignsubmission_babelium
- * @copyright 2013 Babelium Project {@link http://babeliumproject.com}
+ * @copyright 2015 Babelium Project {@link http://babeliumproject.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -185,6 +171,7 @@ class assign_submission_babelium extends assign_submission_plugin {
         $PAGE->requires->string_for_js('babeliumViewExercise', 'assignsubmission_babelium');
         $PAGE->requires->string_for_js('babeliumStartRecording', 'assignsubmission_babelium');
         $PAGE->requires->string_for_js('babeliumStopRecording', 'assignsubmission_babelium');
+        $PAGE->requires->jquery();
 
         list($data, $exinfo, $exroles, $exlangs, $exsubs) = $formdata;
 
@@ -260,18 +247,53 @@ class assign_submission_babelium extends assign_submission_plugin {
     public function save(stdClass $submission, stdClass $data) {
         global $USER, $DB;
 
+        // File storage options should go here if needed
+
         $babeliumsubmission = $this->get_babelium_submission($submission->id);
 
-        //plagiarism code event trigger when files are uploaded
-        $eventdata = new stdClass();
-        $eventdata->modulename = 'assign';
-        $eventdata->cmid = $this->assignment->get_course_module()->id;
-        $eventdata->itemid = $submission->id;
-        $eventdata->courseid = $this->assignment->get_course()->id;
-        $eventdata->userid = $USER->id;
-        $eventdata->content = $data->responsehash;
-        events_trigger('assessable_content_uploaded', $eventdata);
+        // Check that the responsehash is set before submitting anything
+        $codenotset = $this->check_file_code($data->responsehash);
+        if($codenotset) {
+          $this->set_error($codenotset);
+          return false;
+        }
 
+        $params = array(
+          'context' => context_module::instance($this->assignment->get_course_module()->id),
+          'courseid' => $this->assignment->get_course()->id,
+          'objectid' => $submission->id,
+          'other' => array(
+              'content' => trim($data->responsehash),
+              'pathnamehashes' => array()
+          )
+        );
+        if (!empty($submission->userid) && ($submission->userid != $USER->id)) {
+          $params['relateduserid'] = $submission->userid;
+        }
+        $event = \assignsubmission_babelium\event\assessable_uploaded::create($params);
+        $event->trigger();
+
+        $groupname = null;
+        $groupid = 0;
+        //Get the group name as other fields are not transcribed in the logs and this information is important.
+        if(empty($submission->userid) && !empty($submission->groupid)) {
+          $groupname = $DB->get_field('groups', 'name', array('id' => $submission->groupid), '*', MUST_EXIST);
+          $groupid = $submission->groupid;
+        } else {
+          $params['relateduserid'] = $submission->userid;
+        }
+
+        // Unset the objectid and other fields from params for use in submission events.
+        unset($params['objectid']);
+        unset($params['other']);
+        $params['other'] = array(
+            'submissionid' => $submission->id,
+            'submissionattempt' => $submission->attemptnumber,
+            'submissionstatus' => $submission->status,
+            'responsehash' => $data->responsehash,
+            'groupid' => $groupid,
+            'groupname' => $groupname
+        );
 
         if ($babeliumsubmission) {
             if($babeliumsubmission->responsehash != $data->responsehash){
@@ -287,8 +309,12 @@ class assign_submission_babelium extends assign_submission_plugin {
                 $babeliumsubmission->responseid = $data->responseid;
             }
             $babeliumsubmission->responsehash = $data->responsehash;
-
-            return $DB->update_record('assignsubmission_babelium', $babeliumsubmission);
+            $params['objectid'] = $babeliumsubmission->id;
+            $updatestatus = $DB->update_record('assignsubmission_babelium', $babeliumsubmission);
+            $event = \assignsubmission_babelium\event\submission_updated::create($params);
+            $event->set_assign($this->assignment);
+            $event->trigger();
+            return $updatestatus;
         } else {
             $babeliumsubmission = new stdClass();
             $babeliumsubmission->responsehash = $data->responsehash;
@@ -305,7 +331,12 @@ class assign_submission_babelium extends assign_submission_plugin {
 
             $babeliumsubmission->submission = $submission->id;
             $babeliumsubmission->assignment = $this->assignment->get_instance()->id;
-            return $DB->insert_record('assignsubmission_babelium', $babeliumsubmission) > 0;
+            $babeliumsubmission->id = $DB->insert_record('assignsubmission_babelium', $babeliumsubmission);
+            $params['objectid'] = $babeliumsubmission->id;
+            $event = \assignsubmission_babelium\event\submission_created::create($params);
+            $event->set_assign($this->assignment);
+            $event->trigger();
+            return $babeliumsubmission->id > 0;
         }
     }
 
@@ -344,7 +375,8 @@ class assign_submission_babelium extends assign_submission_plugin {
 
         if ($babeliumsubmission) {
             $output = '<div class="no-overflow">';
-            $thumbnailpath = 'http://'.get_config('assignsubmission_babelium','serverdomain').
+            $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
+            $thumbnailpath = $protocol.get_config('assignsubmission_babelium','serverdomain').
                              '/resources/images/thumbs/'.$babeliumsubmission->responsehash.'/default.jpg';
             $thumbnail = '<img src="'.$thumbnailpath.'" alt="'.get_string('babelium','assignsubmission_babelium').'" border="0" height="45" width="60"/>';
             $output .= $thumbnail;
@@ -446,19 +478,6 @@ class assign_submission_babelium extends assign_submission_plugin {
     }
 
     /**
-     * The assignment has been deleted - cleanup
-     *
-     * @return bool
-     */
-    public function delete_instance() {
-        global $DB;
-        // will throw exception on failure
-        $DB->delete_records('assignsubmission_babelium', array('assignment'=>$this->assignment->get_instance()->id));
-
-        return true;
-    }
-
-    /**
      * Formatting for log info
      *
      * @param stdClass $submission The submission
@@ -477,6 +496,20 @@ class assign_submission_babelium extends assign_submission_plugin {
     }
 
     /**
+     * The assignment has been deleted - cleanup
+     *
+     * @return bool
+     */
+    public function delete_instance() {
+        global $DB;
+        // will throw exception on failure
+        $DB->delete_records('assignsubmission_babelium',
+                            array('assignment'=>$this->assignment->get_instance()->id));
+
+        return true;
+    }
+
+    /**
      * Return true if no response was submitted
      * @param stdClass $submission
      */
@@ -492,5 +525,35 @@ class assign_submission_babelium extends assign_submission_plugin {
      */
     public function get_file_areas() {
         return array(ASSIGNSUBMISSION_BABELIUM_FILEAREA=>$this->get_name());
+    }
+
+    /**
+     * Copy the student's submission from a previous submission. Used when a student opts to base their resubmission
+     * on the last submission.
+     * @param stdClass $sourcesubmission
+     * @param stdClass $destsubmission
+     */
+    public function copy_submission(stdClass $sourcesubmission, stdClass $destsubmission) {
+        global $DB;
+
+        // Copy the assignsubmission_babelium record.
+        $babeliumsubmission = $this->get_babelium_submission($sourcesubmission->id);
+        if ($babeliumsubmission) {
+            unset($babeliumsubmission->id);
+            $babeliumsubmission->submission = $destsubmission->id;
+            $DB->insert_record('assignsubmission_babelium', $babeliumsubmission);
+        }
+        return true;
+    }
+
+    public function check_file_code($submissioncode) {
+      global $OUTPUT;
+
+      if(!$submissioncode || empty($submissioncode)){
+        $errormsg = get_string('responsehashnotset', 'assignsubmission_babelium');
+        return $OUTPUT->error_text($errormsg);
+      } else {
+        return null;
+      }
     }
 }

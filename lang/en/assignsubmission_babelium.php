@@ -59,6 +59,7 @@ $string['babeliumStopRecording']='Stop Recording';
 $string['babeliumViewRecording']='View Recording';
 $string['babeliumRecordAgain']='Record Again';
 $string['babeliumViewExercise']='View Exercise';
+$string['responsehashnotset']='You are attempting to submit an empty submission. Please review your submission and try again.';
 
 //Error messages
 $string['babeliumErrorConfigParameters']='Babelium configuration parameters not set';
@@ -67,4 +68,3 @@ $string['babeliumApiErrorCode400']='Babelium Error 400. Malformed request';
 $string['babeliumApiErrorCode403']='Babelium Error 403. Wrong authorization credentials';
 $string['babeliumApiErrorCode404']='Babelium Error 404. Method not found. Invalid parameters';
 $string['babeliumApiErrorCode500']='Babelium Error 500. Internal server error';
-

@@ -1,0 +1,8 @@
+{
+  "moodle-assignsubmission_babelium-service": {
+    "requires": [
+      "base",
+      "node"
+    ]
+  }
+}
