@@ -355,8 +355,9 @@ function exercise2(){
     this.preloaded=false;
   }
 
-  this.preloadParallel=function(playerObj,mediaData,captions){
-
+  this.preloadParallel=function(playerObj,submissionData,captions){
+    this.preloaded=true;
+    this.initialize(playerObj);
   }
 
   this.onStartStopRecordingClicked = function(){
