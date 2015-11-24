@@ -32,8 +32,11 @@ function init(babeliumDomain, locale, forcertmpt, exInfo, exSubs, rInfo, rSubs){
 function flashLoader(babeliumDomain, locale, forcertmpt, jsCallbackObj){
 	// For version detection, set to min. required Flash Player version, or 0 (or 0.0.0), for no version detection.
 	var swfVersionStr = "11.1.0";
+
+  var protocol = window.location.protocol;
+
 	// To use express install, set to playerProductInstall.swf, otherwise the empty string.
-	var xiSwfUrlStr = "http://"+babeliumDomain+"/playerProductInstall.swf";
+	var xiSwfUrlStr = protocol+"//"+babeliumDomain+"/playerProductInstall.swf";
 	var flashvars = {};
 	flashvars.locale = locale; //Overrides the default locale that's established via system info, to the specified locale
 	flashvars.forcertmpt = forcertmpt;
@@ -42,31 +45,31 @@ function flashLoader(babeliumDomain, locale, forcertmpt, jsCallbackObj){
 	params.quality = "high";
 	params.bgcolor = "#000000"; //Use black background
 	params.allowscriptaccess = "always"; //The swf file is stored in a different domain
-	params.allowfullscreen = "true";
+	params.allowfullscreen = "false";
 	params.wmode = "window";
 	var attributes = {};
 	attributes.id = "babeliumPlayer";
 	attributes.name = "babeliumPlayer";
 	attributes.align = "middle";
-	swfobject.embedSWF("http://"+babeliumDomain+"/babeliumPlayer.swf", "flashContent", "640", "380", swfVersionStr, xiSwfUrlStr, flashvars, params, attributes);
+	swfobject.embedSWF(protocol+"//"+babeliumDomain+"/babeliumPlayer.swf", "flashContent", "640", "380", swfVersionStr, xiSwfUrlStr, flashvars, params, attributes);
 	// JavaScript enabled so display the flashContent div in case it is not replaced with a swf object.
 	swfobject.createCSS("#flashContent", "display:block;text-align:left;");
 };
 
 //This function is top-level until finding a way to route ExternalInterface.call() to object encapsulation
-function onConnectionReady(playerid){
+function onVideoPlayerInitialized(playerid){
 	var bpPlayer = document.getElementById(playerid);
 	if (!bpPlayer) {
-		Alert("There was a problem while loading the video player.");
+		logMessage("There was a problem while loading the video player.");
 		return;
 	}
-	logMessage("Streaming connection established.");
-	bpExercises = new exercise();
+	logMessage("Player was successfully initialized.");
+	bpExercises = new exercise2();
 	if(exerciseInfo && exerciseSubs){
-		bpExercises.loadExerciseStatic(bpPlayer, exerciseInfo, exerciseSubs);
+		bpExercises.preloadPlayback(bpPlayer, exerciseInfo, exerciseSubs);
 	}
 	if(responseInfo && responseSubs){
-		bpExercises.loadResponseStatic(bpPlayer, responseInfo, responseSubs);
+		bpExercises.preloadParallel(bpPlayer, responseInfo, responseSubs);
 	}
 }
 
@@ -99,33 +102,15 @@ function exercise2(){
   this.recordingAttempts=null;
   this.isRecording=!1;
 
-  //on init
-  setupVideoPlayer();
-  setRecordingButtonGroupVisibility();
+  this.preloaded=!1;
 
-  // Helper function to separate captions by role tags
-  this.separateByRole = function(collection) {
-    'use strict';
-    if (!collection) {
-        return null;
+  this.initialize = function(playerObj){
+    if(!playerObj){
+      logMessage("Can't initialize the module without a valid player object");
     }
-    var s = {};
-    collection.forEach(function (cv) {
-        if (!s.hasOwnProperty(cv.exerciseRoleName)) {
-        	s[cv.exerciseRoleName]=[];
-        }
-		s[cv.exerciseRoleName].push(cv);
-    });
-    return s;
-  }
-
-  //The preload functions rig the player without making additional service calls
-  this.preloadPlayback=function(playerObj,mediaData,captions){
-
-  }
-
-  this.preloadParallel=function(){
-
+    this.bpPlayer = playerObj;
+    this.setupVideoPlayer();
+    this.setRecordingButtonGroupVisibility();
   }
 
   this.setupVideoPlayer = function(){
@@ -142,47 +127,9 @@ function exercise2(){
     $('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
   }
 
-  this.onRolesRetrieved = function(data){
-    this.roles = null;
-    this.characterNames = [];
-    $('#id_roleCombo option:selected').hide();
-
-    if(data.availableExerciseRoles){
-      this.roles = data.availableExerciseRoles;
-      var code=0;
-      for(var role in this.roles){
-        if(role != "NPC"){
-          code++;
-          this.characterNames.push({"code": code, "label": role});
-        }
-      }
-    }
-
-    var numVoices = this.characterNames.length;
-    if(!numVoices){
-      //Remove all children <option> from <select> control
-      $('#id_startStopRecordingBtn').empty();
-      this.rolesReady=!1;
-    } else {
-      var elem =$('#id_startStopRecordingBtn');
-      $.each(this.characterNames, function(item){
-        elem.append($("<option />").val(item.code).text(item.label));
-      });
-      this.rolesReady=!0;
-      if(numVoices > 1){
-        $('#id_startStopRecordingBtn').show();
-      }
-    }
-
-    //Set 'Start recording' button's state
-    $('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
-  }
-
-
-
-  this.exerciseDataRetrieved = function(data){
-    if(data.watchExerciseData){
-      this.currentExercise = data.watchExerciseData;
+  this.onExerciseRetrieved = function(exerciseData){
+    if(mediaData){
+      this.currentExercise = mediaData;
 
       /* These fields are for setting the visual components
       this.exerciseTitle = currentExercise.title;
@@ -218,6 +165,53 @@ function exercise2(){
     }
   }
 
+  this.onCaptionsRetrieved = function(captionData){
+    if(captionData){
+      this.currentCaptions=captionData;
+      var ccollection=this.currentCaptions;
+      var item=ccollection && ccollection.length ? ccollection[0] : null;
+
+      this.subtitleId = item.subtitleId;
+      this.bpPlayer.setCaptions(this.currentCaptions);
+    }
+  }
+
+  this.onRolesRetrieved = function(roleData){
+    this.roles = null;
+    this.characterNames = [];
+    $('#id_roleCombo option:selected').hide();
+
+    if(roleData){
+      this.roles = roleData;
+      var code=0;
+      for(var role in this.roles){
+        if(role != "NPC"){
+          code++;
+          this.characterNames.push({"code": code, "label": role});
+        }
+      }
+    }
+
+    var numVoices = this.characterNames.length;
+    if(!numVoices){
+      //Remove all children <option> from <select> control
+      $('#id_startStopRecordingBtn').empty();
+      this.rolesReady=!1;
+    } else {
+      var elem =$('#id_startStopRecordingBtn');
+      $.each(this.characterNames, function(item){
+        elem.append($("<option />").val(item.code).text(item.label));
+      });
+      this.rolesReady=!0;
+      if(numVoices > 1){
+        $('#id_startStopRecordingBtn').show();
+      }
+    }
+
+    //Set 'Start recording' button's state
+    $('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
+  }
+
   this.loadSelectedMedia = function(media){
     this.recordingAttempts=null;
     this.setRecordingButtonGroupVisibility();
@@ -236,19 +230,9 @@ function exercise2(){
     var args={};
     args.mediaid=this.currentMediaData.id;
 
-    //subtitleEvent get exercise subtitle lines, args)
-  }
-
-  this.exerciseSubtitlesRetrieved = function(value){
-    if(this.initialized){
-      if(data.availableSubtitleLines){
-        this.currentCaptions=data.availableSubtitleLines;
-        var ccollection=this.currentCaptions;
-        var item=ccollection && ccollection.length ? ccollection[0] : null;
-
-        this.subtitleId = item.subtitleId;
-        this.bpPlayer.setCaptions(this.currentCaptions);
-      }
+    if(!preloaded){
+      //Dispatch an AJAX call to retrieve the associated captions
+      //subtitleEvent get exercise subtitle lines, args)
     }
   }
 
@@ -282,17 +266,15 @@ function exercise2(){
   }
 
   this.recordMediaSlotHandler = function(){
-    if(initialized){
-      this.recordMediaData=null;
-      if(data.recordMediaData){
-        var tmp=data.recordMediaData;
-        this.recordMediaData={};
-        this.recordMediaData.netConnectionUrl=tmp.netConnectionUrl || null;
-        this.recordMediaData.mediaUrl=tmp.mediaUrl || null;
-        this.recordMediaData.maxDuration=tmp.duration || 0;
+    this.recordMediaData=null;
+    if(data.recordMediaData){
+      var tmp=data.recordMediaData;
+      this.recordMediaData={};
+      this.recordMediaData.netConnectionUrl=tmp.netConnectionUrl || null;
+      this.recordMediaData.mediaUrl=tmp.mediaUrl || null;
+      this.recordMediaData.maxDuration=tmp.duration || 0;
 
-        this.prepareRecording();
-      }
+      this.prepareRecording();
     }
   }
 
@@ -345,6 +327,36 @@ function exercise2(){
   		  $('#id_viewExerciseBtn').show();
       }
     }
+  }
+
+  // Helper function to separate captions by role tags
+  this.separateByRole = function(collection) {
+    'use strict';
+    if (!collection) {
+        return null;
+    }
+    var s = {};
+    collection.forEach(function (cv) {
+        if (!s.hasOwnProperty(cv.exerciseRoleName)) {
+        	s[cv.exerciseRoleName]=[];
+        }
+		s[cv.exerciseRoleName].push(cv);
+    });
+    return s;
+  }
+
+  //The preload functions rig the player without making additional service calls
+  this.preloadPlayback=function(playerObj,exerciseData,captions){
+    this.preloaded=true;
+    this.initialize(playerObj);
+    this.onExerciseRetrieved(exerciseData);
+    this.onCaptionsRetrieved(captions);
+    this.onRolesRetrieved(this.separateByRole(captions));
+    this.preloaded=false;
+  }
+
+  this.preloadParallel=function(playerObj,mediaData,captions){
+
   }
 
   this.onStartStopRecordingClicked = function(){
