@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/mod/assign/submission/babelium/babeliumservice.ph
  *	An html snippet that loads the babelium player and its related scripts
  */
 function babeliumsubmission_html_output($mode, $info, $subs){
-	
+
 	global $SESSION, $CFG, $BCFG;
 
 	$exinfo = '""'; $exsubs = '""'; $rsinfo = '""'; $rssubs = '""';
@@ -47,28 +47,27 @@ function babeliumsubmission_html_output($mode, $info, $subs){
 	} else {
 		$exinfo = json_encode($info);
 		$exsubs = json_encode($subs);
-	}	
-		
+	}
+
 	$html_content = '';
 	$html_content.='<h2 id="babelium-exercise-title">'.$info['title'].'</h2>';
-	$html_content.='<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js" language="javascript"></script>';
+	$html_content.='<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js" language="javascript"></script>';
 	$html_content.='<script src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/swfobject.js" language="javascript"></script>';
 	$html_content.='<script src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/babelium.moodle.js" language="javascript"></script>';
 	$html_content.='<div id="flashContent">
 			 <p>To view this page ensure that Adobe Flash Player version 11.1.0 or greater is installed. </p>
-			 <script type="text/javascript"> 
-				var pageHost = ((document.location.protocol == "https:") ? "https://" : "http://"); 
-				document.write("<a href=\'http://www.adobe.com/go/getflashplayer\'><img src=\'" 
-						+ pageHost + "www.adobe.com/images/shared/download_buttons/get_flash_player.gif\' alt=\'Get Adobe Flash player\' /></a>" ); 
-			</script> 
-			</div>     
+			 <script type="text/javascript">
+				var pageHost = ((document.location.protocol == "https:") ? "https://" : "http://");
+				document.write("<a href=\'http://www.adobe.com/go/getflashplayer\'><img src=\'"
+						+ pageHost + "www.adobe.com/images/shared/download_buttons/get_flash_player.gif\' alt=\'Get Adobe Flash player\' /></a>" );
+			</script>
+			</div>
 			<noscript><p>Either scripts and active content are not permitted to run or Adobe Flash Player version 11.1.0 or greater is not installed.</p></noscript>';
-	
-	//$lang = isset($SESSION->lang) ? $SESSION->lang : '';
+
 	$domain = get_config('assignsubmission_babelium','serverdomain');
 	$forcertmpt = get_config('assignsubmission_babelium','forcertmpt');
 	$lang = current_language();
-	
+
 	$html_content .= '<script language="javascript" type="text/javascript">
 						init("'.$domain.'", "'.$lang.'", "'.$forcertmpt.'", '.$exinfo.', '.$exsubs.', '. $rsinfo .', '. $rssubs .');
 					  </script>';
@@ -80,7 +79,7 @@ function babeliumsubmission_html_output($mode, $info, $subs){
  * @return mixed $result
  * 		An array of exercise data if successful or false on error/when empty query results
  */
-function babeliumsubmission_get_available_exercise_list(){	
+function babeliumsubmission_get_available_exercise_list(){
 	$g = new babeliumservice();
 	$result = $g->newServiceCall('getRecordableExercises');
 	return $result;
@@ -98,6 +97,7 @@ function babeliumsubmission_get_exercise_data($exerciseid){
 	$g = new babeliumservice();
 	$exerciseInfo = $g->newServiceCall('getExerciseById', array("id"=>$exerciseid));
 
+/*
 	if(is_array($exerciseInfo)){
 		$exerciseInfo = array(
 			"exerciseId" => $exerciseInfo['id'],
@@ -107,21 +107,22 @@ function babeliumsubmission_get_exercise_data($exerciseid){
 			"title" => $exerciseInfo['title']
 		);
 	}
-	
+	*/
+
 	$exerciseSubtitleLanguages = $g->newServiceCall('getExerciseLocales', array("exerciseId"=>$exerciseid));
 	//TODO in future versions this should be replaced. We should retrieve all the available subtitle locales instead and change with js combo selection
 	$exerciseSubtitleLines = $g->newServiceCall('getSubtitleLines', array("exerciseId"=>$exerciseid, "language"=>$exerciseSubtitleLanguages[0]['locale']));
-	
+
 	$exerciseRoles = array();
 	foreach($exerciseSubtitleLines as $subline){
-		$role = array("id"=>$subline['exerciseRoleId'], "characterName"=>$subline['exerciseRoleName']); 
+		$role = array("id"=>$subline['exerciseRoleId'], "characterName"=>$subline['exerciseRoleName']);
 		if(!in_array($role,$exerciseRoles))
 			$exerciseRoles[] = $role;
 	}
-	
-	if($exerciseInfo && $exerciseRoles && $exerciseSubtitleLanguages && $exerciseSubtitleLines && 
+
+	if($exerciseInfo && $exerciseRoles && $exerciseSubtitleLanguages && $exerciseSubtitleLines &&
 	   is_array($exerciseRoles[0]) && is_array($exerciseSubtitleLanguages[0]) && is_array($exerciseSubtitleLines[0])){
-		$exercise = array("info" => $exerciseInfo, "roles" => $exerciseRoles, "languages" => $exerciseSubtitleLanguages, "subtitles" => $exerciseSubtitleLines); 
+		$exercise = array("info" => $exerciseInfo, "roles" => $exerciseRoles, "languages" => $exerciseSubtitleLanguages, "subtitles" => $exerciseSubtitleLines);
 		return $exercise;
 	} else {
 		//TODO add some kind of log function here so that the admin knows what happened: add_to_log() maybe
@@ -145,7 +146,7 @@ function babeliumsubmission_get_response_data($responseid){
 
 	$exerciseRoles = array();
 	foreach($responseSubtitleLines as $subline){
-		$role = array("id"=>$subline['exerciseRoleId'], "characterName"=>$subline['exerciseRoleName']); 
+		$role = array("id"=>$subline['exerciseRoleId'], "characterName"=>$subline['exerciseRoleName']);
 		if(!in_array($role,$exerciseRoles))
 			$exerciseRoles[] = $role;
 	}
@@ -168,7 +169,7 @@ function babeliumsubmission_get_response_data($responseid){
  * @param int $subtitleId
  * 		The identificator of the subtitles that were used on the recording process
  * @param String $recordedRole
- * 		The character name that was impersonated in the recording process 
+ * 		The character name that was impersonated in the recording process
  * @param String $responseName
  * 		The hash name of the recording file
  * @return mixed $responseData
@@ -181,8 +182,7 @@ function babeliumsubmission_save_response_data($exerciseId, $exerciseDuration, $
 				"duration" => $exerciseDuration,
 				"subtitleId" => $subtitleId,
 				"characterName" => $recordedRole,
-				"fileIdentifier" => $responseName 
+				"fileIdentifier" => $responseName
 				);
 	return $responsedata = $g->newServiceCall('admSaveResponse', $parameters);
 }
-

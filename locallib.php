@@ -171,7 +171,7 @@ class assign_submission_babelium extends assign_submission_plugin {
         $PAGE->requires->string_for_js('babeliumViewExercise', 'assignsubmission_babelium');
         $PAGE->requires->string_for_js('babeliumStartRecording', 'assignsubmission_babelium');
         $PAGE->requires->string_for_js('babeliumStopRecording', 'assignsubmission_babelium');
-        $PAGE->requires->jquery();
+        //$PAGE->requires->jquery();
 
         list($data, $exinfo, $exroles, $exlangs, $exsubs) = $formdata;
 
