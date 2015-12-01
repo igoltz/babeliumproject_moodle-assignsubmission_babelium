@@ -151,11 +151,14 @@ class assign_submission_babelium extends assign_submission_plugin {
         if(!$exercise_data)
             throw new dml_exception("Error while retrieving Babelium external data");
 
+        error_log(print_r($exercise_data,true),3,"/tmp/error.log");
+
         $this->get_babelium_form_elements($mform, array($data,
                                           $exercise_data['info'],
                                           $exercise_data['roles'],
                                           $exercise_data['languages'],
-                                          $exercise_data['subtitles']));
+                                          $exercise_data['subtitles'],
+                                          $exercise_data['recinfo']));
         return true;
     }
 
@@ -173,7 +176,7 @@ class assign_submission_babelium extends assign_submission_plugin {
         $PAGE->requires->string_for_js('babeliumStopRecording', 'assignsubmission_babelium');
         //$PAGE->requires->jquery();
 
-        list($data, $exinfo, $exroles, $exlangs, $exsubs) = $formdata;
+        list($data, $exinfo, $exroles, $exlangs, $exsubs, $recinfo) = $formdata;
 
         $roleMenu = array();
         if($exroles && count($exroles) > 0){
@@ -210,8 +213,11 @@ class assign_submission_babelium extends assign_submission_plugin {
           $mform->addElement('hidden', 'exerciseDuration', $exinfo['duration']);
           $mform->setType('exerciseDuration', PARAM_RAW);
         }
+
+        error_log(print_r($recinfo,true),3,"/tmp/error.log");
+
         //Returns a string with all the html and script tags needed to init the babelium widget
-        $html_content = babeliumsubmission_html_output(!empty($data->responsehash),$exinfo,$exsubs);
+        $html_content = babeliumsubmission_html_output(!empty($data->responsehash),$exinfo,$exsubs, $recinfo);
 
         $mform->addElement('html',$html_content);
         $mform->addElement('select', 'roleCombo', get_string('babeliumChooseRole', 'assignsubmission_babelium'), $roleMenu);
@@ -401,7 +407,7 @@ class assign_submission_babelium extends assign_submission_plugin {
             $babeliumcontent = '';
             $response_data = babeliumsubmission_get_response_data($babeliumsubmission->responseid);
             if($response_data)
-                $babeliumcontent = babeliumsubmission_html_output(0,$response_data['info'],$response_data['subtitles']);
+                $babeliumcontent = babeliumsubmission_html_output(0,$response_data['info'],$response_data['subtitles'],$response_data['recinfo']);
             $result .= $babeliumcontent;
             $result .= '</div>';
         }

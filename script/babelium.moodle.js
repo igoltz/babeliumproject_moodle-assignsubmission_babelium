@@ -3,6 +3,7 @@
 var bpExercises = null;
 var exerciseInfo = null;
 var exerciseSubs = null;
+var recordInfo = null;
 var responseInfo = null;
 var respponseSubs = null;
 
@@ -14,15 +15,17 @@ function logMessage(message){
     if(debug && window.console) console.log(message);
 }
 
-function init(babeliumDomain, locale, forcertmpt, exInfo, exSubs, rInfo, rSubs){
+function init(babeliumDomain, locale, forcertmpt, exInfo, exSubs, rInfo, rSubs, recInfo){
 
 	if(exInfo && exSubs){
 		exerciseInfo = exInfo;
 		exerciseSubs = exSubs;
+    recordInfo = recInfo;
 	}
 	if(rInfo && rSubs){
 		responseInfo = rInfo;
 		responseSubs = rSubs;
+    recordInfo = recInfo;
 	}
 
 	//Load flash object
@@ -66,10 +69,10 @@ function onVideoPlayerInitialized(playerid){
 	logMessage("Player was successfully initialized.");
 	bpExercises = new exercise();
 	if(exerciseInfo && exerciseSubs){
-		bpExercises.preloadPlayback(bpPlayer, exerciseInfo, exerciseSubs);
+		bpExercises.preloadPlayback(bpPlayer, exerciseInfo, exerciseSubs, recordInfo);
 	}
 	if(responseInfo && responseSubs){
-		bpExercises.preloadParallel(bpPlayer, responseInfo, responseSubs);
+		bpExercises.preloadParallel(bpPlayer, responseInfo, responseSubs, recordInfo);
 	}
 }
 
@@ -79,6 +82,12 @@ function exercise(){
 
   //Reference to player object
   this.bpPlayer = null;
+
+  //These fields hold the data of the preloaded calls
+  this.preloaded=!1;
+  this.pData = null;
+  this.pRecordData=null;
+  this.pCaptions = null;
 
   this.currentExercise=null;
   this.currentMediaData=null;
@@ -102,8 +111,7 @@ function exercise(){
   this.recordingAttempts=null;
   this.isRecording=!1;
 
-  this.preloaded=!1;
-
+  // Set the player element in the closure and init the scope
   this.initialize = function(playerObj){
     if(!playerObj){
       logMessage("Can't initialize the module without a valid player object");
@@ -111,6 +119,12 @@ function exercise(){
     this.bpPlayer = playerObj;
     this.setupVideoPlayer();
     this.setRecordingButtonGroupVisibility();
+  }
+
+  this.setupStartStopRecordButton = function(value){
+    var elem = $bjq('#id_startStopRecordingBtn');
+    var label = value ? M.str.assignsubmission_babelium.babeliumStopRecording : M.str.assignsubmission_babelium.babeliumStartRecording;
+    elem.val(label);
   }
 
   this.setupVideoPlayer = function(){
@@ -124,7 +138,7 @@ function exercise(){
     this.videoPlayerReady=!0;
 
     //Set 'Start recording' button's state
-    $('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
+    $bjq('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
   }
 
   this.onExerciseRetrieved = function(exerciseData){
@@ -162,8 +176,7 @@ function exercise(){
           this.primaryMediaData=this.currentExercise.media;
         }
       }
-
-      this.loadSelectedMedia(primaryMediaData);
+      this.loadSelectedMedia(this.primaryMediaData);
     }
   }
 
@@ -189,6 +202,7 @@ function exercise(){
         var item=ccollection && ccollection.length ? ccollection[0] : null;
         this.subtitleId = item.subtitleId;
       }
+      logMessage("Captions: "+this.currentCaptions);
       this.bpPlayer.setCaptions(this.currentCaptions);
     }
   }
@@ -196,11 +210,16 @@ function exercise(){
   this.onRolesRetrieved = function(roleData){
     this.roles = null;
     this.characterNames = [];
-    $('#id_roleCombo option:selected').hide();
+
+    //Grab the <select> element of the roles
+    var elem =$bjq('#id_roleCombo');
+    //Start out hidden
+    elem.hide();
 
     if(roleData){
       this.roles = roleData;
       var code=0;
+      logMessage(this.roles.constructor);
       for(var role in this.roles){
         if(role != "NPC"){
           code++;
@@ -208,25 +227,31 @@ function exercise(){
         }
       }
     }
-
+    logMessage("Voices: "+this.characterNames.length);
     var numVoices = this.characterNames.length;
+
+    //Remove all children <option> from the <select> control
+    elem.find('option').remove().end();
+
     if(!numVoices){
-      //Remove all children <option> from <select> control
-      $('#id_startStopRecordingBtn').empty();
       this.rolesReady=!1;
     } else {
-      var elem =$('#id_startStopRecordingBtn');
-      $.each(this.characterNames, function(item){
-        elem.append($("<option />").val(item.code).text(item.label));
+      $bjq.each(this.characterNames, function(index, value){
+        elem.append($bjq("<option />").val(value.code).text(value.label));
       });
+      elem.val($bjq("#id_roleCombo option:first").val());
       this.rolesReady=!0;
       if(numVoices > 1){
-        $('#id_startStopRecordingBtn').show();
+        elem.show();
       }
     }
 
     //Set 'Start recording' button's state
-    $('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
+    $bjq('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
+
+    if(this.preload){
+      this.preload=!1; //preloading steps are over
+    }
   }
 
   this.loadSelectedMedia = function(media){
@@ -240,52 +265,77 @@ function exercise(){
     this.rolesReady=!1;
 
     //Set 'Start recording' button's state
-    $('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
+    $bjq('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
 
     //this.exerciseSelected=true;
 
-    var args={};
-    args.mediaid=this.currentMediaData.id;
-
-    if(!preloaded){
+    if(!this.preloaded){
+      var args={};
+      args.mediaid=this.currentMediaData.id;
       //Dispatch an AJAX call to retrieve the associated captions
       //subtitleEvent get exercise subtitle lines, args)
+    } else {
+      this.onCaptionsRetrieved(this.pCaptions);
+      this.onRolesRetrieved(this.separateByRole(this.pCaptions));
     }
   }
 
   this.checkRoleSelected = function(){
     //Get the selected role name
-    this.selectedRole = $('#id_roleCombo option:selected').text();
+    this.selectedRole = $bjq('#id_roleCombo option:selected').text();
     if(this.selectedRole){
       var mform = document.forms['mform1'];
       mform.elements["recordedRole"].value = this.selectedRole;
 
       this.isRecording=!0;
+      this.setupStartStopRecordButton(this.isRecording);
       this.setRecordingButtonGroupVisibility();
     }
   }
 
   this.requestRecordingSlot = function(){
-    //new exercise event request recording slot
+    if(this.preloaded && this.pRecordData){
+      logMessage(this.pRecordData);
+      var iurl=this.pRecordData.mediaUrl;
+      logMessage("Incoming record url: "+iurl);
+      var mediadir=iurl.substring(0,iurl.lastIndexOf('/')+1);
+      logMessage("Reported media directory: "+mediadir);
+
+      var prefix='resp-';
+      var timestamp=new Date().getTime();
+
+      var attemptHash=prefix+timestamp+'.flv';
+      var mediaUrl=mediadir+'/'+attemptHash;
+
+      this.pRecordData.mediaUrl=mediaUrl;
+
+      this.recordMediaSlotHandler(this.pRecordData);
+    } else {
+      //new exercise event request recording slot
+    }
   }
 
   this.prepareRecording = function(){
-    this.statisticRecAttempt();
+    //Disabled for now
+    //this.statisticRecAttempt();
     var media={};
     media.playbackMedia=this.currentMediaData;
     media.recordMedia=this.recordMediaData;
 
-    var useWebcam=$("input[name=recmethod]:checked").val() == 1;
+    var useWebcam=$bjq("input[name=recmethod]:checked").val() == 1;
 
     this.currentTimeMarkers=this.roles[this.selectedRole];
 
     this.bpPlayer.recordVideo(media, useWebcam, this.currentTimeMarkers);
   }
 
-  this.recordMediaSlotHandler = function(){
+  this.recordMediaSlotHandler = function(recordMediaData){
+    if(this.preloaded){
+      this.preloaded=false;
+    }
     this.recordMediaData=null;
-    if(data.recordMediaData){
-      var tmp=data.recordMediaData;
+    if(recordMediaData){
+      var tmp=recordMediaData;
       this.recordMediaData={};
       this.recordMediaData.netConnectionUrl=tmp.netConnectionUrl || null;
       this.recordMediaData.mediaUrl=tmp.mediaUrl || null;
@@ -296,14 +346,19 @@ function exercise(){
   }
 
   this.onRecordingEnd = function(event){
+    logMessage("Recording ended");
     this.isRecording=!1;
+    this.setupStartStopRecordButton(this.isRecording);
 
     if(!this.recordingAttempts){
       this.recordingAttempts=[];
     }
     this.recordingAttempts.push(this.recordMediaData);
 
-    this.setupRecordingButtonGroupVisibility();
+    var mform = document.forms['mform1'];
+		mform.elements["responsehash"].value = this.recordMediaData.mediaUrl;
+
+    this.setRecordingButtonGroupVisibility();
 
     var parallelmedia={};
     parallelmedia.leftMedia=this.currentMediaData;
@@ -325,23 +380,24 @@ function exercise(){
 
   this.restorePlaybackView = function(){
     this.isRecording=!1;
+    this.setupStartStopRecordButton(this.isRecording);
     this.videoPlayerReady=!1;
 
-    this.setupRecordingButtonGroupVisibility();
+    this.setRecordingButtonGroupVisibility();
 
     //Set 'Start recording' button's state
-    $('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
+    $bjq('#id_startStopRecordingBtn').prop("disabled",(!this.videoPlayerReady||!this.rolesReady));
   }
 
   this.setRecordingButtonGroupVisibility=function(){
     if(this.isRecording){
-  		$('#id_viewRecordingBtn').hide();
-  		$('#id_viewExerciseBtn').hide();
+  		$bjq('#id_viewRecordingBtn').hide();
+  		$bjq('#id_viewExerciseBtn').hide();
     } else {
       var ra=this.recordingAttempts ? 1 : !1;
       if(ra){
-        $('#id_viewRecordingBtn').show();
-  		  $('#id_viewExerciseBtn').show();
+        $bjq('#id_viewRecordingBtn').show();
+  		  $bjq('#id_viewExerciseBtn').show();
       }
     }
   }
@@ -363,17 +419,21 @@ function exercise(){
   }
 
   //The preload functions rig the player without making additional service calls
-  this.preloadPlayback=function(playerObj,exerciseData,captions){
+  this.preloadPlayback=function(playerObj,exerciseData,captions,recordData){
     logMessage("Initializing playback mode with prefetched data.");
+
     this.preloaded=true;
     this.initialize(playerObj);
-    this.onExerciseRetrieved(exerciseData);
-    this.onCaptionsRetrieved(captions);
-    this.onRolesRetrieved(this.separateByRole(captions));
-    this.preloaded=false;
+
+    this.pData=exerciseData;
+    this.pCaptions=captions;
+    if(recordData){
+      this.pRecordData=recordData;
+    }
+    this.onExerciseRetrieved(this.pData);
   }
 
-  this.preloadParallel=function(playerObj,submissionData,captions){
+  this.preloadParallel=function(playerObj,submissionData,captions,recordData){
     this.preloaded=true;
     this.initialize(playerObj);
   }
@@ -381,9 +441,11 @@ function exercise(){
   this.onStartStopRecordingClicked = function(){
     if(this.isRecording){
       this.restorePlaybackView();
-      this.bpPLayer.loadVideoByUrl(this.currentMediaData);
+      this.bpPlayer.loadVideoByUrl(this.currentMediaData);
     } else {
+      this.preloaded=true;
       this.checkRoleSelected();
+      this.requestRecordingSlot();
     }
   }
 
@@ -397,12 +459,12 @@ function exercise(){
     parallelmedia.rightMedia=lastSuccessfulResponse;
 
     this.bpPlayer.enableAutoPlay();
-    this.bpPlayer.loadVideoByUrl(this.currentMediaData);
+    this.bpPlayer.loadVideoByUrl(parallelmedia, this.currentTimeMarkers);
   }
 
   this.onWatchExercise = function(event){
     this.bpPlayer.enableAutoPlay();
-    this.loadVideoByUrl(this.currentMediaData);
+    this.bpPlayer.loadVideoByUrl(this.currentMediaData);
   }
 
   /*
@@ -457,9 +519,9 @@ function exercise(){
   }
   */
 
-	$(document).ready(function() {
-		$('#id_startStopRecordingBtn').click(function(){ instance.startStopRecordingClickHandler(); });
-		$('#id_viewRecordingBtn').click(function() { instance.viewRecordingClickHandler(); });
-		$('#id_viewExerciseBtn').click(function() { instance.viewExerciseClickHandler(); });
+	$bjq(document).ready(function() {
+		$bjq('#id_startStopRecordingBtn').click(function(){ instance.onStartStopRecordingClicked(); });
+		$bjq('#id_viewRecordingBtn').click(function() { instance.onWatchResponse(); });
+		$bjq('#id_viewExerciseBtn').click(function() { instance.onWatchExercise(); });
 	});
 }

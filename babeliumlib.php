@@ -35,11 +35,15 @@ require_once($CFG->dirroot . '/mod/assign/submission/babelium/babeliumservice.ph
  * @return String $html_content
  *	An html snippet that loads the babelium player and its related scripts
  */
-function babeliumsubmission_html_output($mode, $info, $subs){
+function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
 
 	global $SESSION, $CFG, $BCFG;
 
-	$exinfo = '""'; $exsubs = '""'; $rsinfo = '""'; $rssubs = '""';
+	$exinfo = '""';
+	$exsubs = '""';
+	$rsinfo = '""';
+	$rssubs = '""';
+	$recinfo = '""';
 
 	if($mode){
 		$rsinfo = json_encode($info);
@@ -49,9 +53,12 @@ function babeliumsubmission_html_output($mode, $info, $subs){
 		$exsubs = json_encode($subs);
 	}
 
+	$recinfo = json_encode($rmedia);
+
 	$html_content = '';
 	$html_content.='<h2 id="babelium-exercise-title">'.$info['title'].'</h2>';
-	$html_content.='<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js" language="javascript"></script>';
+	$html_content.='<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js" language="javascript"></script>';
+	$html_content.='<script type="text/javascript"> var $bjq = jQuery.noConflict(); </script>';
 	$html_content.='<script src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/swfobject.js" language="javascript"></script>';
 	$html_content.='<script src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/babelium.moodle.js" language="javascript"></script>';
 	$html_content.='<div id="flashContent">
@@ -69,7 +76,7 @@ function babeliumsubmission_html_output($mode, $info, $subs){
 	$lang = current_language();
 
 	$html_content .= '<script language="javascript" type="text/javascript">
-						init("'.$domain.'", "'.$lang.'", "'.$forcertmpt.'", '.$exinfo.', '.$exsubs.', '. $rsinfo .', '. $rssubs .');
+						init("'.$domain.'", "'.$lang.'", "'.$forcertmpt.'", '.$exinfo.', '.$exsubs.', '. $rsinfo .', '. $rssubs .', '. $recinfo .');
 					  </script>';
 	return $html_content;
 }
@@ -120,9 +127,17 @@ function babeliumsubmission_get_exercise_data($exerciseid){
 			$exerciseRoles[] = $role;
 	}
 
+	$recordInfo = $g->newServiceCall('requestRecordingSlot');
+
 	if($exerciseInfo && $exerciseRoles && $exerciseSubtitleLanguages && $exerciseSubtitleLines &&
 	   is_array($exerciseRoles[0]) && is_array($exerciseSubtitleLanguages[0]) && is_array($exerciseSubtitleLines[0])){
-		$exercise = array("info" => $exerciseInfo, "roles" => $exerciseRoles, "languages" => $exerciseSubtitleLanguages, "subtitles" => $exerciseSubtitleLines);
+		$exercise = array(
+			"info" => $exerciseInfo,
+			"roles" => $exerciseRoles,
+			"languages" => $exerciseSubtitleLanguages,
+			"subtitles" => $exerciseSubtitleLines,
+			"recinfo" => $recordInfo
+		);
 		return $exercise;
 	} else {
 		//TODO add some kind of log function here so that the admin knows what happened: add_to_log() maybe
@@ -151,8 +166,16 @@ function babeliumsubmission_get_response_data($responseid){
 			$exerciseRoles[] = $role;
 	}
 
+	$recordInfo = $g->newServiceCall('requestRecordingSlot');
+
 	if($responseInfo && $responseSubtitleLines && $exerciseRoles && is_array($responseSubtitleLines[0]) && is_array($exerciseRoles[0])){
-		$response = array("info" => $responseInfo, "subtitles" => $responseSubtitleLines, "roles" => $exerciseRoles, "languages" => null);
+		$response = array(
+			"info" => $responseInfo,
+			"subtitles" => $responseSubtitleLines,
+			"roles" => $exerciseRoles,
+			"languages" => null,
+			"recinfo" => $recordInfo
+		);
 		return $response;
 	} else {
 		//TODO add logging for failure
