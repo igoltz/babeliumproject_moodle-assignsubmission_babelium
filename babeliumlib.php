@@ -198,14 +198,13 @@ function babeliumsubmission_get_response_data($responseid){
  * @return mixed $responseData
  * 		Array with information about the newly saved response, or false on error
  */
-function babeliumsubmission_save_response_data($exerciseId, $exerciseDuration, $subtitleId, $recordedRole, $responseName){
+function babeliumsubmission_save_response_data($exerciseId, $subtitleId, $recordedRole, $responseName){
 	$g = new babeliumservice();
 	$parameters = array(
 				"exerciseId" => $exerciseId,
-				"duration" => $exerciseDuration,
 				"subtitleId" => $subtitleId,
 				"characterName" => $recordedRole,
-				"fileIdentifier" => $responseName
+				"mediaUrl" => $responseName
 				);
 	return $responsedata = $g->newServiceCall('admSaveResponse', $parameters);
 }

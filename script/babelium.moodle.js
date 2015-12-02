@@ -305,7 +305,7 @@ function exercise(){
       var timestamp=new Date().getTime();
 
       var attemptHash=prefix+timestamp+'.flv';
-      var mediaUrl=mediadir+'/'+attemptHash;
+      var mediaUrl=mediadir+attemptHash;
 
       this.pRecordData.mediaUrl=mediaUrl;
 

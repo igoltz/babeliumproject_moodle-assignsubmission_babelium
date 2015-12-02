@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/assign/submission/babelium/db" 
-       VERSION="20120423" 
+<XMLDB PATH="mod/assign/submission/babelium/db"
+       VERSION="20120423"
        COMMENT="XMLDB file for Moodle mod/assign/submission/babelium"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd">
@@ -12,6 +12,7 @@
         <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="assignment" NEXT="responseid"/>
         <FIELD NAME="responseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="submission" NEXT="responsehash"/>
         <FIELD NAME="responsehash" TYPE="text" LENGTH="30" NOTNULL="true" SEQUENCE="false" PREVIOUS="responseid"/>
+        <!-- <FIELD NAME="thumbnail" TYPE="text" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="responsehash"/> -->
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="The unique id for this submission info." NEXT="assignment"/>

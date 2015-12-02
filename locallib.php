@@ -200,7 +200,7 @@ class assign_submission_babelium extends assign_submission_plugin {
         $mform->addElement('hidden', 'responsehash');
         $mform->setType('responsehash', PARAM_TEXT);
         //$mform->addRule('responsehash','You cannot save the assignment without recording something','required');
-        $mform->addRule('responsehash', get_string('required'), 'required', null, 'client');
+        //$mform->addRule('responsehash', get_string('required'), 'required', null, 'server');
 
         //The role selected in the combobox the last time the user pushed the 'Start Recording' button
         $mform->addElement('hidden', 'recordedRole');
@@ -304,7 +304,6 @@ class assign_submission_babelium extends assign_submission_plugin {
         if ($babeliumsubmission) {
             if($babeliumsubmission->responsehash != $data->responsehash){
                 $responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'),
-                                                                      $data->exerciseDuration,
                                                                       $data->subtitleId,
                                                                       $data->recordedRole,
                                                                       $data->responsehash);
@@ -326,7 +325,6 @@ class assign_submission_babelium extends assign_submission_plugin {
             $babeliumsubmission->responsehash = $data->responsehash;
 
             $responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'),
-                                                                  $data->exerciseDuration,
                                                                   $data->subtitleId,
                                                                   $data->recordedRole,
                                                                   $data->responsehash);
@@ -382,8 +380,12 @@ class assign_submission_babelium extends assign_submission_plugin {
         if ($babeliumsubmission) {
             $output = '<div class="no-overflow">';
             $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
+
+            $recordedMediaUrl = $babeliumsubmission->responsehash;
+            $recordedMediaCode = substr($recordedMediaUrl,strpos($recordedMediaUrl,'/')+1,-4);
+
             $thumbnailpath = $protocol.get_config('assignsubmission_babelium','serverdomain').
-                             '/resources/images/thumbs/'.$babeliumsubmission->responsehash.'/default.jpg';
+                             '/resources/images/thumbs/'.$recordedMediaCode.'/default.jpg';
             $thumbnail = '<img src="'.$thumbnailpath.'" alt="'.get_string('babelium','assignsubmission_babelium').'" border="0" height="45" width="60"/>';
             $output .= $thumbnail;
             $output .= '</div>';
