@@ -69,10 +69,10 @@ function onVideoPlayerInitialized(playerid){
 	logMessage("Player was successfully initialized.");
 	bpExercises = new exercise();
 	if(exerciseInfo && exerciseSubs){
-		bpExercises.preloadPlayback(bpPlayer, exerciseInfo, exerciseSubs, recordInfo);
+		bpExercises.preloadAddEdit(bpPlayer, exerciseInfo, exerciseSubs, recordInfo);
 	}
 	if(responseInfo && responseSubs){
-		bpExercises.preloadParallel(bpPlayer, responseInfo, responseSubs, recordInfo);
+		bpExercises.preloadView(bpPlayer, responseInfo, responseSubs);
 	}
 }
 
@@ -180,17 +180,27 @@ function exercise(){
     }
   }
 
-  this.onSubmissionRetrieved = function(submissionData){
+  this.onSubmissionRetrieved = function(submissionData,captions){
     if(submissionData){
       this.selectedRole=submissionData.character_name;
       this.subtitleId=submissionData.fk_subtitle_id;
       if(submissionData.hasOwnProperty('leftMedia')){
-        this.leftMedia=submissionData.leftMedia;
+        this.currentMediaData=submissionData.leftMedia;
       }
       if(submissionData.hasOwnProperty('rightMedia')){
-        this.rightMedia=submissionData.rightMedia;
+        this.recordMediaData=submissionData.rightMedia;
       }
-      this.fetchSubtitlesById(this.subtitleId);
+      this.currentCaptions=captions;
+      this.roles=this.separateByRole(captions);
+      this.currentTimeMarkers=this.roles[this.selectedRole];
+
+      this.bpPlayer.setCaptions(this.currentCaptions);
+
+      var parallelmedia={};
+      parallelmedia.leftMedia=this.currentMediaData;
+      parallelmedia.rightMedia=this.recordMediaData;
+
+      this.bpPlayer.loadVideoByUrl(parallelmedia,this.currentTimeMarkers);
     }
   }
 
@@ -419,8 +429,10 @@ function exercise(){
   }
 
   //The preload functions rig the player without making additional service calls
-  this.preloadPlayback=function(playerObj,exerciseData,captions,recordData){
-    logMessage("Initializing playback mode with prefetched data.");
+  this.preloadAddEdit=function(playerObj,exerciseData,captions,recordData){
+    logMessage("Initializing interactive mode with prefetched data.");
+
+    this.pData=this.pCaptions=this.pRecordData=null;
 
     this.preloaded=true;
     this.initialize(playerObj);
@@ -433,9 +445,15 @@ function exercise(){
     this.onExerciseRetrieved(this.pData);
   }
 
-  this.preloadParallel=function(playerObj,submissionData,captions,recordData){
-    this.preloaded=true;
-    this.initialize(playerObj);
+  this.preloadView=function(playerObj,submissionData,captions){
+    logMessage("Initializing review mode with prefetched data.");
+
+    this.pData=this.pCaptions=null;
+
+    //In place on this.initialize()
+    this.bpPlayer=playerObj;
+
+    this.onSubmissionRetrieved(submissionData,captions);
   }
 
   this.onStartStopRecordingClicked = function(){

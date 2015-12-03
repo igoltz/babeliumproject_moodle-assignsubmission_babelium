@@ -65,7 +65,7 @@ function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
 			 <p>To view this page ensure that Adobe Flash Player version 11.1.0 or greater is installed. </p>
 			 <script type="text/javascript">
 				var pageHost = ((document.location.protocol == "https:") ? "https://" : "http://");
-				document.write("<a href=\'http://www.adobe.com/go/getflashplayer\'><img src=\'"
+				document.write("<a href=\'"+pageHost+"://www.adobe.com/go/getflashplayer\'><img src=\'"
 						+ pageHost + "www.adobe.com/images/shared/download_buttons/get_flash_player.gif\' alt=\'Get Adobe Flash player\' /></a>" );
 			</script>
 			</div>
@@ -153,7 +153,7 @@ function babeliumsubmission_get_exercise_data($exerciseid){
  */
 function babeliumsubmission_get_response_data($responseid){
 	$g = new babeliumservice();
-	$responseInfo = $g->newServiceCall('admGetResponseById', array("responseId"=>$responseid));
+	$responseInfo = $g->newServiceCall('getResponseData', array("responseId"=>$responseid));
 	$responseSubtitleLines = $g->newServiceCall('getSubtitleLines', array("id"=>$responseInfo['subtitleId'],"language"=>''));
 
 	if (!$responseSubtitleLines)
