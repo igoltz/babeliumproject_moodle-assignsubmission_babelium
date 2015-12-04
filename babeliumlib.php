@@ -53,10 +53,13 @@ function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
 		$exsubs = json_encode($subs);
 	}
 
-	$recinfo = json_encode($rmedia);
+	if($rmedia)
+		$recinfo = json_encode($rmedia);
 
 	$html_content = '';
-	$html_content.='<h2 id="babelium-exercise-title">'.$info['title'].'</h2>';
+	if(isset($info['title'])){
+		$html_content.='<h2 id="babelium-exercise-title">'.$info['title'].'</h2>';
+	}
 	$html_content.='<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js" language="javascript"></script>';
 	$html_content.='<script type="text/javascript"> var $bjq = jQuery.noConflict(); </script>';
 	$html_content.='<script src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/swfobject.js" language="javascript"></script>';
@@ -99,29 +102,28 @@ function babeliumsubmission_get_available_exercise_list(){
  * @return mixed $exercise
  * 		An associative array with the info, the roles, the languages and the subtitle lines of the exercise, or false on error/when empty query results
  */
-function babeliumsubmission_get_exercise_data($exerciseid){
-	//global $BCFG;
+function babeliumsubmission_get_exercise_data($exerciseid,$responseid=0){
 	$g = new babeliumservice();
-	$exerciseInfo = $g->newServiceCall('getExerciseById', array("id"=>$exerciseid));
 
-/*
-	if(is_array($exerciseInfo)){
-		$exerciseInfo = array(
-			"exerciseId" => $exerciseInfo['id'],
-			"exerciseName" => $exerciseInfo['name'],
-			"duration" => $exerciseInfo['duration'],
-			"exerciseThumbnailUri" => $exerciseInfo['thumbnailUri'],
-			"title" => $exerciseInfo['title']
-		);
+	if($responseid){
+		$data = $g->newServiceCall('getResponseById', array("responseId"=>$responseid));
+	} else {
+		$data = $g->newServiceCall('getExerciseById', array("id"=>$exerciseid));
 	}
-	*/
+	if(!$data){
+		return null;
+	}
 
-	$exerciseSubtitleLanguages = $g->newServiceCall('getExerciseLocales', array("exerciseId"=>$exerciseid));
-	//TODO in future versions this should be replaced. We should retrieve all the available subtitle locales instead and change with js combo selection
-	$exerciseSubtitleLines = $g->newServiceCall('getSubtitleLines', array("exerciseId"=>$exerciseid, "language"=>$exerciseSubtitleLanguages[0]['locale']));
+	$subtitleId = isset($data['subtitleId']) ? $data['subtitleId'] : 0;
+	$mediaId= isset($data['media']) ? $data['media']['id'] : 0;
+	$captions = $g->newServiceCall('getSubtitleLines', array("id" => $subtitleId, "mediaid" => $mediaId));
+
+	if(!$captions){
+		return null;
+	}
 
 	$exerciseRoles = array();
-	foreach($exerciseSubtitleLines as $subline){
+	foreach($captions as $subline){
 		$role = array("id"=>$subline['exerciseRoleId'], "characterName"=>$subline['exerciseRoleName']);
 		if(!in_array($role,$exerciseRoles))
 			$exerciseRoles[] = $role;
@@ -129,13 +131,12 @@ function babeliumsubmission_get_exercise_data($exerciseid){
 
 	$recordInfo = $g->newServiceCall('requestRecordingSlot');
 
-	if($exerciseInfo && $exerciseRoles && $exerciseSubtitleLanguages && $exerciseSubtitleLines &&
-	   is_array($exerciseRoles[0]) && is_array($exerciseSubtitleLanguages[0]) && is_array($exerciseSubtitleLines[0])){
+	if($data && $exerciseRoles && $captions && is_array($exerciseRoles[0]) && is_array($captions[0])){
 		$exercise = array(
-			"info" => $exerciseInfo,
+			"info" => $data,
 			"roles" => $exerciseRoles,
-			"languages" => $exerciseSubtitleLanguages,
-			"subtitles" => $exerciseSubtitleLines,
+			"subtitles" => $captions,
+			"languages" => null,
 			"recinfo" => $recordInfo
 		);
 		return $exercise;
@@ -153,28 +154,26 @@ function babeliumsubmission_get_exercise_data($exerciseid){
  */
 function babeliumsubmission_get_response_data($responseid){
 	$g = new babeliumservice();
-	$responseInfo = $g->newServiceCall('getResponseData', array("responseId"=>$responseid));
-	$responseSubtitleLines = $g->newServiceCall('getSubtitleLines', array("id"=>$responseInfo['subtitleId'],"language"=>''));
+	$data = $g->newServiceCall('getResponseById', array("responseId"=>$responseid));
+	$captions = $g->newServiceCall('getSubtitleLines', array("id"=>$data['subtitleId'],"mediaid"=>''));
 
-	if (!$responseSubtitleLines)
+	if (!$captions)
 		return;
 
 	$exerciseRoles = array();
-	foreach($responseSubtitleLines as $subline){
+	foreach($captions as $subline){
 		$role = array("id"=>$subline['exerciseRoleId'], "characterName"=>$subline['exerciseRoleName']);
 		if(!in_array($role,$exerciseRoles))
 			$exerciseRoles[] = $role;
 	}
 
-	$recordInfo = $g->newServiceCall('requestRecordingSlot');
-
-	if($responseInfo && $responseSubtitleLines && $exerciseRoles && is_array($responseSubtitleLines[0]) && is_array($exerciseRoles[0])){
+	if($data && $captions && $exerciseRoles && is_array($captions[0]) && is_array($exerciseRoles[0])){
 		$response = array(
-			"info" => $responseInfo,
-			"subtitles" => $responseSubtitleLines,
+			"info" => $data,
+			"subtitles" => $captions,
 			"roles" => $exerciseRoles,
 			"languages" => null,
-			"recinfo" => $recordInfo
+			"recinfo" => null
 		);
 		return $response;
 	} else {

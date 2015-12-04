@@ -20,6 +20,9 @@ require_once($CFG->dirroot . '/mod/assign/submission/babelium/babeliumlib.php');
 
 class assign_submission_babelium extends assign_submission_plugin {
 
+    const PRACTICE_MODE=0;
+    const REVIEW_MODE=1;
+
     /**
      * Get the name of the babelium submission plugin
      * @return string
@@ -146,12 +149,11 @@ class assign_submission_babelium extends assign_submission_plugin {
 
         }
 
-        $exercise_data = !empty($data->responsehash) ?
-            babeliumsubmission_get_response_data($data->responseid) : babeliumsubmission_get_exercise_data($exerciseid);
+        $exercise_data = !empty($data->responsehash) ? babeliumsubmission_get_exercise_data(0,$data->responseid) : babeliumsubmission_get_exercise_data($exerciseid);
         if(!$exercise_data)
             throw new dml_exception("Error while retrieving Babelium external data");
 
-        error_log(print_r($exercise_data,true),3,"/tmp/error.log");
+        //error_log(print_r($exercise_data,true),3,"/tmp/error.log");
 
         $this->get_babelium_form_elements($mform, array($data,
                                           $exercise_data['info'],
@@ -214,10 +216,10 @@ class assign_submission_babelium extends assign_submission_plugin {
           $mform->setType('exerciseDuration', PARAM_RAW);
         }
 
-        error_log(print_r($recinfo,true),3,"/tmp/error.log");
+        //error_log(print_r($recinfo,true),3,"/tmp/error.log");
 
         //Returns a string with all the html and script tags needed to init the babelium widget
-        $html_content = babeliumsubmission_html_output(!empty($data->responsehash),$exinfo,$exsubs, $recinfo);
+        $html_content = babeliumsubmission_html_output(self::PRACTICE_MODE,$exinfo,$exsubs, $recinfo);
 
         $mform->addElement('html',$html_content);
         $mform->addElement('select', 'roleCombo', get_string('babeliumChooseRole', 'assignsubmission_babelium'), $roleMenu);
@@ -409,7 +411,7 @@ class assign_submission_babelium extends assign_submission_plugin {
             $babeliumcontent = '';
             $response_data = babeliumsubmission_get_response_data($babeliumsubmission->responseid);
             if($response_data)
-                $babeliumcontent = babeliumsubmission_html_output(0,$response_data['info'],$response_data['subtitles'],$response_data['recinfo']);
+                $babeliumcontent = babeliumsubmission_html_output(self::REVIEW_MODE,$response_data['info'],$response_data['subtitles'],null);
             $result .= $babeliumcontent;
             $result .= '</div>';
         }

@@ -8,7 +8,7 @@ var responseInfo = null;
 var respponseSubs = null;
 
 //Enable debugging messages
-var debug = !0;
+var debug = !1;
 
 function logMessage(message){
 	//IE9 and prior versions don't work well with console. Make sure it is available
@@ -92,7 +92,6 @@ function exercise(){
   this.currentExercise=null;
   this.currentMediaData=null;
   this.primaryMediaData=null;
-  this.modelMediaData=null;
   this.recordMediaData=null;
   this.currentCaptions=null;
   this.currentTimeMarkers=null;
@@ -146,44 +145,31 @@ function exercise(){
       logMessage("Exercise data retrieved");
       this.currentExercise = exerciseData;
 
-      /* These fields are for setting the visual components
-      this.exerciseTitle = currentExercise.title;
-      exerciseTitleInput.text=this.exerciseTitle;
-      usernameLbl.text=this.currentExercise.userName;
-      difficultyLbl.text=ExerciseRenderUtils.getLevelLabel(this.currentExercise.difficulty);
-      timecreatedLbl.text=ExerciseRenderUtils.formatTimestamp(this.currentExercise.timecreated, 'medium', 'none');
-      langImg.src=ExerciseRenderUtils.getFlagSource(this.currentExercise);
-      exerciseDetailedData.exerciseData = this.currentExercise;
-      */
-
       this.primaryMediaData=null;
-      this.modelMediaData=null;
       if(this.currentExercise.hasOwnProperty('media')){
-        if(this.currentExercise.media instanceof Array){
-          var media=this.currentExercise.media;
-          for(var i=0; i<media.length; i++){
-            var level=parseInt(media[i].level);
-            if(level==1 && !this.primaryMediaData){
-              this.primaryMediaData=media[i];
-              continue;
-            }
-            if(level==2 && !this.modelMediaData){
-              this.modelMediaData=media[i];
-              continue;
-            }
-          }
-        } else if (this.currentExercise.media instanceof Object){
-          this.primaryMediaData=this.currentExercise.media;
-        }
+        this.primaryMediaData=this.currentExercise.media;
+        this.loadSelectedMedia(this.primaryMediaData);
       }
-      this.loadSelectedMedia(this.primaryMediaData);
+      if (this.currentExercise.hasOwnProperty('leftMedia')) {
+        this.primaryMediaData=this.currentExercise.leftMedia;
+        this.currentMediaData=this.primaryMediaData;
+        this.recordMediaData=this.currentExercise.rightMedia;
+        this.selectedRole=this.currentExercise.selectedRole;
+        this.onCaptionsRetrieved(this.pCaptions);
+        this.onRolesRetrieved(this.separateByRole(this.pCaptions));
+
+        this.recordingAttempts=[];
+        this.recordingAttempts.push(this.recordMediaData);
+        this.recordMediaData.recordedRole=exerciseData.selectedRole;
+        this.onWatchResponse(null);
+      }
     }
   }
 
   this.onSubmissionRetrieved = function(submissionData,captions){
     if(submissionData){
-      this.selectedRole=submissionData.character_name;
-      this.subtitleId=submissionData.fk_subtitle_id;
+      this.selectedRole=submissionData.selectedRole;
+      this.subtitleId=submissionData.subtitleId;
       if(submissionData.hasOwnProperty('leftMedia')){
         this.currentMediaData=submissionData.leftMedia;
       }
@@ -294,9 +280,6 @@ function exercise(){
     //Get the selected role name
     this.selectedRole = $bjq('#id_roleCombo option:selected').text();
     if(this.selectedRole){
-      var mform = document.forms['mform1'];
-      mform.elements["recordedRole"].value = this.selectedRole;
-
       this.isRecording=!0;
       this.setupStartStopRecordButton(this.isRecording);
       this.setRecordingButtonGroupVisibility();
@@ -360,13 +343,17 @@ function exercise(){
     this.isRecording=!1;
     this.setupStartStopRecordButton(this.isRecording);
 
+    //Recording ended successfully, set the recorded role
+    var mform = document.forms['mform1'];
+    mform.elements["recordedRole"].value = this.selectedRole;
+    mform.elements["responsehash"].value = this.recordMediaData.mediaUrl;
+
+    this.recordMediaData.recordedRole = this.selectedRole;
+
     if(!this.recordingAttempts){
       this.recordingAttempts=[];
     }
     this.recordingAttempts.push(this.recordMediaData);
-
-    var mform = document.forms['mform1'];
-		mform.elements["responsehash"].value = this.recordMediaData.mediaUrl;
 
     this.setRecordingButtonGroupVisibility();
 
@@ -472,6 +459,7 @@ function exercise(){
 
     //The right-side media is the last successfully recorded response
     var lastSuccessfulResponse=this.recordingAttempts[this.recordingAttempts.length-1];
+    this.currentTimeMarkers=this.roles[lastSuccessfulResponse.recordedRole];
 
     parallelmedia.leftMedia=this.currentMediaData;
     parallelmedia.rightMedia=lastSuccessfulResponse;
