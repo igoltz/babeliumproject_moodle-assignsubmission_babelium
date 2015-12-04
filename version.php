@@ -24,17 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014031800;
-$plugin->release   = '0.9.8 (Build: 2014031800)';
+$plugin->version   = 2015120400;
+$plugin->release   = '1.0 (Build: 2015120400)';
 
-// Moodle 2.4 changed the header of the function get_files()
-// of mod/assign/assignmentplugin.php  after its initial release to fix
-// an issue. The Babelium plugin requires you to use a Moodle 2.4 version
-// newer than this change to avoid strict check warnings that could arise
-// from checking this function's header. See Moodle commits:
-//    f6d09222a2ec0208a280558171da1affd226ff52 (change in the function header)
-//    322af447f5f0fa1cb83ea80e322e7b26bddecdc1 (weekly release after the change)
-$plugin->requires  = 2012120300.05;
+//Moodle 2.7
+$plugin->requires  = 2014051200;
 
 $plugin->component = 'assignsubmission_babelium';
 $plugin->cron      = 0;
