@@ -18,7 +18,7 @@ defined('MOODLE_INTERNAL') || die();
  * @property-read array $other {
  *      Extra information about the event.
  *
- *      - int babeliumwordcount: Word count of the online text submission.
+ *      - String responsehash: the remote response hash.
  * }
  *
  * @package    assignsubmission_babelium

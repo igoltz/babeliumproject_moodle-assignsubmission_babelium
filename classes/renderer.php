@@ -17,7 +17,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2015 Inko Perurena <inko@elurnet.net>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class assignfeedback_editpdf_renderer extends plugin_renderer_base {
+class assignsubmission_babelium_renderer extends plugin_renderer_base {
 
   /**
    * Render the babelium widget in the submission form.
