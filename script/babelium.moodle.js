@@ -54,7 +54,7 @@ function flashLoader(babeliumDomain, locale, forcertmpt, jsCallbackObj){
 	attributes.id = "babeliumPlayer";
 	attributes.name = "babeliumPlayer";
 	attributes.align = "middle";
-	swfobject.embedSWF(protocol+"//"+babeliumDomain+"/babeliumPlayer.swf", "flashContent", "640", "380", swfVersionStr, xiSwfUrlStr, flashvars, params, attributes);
+	swfobject.embedSWF(protocol+"//"+babeliumDomain+"/playerv2.swf", "flashContent", "640", "380", swfVersionStr, xiSwfUrlStr, flashvars, params, attributes);
 	// JavaScript enabled so display the flashContent div in case it is not replaced with a swf object.
 	swfobject.createCSS("#flashContent", "display:block;text-align:left;");
 };

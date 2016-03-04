@@ -48,7 +48,7 @@ $settings->add(new admin_setting_configcheckbox('assignsubmission_babelium/force
 $settings->add(new admin_setting_configtext('assignsubmission_babelium/apidomain',
 					    new lang_string('apidomain','assignsubmission_babelium'),
 					    new lang_string('apidomain_help','assignsubmission_babelium'),
-					    'babeliumproject.com/api',
+					    'babeliumproject.com/api/v2',
 					    PARAM_TEXT));
 					    
 $settings->add(new admin_setting_configtext('assignsubmission_babelium/apiendpoint',
