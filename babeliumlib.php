@@ -60,10 +60,33 @@ function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
 	if(isset($info['title'])){
 		$html_content.='<h2 id="babelium-exercise-title">'.$info['title'].'</h2>';
 	}
+    $html_content.="<iframe onload='javascript:(function(o){o.style.height=(o.contentWindow.document.body.scrollHeight*0.6)+\"px\";}(this));' style='height:100px;width:100%;border:none;overflow:hidden;' src='//babelium-dev.irontec.com/iframe/upload.html'></iframe>";
+
+    //HTML5 video player example
+
+    /*
+    $html_content.='<h1>Reproduccion de video sin Flash</h1>';
+    $html_content.="<script src='//babelium-static.irontec.com/plyr/dist/plyr.js' language='javascript'></script>";
+    $html_content.="<link rel='stylesheet' href='//babelium-static.irontec.com/plyr/dist/plyr.css'>";
+    $html_content.='<iframe width="560" height="315" src="https://www.youtube.com/embed/8SpASXsPwl0" frameborder="0" allowfullscreen></iframe>';
+    $html_content.='<video style="width:100%" poster="//babelium-static.irontec.com/_temp/poster.jpg" controls crossorigin="anonymous">
+  <source src="//babelium-static.irontec.com/_temp/video.mp4" type="video/mp4">
+  <source src="//babelium-static.irontec.com/_temp/video.webm" type="video/webm">
+  <!-- Captions are optional -->
+  <track kind="captions" label="English captions" src="//babelium-static.irontec.com/_temp/subs.vtt" srclang="en" default>
+    </video>';
+    */
+
+
 	$html_content.='<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js" language="javascript"></script>';
-	$html_content.='<script type="text/javascript"> var $bjq = jQuery.noConflict(); </script>';
-	$html_content.='<script src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/swfobject.js" language="javascript"></script>';
 	$html_content.='<script src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/babelium.moodle.js" language="javascript"></script>';
+	$html_content.='<script type="text/javascript"> var $bjq = jQuery.noConflict(); </script>';
+
+
+	//disable SWF integration
+
+	/*
+	$html_content.='<script src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/swfobject.js" language="javascript"></script>';
 	$html_content.='<div id="flashContent">
 			 <p>To view this page ensure that Adobe Flash Player version 11.1.0 or greater is installed. </p>
 			 <script type="text/javascript">
@@ -73,7 +96,7 @@ function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
 			</script>
 			</div>
 			<noscript><p>Either scripts and active content are not permitted to run or Adobe Flash Player version 11.1.0 or greater is not installed.</p></noscript>';
-
+    */
 	$domain = get_config('assignsubmission_babelium','serverdomain');
 	$forcertmpt = get_config('assignsubmission_babelium','forcertmpt');
 	$lang = current_language();

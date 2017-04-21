@@ -34,12 +34,17 @@ class assignsubmission_babelium_renderer extends plugin_renderer_base {
     $html .= html_writer::div(get_string('jsrequired', 'assignsubmission_babelium'), 'hiddenifjs');
 
     html_writer::tag('h2',$widget->title,array('id'=>'babelium-exercise-title'));
+
+    //Disable SWF integration
+
+    /*
     html_writer::div('flashContent');
     html_writer::tag('p',$text);
-    html_writer::script('var pageHost = ((document.location.protocol == "https:") ? "https://" : "http://"); 
+    html_writer::script('var pageHost = ((document.location.protocol == "https:") ? "https://" : "http://");
     document.write("<a href=\'http://www.adobe.com/go/getflashplayer\'><img src=\'"
         + pageHost + "www.adobe.com/images/shared/download_buttons/get_flash_player.gif\' alt=\'Get Adobe Flash player\' /></a>" ); ');
-    html_writer::script(null,$swfobjecturl);
+    //html_writer::script(null,$swfobjecturl);
+    */
 
     $this->page->requires->yui_module('moodle-assignsubmission_babelium-service',
                                       'M.assignsubmission_babelium.service.init',
