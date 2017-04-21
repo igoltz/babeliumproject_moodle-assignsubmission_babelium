@@ -27,37 +27,7 @@ function init(babeliumDomain, locale, forcertmpt, exInfo, exSubs, rInfo, rSubs, 
 		responseSubs = rSubs;
     recordInfo = recInfo;
 	}
-
-	//Load flash object
-	flashLoader(babeliumDomain,locale,forcertmpt,"");
 }
-
-function flashLoader(babeliumDomain, locale, forcertmpt, jsCallbackObj){
-	// For version detection, set to min. required Flash Player version, or 0 (or 0.0.0), for no version detection.
-	var swfVersionStr = "11.1.0";
-
-  var protocol = window.location.protocol;
-
-	// To use express install, set to playerProductInstall.swf, otherwise the empty string.
-	var xiSwfUrlStr = protocol+"//"+babeliumDomain+"/playerProductInstall.swf";
-	var flashvars = {};
-	flashvars.locale = locale; //Overrides the default locale that's established via system info, to the specified locale
-	flashvars.forcertmpt = forcertmpt;
-	flashvars.jsCallbackObj = jsCallbackObj; //Where to point the ExternalInterface.call() methods to avoid global scope methods
-	var params = {};
-	params.quality = "high";
-	params.bgcolor = "#000000"; //Use black background
-	params.allowscriptaccess = "always"; //The swf file is stored in a different domain
-	params.allowfullscreen = "false";
-	params.wmode = "window";
-	var attributes = {};
-	attributes.id = "babeliumPlayer";
-	attributes.name = "babeliumPlayer";
-	attributes.align = "middle";
-	swfobject.embedSWF(protocol+"//"+babeliumDomain+"/playerv2.swf", "flashContent", "640", "380", swfVersionStr, xiSwfUrlStr, flashvars, params, attributes);
-	// JavaScript enabled so display the flashContent div in case it is not replaced with a swf object.
-	swfobject.createCSS("#flashContent", "display:block;text-align:left;");
-};
 
 //This function is top-level until finding a way to route ExternalInterface.call() to object encapsulation
 function onVideoPlayerInitialized(playerid){
