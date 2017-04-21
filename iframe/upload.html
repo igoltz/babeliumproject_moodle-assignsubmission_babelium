@@ -1,0 +1,435 @@
+<html>
+   <head>
+      <!-- boostrap css -->
+      <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+      <!-- sweet alert-->
+      <script src="//babelium-static.irontec.com/dist/sweetalert/sweetalert.min.js"></script>
+      <link rel="stylesheet" href="//babelium-static.irontec.com/dist/sweetalert/sweetalert.css">
+      <!-- audio recorder -->
+      <script type="text/javascript" src="//babelium-dev.irontec.com/iframe/mp3recorder/recorder.js"></script>
+      <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+      <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <![endif]-->
+
+      <!-- custom styles -->
+
+        <style type="text/css">
+            @import url(https://fonts.googleapis.com/css?family=Roboto:400,700,500);
+
+            body {
+              background: white;
+              font-family: "Roboto", sans-serif;
+              font-size: 16px;
+              font-weight: 700;
+            }
+
+            ul{
+                list-style-type: none;
+            }
+
+            .container {
+              display: -webkit-box;
+              display: -ms-flexbox;
+              display: flex;
+              -webkit-box-orient: vertical;
+              -webkit-box-direction: normal;
+                  -ms-flex-direction: column;
+                      flex-direction: column;
+              width: 100%;
+              padding: 20px;
+            }
+
+            .button-container {
+              display: -webkit-box;
+              display: -ms-flexbox;
+              display: flex;
+              -ms-flex-wrap: wrap;
+                  flex-wrap: wrap;
+              -webkit-box-pack: center;
+                  -ms-flex-pack: center;
+                      justify-content: center;
+            }
+
+            .button {
+              display: -webkit-box;
+              display: -ms-flexbox;
+              display: flex;
+              overflow: hidden;
+              margin: 10px;
+              padding: 12px 12px;
+              cursor: pointer;
+              -webkit-user-select: none;
+                 -moz-user-select: none;
+                  -ms-user-select: none;
+                      user-select: none;
+              -webkit-transition: all 60ms ease-in-out;
+              transition: all 60ms ease-in-out;
+              text-align: center;
+              white-space: nowrap;
+              text-decoration: none !important;
+              text-transform: none;
+              text-transform: capitalize;
+              color: #fff;
+              border: 0 none;
+              border-radius: 4px;
+              font-size: 14px;
+              font-weight: 500;
+              line-height: 1.3;
+              -webkit-appearance: none;
+              -moz-appearance: none;
+              appearance: none;
+              -webkit-box-pack: center;
+                  -ms-flex-pack: center;
+                      justify-content: center;
+              -webkit-box-align: center;
+                  -ms-flex-align: center;
+                      align-items: center;
+              -webkit-box-flex: 0;
+                  -ms-flex: 0 0 160px;
+                      flex: 0 0 160px;
+            }
+            .button:hover {
+              -webkit-transition: all 60ms ease;
+              transition: all 60ms ease;
+              opacity: .85;
+            }
+            .button:active {
+              -webkit-transition: all 60ms ease;
+              transition: all 60ms ease;
+              opacity: .75;
+            }
+            .button:focus {
+              outline: 1px dotted #959595;
+              outline-offset: -4px;
+            }
+
+            .button.-regular {
+              color: #202129;
+              background-color: #edeeee;
+            }
+            .button.-regular:hover {
+              color: #202129;
+              background-color: #e1e2e2;
+              opacity: 1;
+            }
+            .button.-regular:active {
+              background-color: #d5d6d6;
+              opacity: 1;
+            }
+
+            .button.-dark {
+              color: #FFFFFF;
+              background: #333030;
+            }
+            .button.-dark:focus {
+              outline: 1px dotted white;
+              outline-offset: -4px;
+            }
+
+            .button.-green {
+              color: #FFFFFF;
+              background: #3ac569;
+            }
+
+            .button.-blue {
+              color: #FFFFFF;
+              background: #2b90d9;
+            }
+
+            .button.-salmon {
+              color: #FFFFFF;
+              background: #F32C52;
+            }
+
+            .button.-sun {
+              color: #f15c5c;
+              background: #feee7d;
+            }
+
+            .button.-alge {
+              color: #f4f7f7;
+              background: #79a8a9;
+            }
+
+            .button.-flower {
+              color: #FE8CDF;
+              background: #353866;
+            }
+            .justified{
+                text-align: justify;
+            }
+            .centered{
+                text-align: center;
+                padding: 25px;
+            }
+        </style>
+
+   </head>
+   <body>
+      <div class="container">
+         <div class="row">
+            <div class='col-md-6'>
+               <h1>
+                  Moodle submission
+               </h1>
+               <div>
+                  <p class="justified">
+                     Make sure you are using a recent version of Google Chrome, Firefox or Edge. Also before you enable microphone input either plug in headphones or turn the volume down if you want to avoid ear splitting feedback! Please, record your assigment as you usually do. Press 'record' to start.
+                  </p>
+                  <div class="centered">
+                     <script src='//babelium-static.irontec.com/dist/plyr/dist/plyr.js' language='javascript'></script>
+                     <link rel='stylesheet' href='//babelium-static.irontec.com/dist/plyr/dist/plyr.css'>
+                     <h2>Exercise</h2>
+                     <p>Please, view the video first</p>
+                     </br>
+                     <video style="width:100%" poster="//babelium-static.irontec.com/_temp/poster.jpg" controls crossorigin="anonymous">
+                        <source src="//babelium-static.irontec.com/_temp/video.mp4" type="video/mp4">
+                        <source src="//babelium-static.irontec.com/_temp/video.webm" type="video/webm">
+                        <!-- Captions are optional -->
+                        <track kind="captions" label="English captions" src="//babelium-static.irontec.com/_temp/subs.vtt" srclang="en" default>
+                     </video>
+                  </div>
+               </div>
+            </div>
+            <div class="col-md-6">
+                <div class="centered">
+                    <h2>Audio recording controls</h2>
+                    <h3 class="clock">00:00:00</h3>
+                </div>
+
+                <div class="button-container">
+                    <!--button class='button -dark center' onclick="playRecording(this);">Play</button>-->
+                    <button class='button -green center startRecord' onclick="startRecording(this);">Record</button>
+                    <button class='button -salmon center stopRecord' onclick="stopRecording(this);">Stop</button>
+                </div>
+
+                <h2>Recordings list</h2>
+                <ul id="recordingslist"></ul>
+
+                <h2>Recording log</h2>
+                <pre id="log"></pre>
+
+               <!--
+               <div class="button-container" style="display: none">
+              <div class='button -regular center'>Let's start</div>
+
+              <div class='button -dark center'>Touch me</div>
+
+              <div class='button -green center'>Just like that</div>
+
+              <div class='button -blue center'>And that, oh, yeah</div>
+
+              <div class='button -salmon center'>Now that I like</div>
+
+              <div class='button -sun center'>God, that's so nice</div>
+
+              <div class='button -alge center'>Now lower down</div>
+
+              <div class='button -flower center'>Where the figs lie</div>
+              </div>
+              -->
+            </div>
+         </div>
+      </div>
+
+       <!-- clock -->
+    <script>
+    var formathour = 0;
+    var formatmin = 0;
+    var formatsec = 0;
+
+    function myclock() {
+        var date = new Date(); // Get the current date/time
+        var hour = 0; // Save hours
+        var min = 0; // Save minutes
+        var sec = 0; // Save seconds
+        formathour = 0; // Format hours
+        formatmin = 0; // Format minutes
+        formatsec = 0; // Format seconds
+        timeout = setTimeout(myclock, 1000);
+    }
+
+    function format(x) {
+        if (x < 10) x = "0" + x;
+        return x;
+    }
+
+    var c;
+
+    $("#startRecord").click(function() {
+        var started = is_recording;
+        if (!started) {
+            c = setInterval(setTheTime, 1000);
+            started = true; //redundant
+        }
+        else {
+            started = false; //redundant
+            clearInterval(c);
+         }
+    });
+
+    function setTheTime() {
+        myclock();
+        var curTime = formathour + ":" + formatmin + ":" + formatsec // Current time formatted
+        $("#clock").prop('value', curTime);
+    }
+    </script>
+      <!-- audio recorder script -->
+      <script>
+         var generateMp3 = true;
+         var extension;
+         var audio_context;
+         var recorder;
+         var audio_recorded = false;
+         var is_recording = false;
+
+         function cstm_log(e, data) {
+            log.innerHTML += "\n" + e + " " + (data || '');
+         }
+
+         function startUserMedia(stream) {
+            var input = audio_context.createMediaStreamSource(stream);
+            cstm_log('Media stream created.');
+            // Uncomment if you want the audio to feedback directly
+            //input.connect(audio_context.destination);
+            //cstm_log('Input connected to audio context destination.');
+
+            //custom recorder settings
+            config = {
+                sampleRate : 64000, // 64kbps = 64000 sample rate in bits,
+                numChannels: 1,
+                bufferLen: 1024
+            };
+            cstm_log('Setting recorder configuration...');
+
+            recorder = new Recorder(input, config);
+            cstm_log('Recorder initialised.');
+         }
+
+         /*function playRecording(button) {
+            if(!is_recording){
+                if(audio_recorded){
+                    //play audio
+                }
+                else{
+                    sweetAlert("Audio player", "You have to record an AUDIO first", "error");
+                }
+            }
+         }*/
+
+         function startRecording(button) {
+            if(!is_recording){
+                recorder && recorder.record();
+                cstm_log('Recording...');
+                is_recording = true;
+            }
+         }
+
+         function stopRecording(button) {
+            if(is_recording){
+                is_recording = false;
+                recorder && recorder.stop();
+                cstm_log('Stopped recording.');
+
+                // create WAV download link using audio data blob
+                createDownloadLink();
+                recorder.clear();
+            }
+            else{
+                //shoe error
+                sweetAlert("Audio player", "You have to start a record first", "error");
+            }
+         }
+
+         function createDownloadLink() {
+            recorder && recorder.exportWAV(function(blob) {
+                var url = URL.createObjectURL(blob);
+                console.log(url);
+                var li = document.createElement('li');
+                var au = document.createElement('audio');
+                var hf = document.createElement('a');
+
+                au.controls = true;
+                au.src = url;
+                hf.href = url;
+                var filename = new Date().toISOString() +  extension;
+                hf.download = filename;
+                hf.innerHTML = hf.download;
+                li.appendChild(au);
+                li.appendChild(hf);
+                recordingslist.appendChild(li);
+                //make post
+                upload(url, filename, "https://babelium-static.irontec.com/upload/audio.php")
+            });
+         }
+
+         window.onload = function init() {
+            if(generateMp3){
+                extension = ".mp3";
+            }
+            else{
+                extension = ".wav";
+            }
+            //check if secure origin
+            if (location.protocol === 'http:') {
+                // page is in-secure
+                document.body.innerHTML = '<div class="alert alert-danger">\
+                <strong>RECORDING DISABLED!</strong>\
+                For security reasons, audio recording is disabled on non HTTPS locations\
+                </div>'
+                + document.body.innerHTML;
+            }
+            try {
+                // webkit shim
+                window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mediaDevices.getUserMedia;
+                window.URL = window.URL || window.webkitURL;
+
+                audio_context = new AudioContext;
+                cstm_log('Audio context set up.');
+                cstm_log('navigator.getUserMedia() ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
+            }
+            catch (e) {
+                cstm_log('No web audio support in this browser!');
+                sweetAlert("Oops...", "No web audio support in this browser", "error");
+            }
+
+            navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
+                cstm_log('No live audio input: ' + e);
+                sweetAlert("Oops...", "No live audio input", "error");
+            });
+         };
+
+         function upload(blob, filename, url) {
+            //first, self download the file from blob
+            var xhr=new XMLHttpRequest();
+            xhr.onload=function(e) {
+                if(this.readyState === 4) {
+                    //upload received data as blob/raw to server
+                    //then, upload downloaded file to server
+                    send(filename, e.target.responseText, url);
+                }
+            };
+            xhr.open("GET",blob,true);
+            xhr.send();
+         }
+
+         function send(filename, data, url){
+            var xhr=new XMLHttpRequest();
+            xhr.onload=function(e) {
+                if(this.readyState === 4) {
+                    console.log("Server returned: ",e.target.responseText);
+                }
+            };
+            var fd=new FormData();
+            fd.append("audioname", filename);
+            fd.append("audiofile",data);
+            xhr.open("POST",url,true);
+            xhr.send(fd);
+         }
+      </script>
+   </body>
+</html>
