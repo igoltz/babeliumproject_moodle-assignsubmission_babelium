@@ -1,3 +1,10 @@
+#exclude audio/video files
+
+*.wav
+*.mp3
+*.mp4
+*.old
+
 #Ignore config files
 build.properties
 Config.php
