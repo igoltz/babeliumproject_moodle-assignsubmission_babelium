@@ -7,6 +7,8 @@ var recordInfo = null;
 var responseInfo = null;
 var respponseSubs = null;
 
+var $bjq = jQuery.noConflict();
+
 //Enable debugging messages
 var debug = !1;
 
