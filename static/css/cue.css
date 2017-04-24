@@ -1,0 +1,10 @@
+
+::cue(v[voice='NPC']) {
+  color:#fff;
+  background:blue;
+}
+
+::cue(v[voice='Yourself']) {
+  color:#fff;
+  background:orange;
+}
