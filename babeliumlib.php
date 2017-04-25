@@ -60,8 +60,8 @@ function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
 	if(isset($info['title'])){
 		$html_content.='<h2 id="babelium-exercise-title">'.$info['title'].'</h2>';
 	}
-    $html_content.="<iframe onload='javascript:(function(o){o.style.height=(o.contentWindow.document.body.scrollHeight*0.6)+\"px\";}(this));' style='height:100px;width:100%;border:none;overflow:hidden;' src='//babelium-dev.irontec.com/iframe/upload.html'></iframe>";
-
+    //$html_content.="<iframe onload='javascript:(function(o){o.style.height=(o.contentWindow.document.body.scrollHeight*0.6)+\"px\";}(this));' style='height:100px;width:100%;border:none;overflow:hidden;' src='//babelium-dev.irontec.com/iframe/upload.html'></iframe>";
+    $html_content.= file_get_contents('/var/www/html/babelium-plugin-shortcut/iframe/upload.body.html', FILE_USE_INCLUDE_PATH);
     //HTML5 video player example
 
     /*
@@ -77,10 +77,9 @@ function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
     </video>';
     */
 
-
-	$html_content.='<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js" language="javascript"></script>';
 	$html_content.='<script src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/babelium.moodle.js" language="javascript"></script>';
-	$html_content.='<script type="text/javascript"> var $bjq = jQuery.noConflict(); </script>';
+	$html_content.='<script src="//babelium-static.irontec.com/js/babelium.core.js" language="javascript"></script>';
+    $html_content.='<script type="text/javascript"> var $bjq = jQuery.noConflict(); </script>';
 
 
 	//disable SWF integration
