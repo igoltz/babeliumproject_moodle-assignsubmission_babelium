@@ -102,14 +102,14 @@ function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
 	$lang = current_language();
 
 	$html_content .= '<script language="javascript" type="text/javascript">
-						var domain = "'+$domain+'";
-						var lang = '+$lang+';
-						var forcertmpt = '+$forcertmpt+';
-						var exinfo = '+$exinfo+';
-						var exsubs = '+$exsubs+';
-						var rsinfo = '+$rsinfo+';
-						var rssubs = '+$rssubs+';
-						var recinfo = '+$recinfo+';
+						var domain = "'.$domain.'";
+						var lang = "'.$lang.'";
+						var forcertmpt = '.$forcertmpt.';
+						var exinfo = '.$exinfo.';
+						var exsubs = '.$exsubs.';
+						var rsinfo = '.$rsinfo.';
+						var rssubs = '.$rssubs.';
+						var recinfo = '.$recinfo.';
 						init(domain, lang, forcertmpt, exinfo, exsubs, rsinfo, rssubs, recinfo);
 					  </script>';
 	return $html_content;
