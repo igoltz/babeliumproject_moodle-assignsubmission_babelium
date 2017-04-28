@@ -68,6 +68,7 @@ class assign_submission_babelium extends assign_submission_plugin
         );
 
         try {
+            //$exercises = babeliumsubmission_get_available_exercise_list();
             $exercises = babeliumsubmission_get_available_exercise_list();
 
             if ($exercises && count($exercises) > 0) {

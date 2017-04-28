@@ -121,8 +121,9 @@ function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
  */
 function babeliumsubmission_get_available_exercise_list(){
 	$g = new babeliumservice();
-	$result = $g->newServiceCall('getRecordableExercises');
-	return $result;
+	//$result = $g->newServiceCall('getRecordableExercises');
+	//return $result;
+        return $g->getExerciseList();
 }
 
 /**
