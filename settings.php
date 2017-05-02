@@ -34,27 +34,27 @@ $settings->add(new admin_setting_configtext('assignsubmission_babelium/serverdom
                         'babeliumproject.com',
                         PARAM_TEXT));
 
-$settings->add(new admin_setting_configtext('assignsubmission_babelium/serverport',
+/*$settings->add(new admin_setting_configtext('assignsubmission_babelium/serverport',
                         new lang_string('serverport','assignsubmission_babelium'),
                         new lang_string('serverport_help','assignsubmission_babelium'),
                         '80',
-                        PARAM_INT));
+                        PARAM_INT));*/
 
-$settings->add(new admin_setting_configcheckbox('assignsubmission_babelium/forcertmpt',
+/*$settings->add(new admin_setting_configcheckbox('assignsubmission_babelium/forcertmpt',
                     new lang_string('forcertmpt', 'assignsubmission_babelium'),
                     new lang_string('forcertmpt_help', 'assignsubmission_babelium'),
-                    0));
+                    0));*/
 
-$settings->add(new admin_setting_configtext('assignsubmission_babelium/apidomain',
+/*$settings->add(new admin_setting_configtext('assignsubmission_babelium/apidomain',
                         new lang_string('apidomain','assignsubmission_babelium'),
                         new lang_string('apidomain_help','assignsubmission_babelium'),
                         'babeliumproject.com/api/v2',
-                        PARAM_TEXT));
+                        PARAM_TEXT));*/
                         
 $settings->add(new admin_setting_configtext('assignsubmission_babelium/apiendpoint',
                         new lang_string('apiendpoint','assignsubmission_babelium'),
                         new lang_string('apiendpoint_help','assignsubmission_babelium'),
-                        'rest.php',
+                        '/api/v2/rest.php',
                         PARAM_TEXT));
 
 $settings->add(new admin_setting_configpasswordunmask('assignsubmission_babelium/accesskey',
@@ -66,5 +66,3 @@ $settings->add(new admin_setting_configpasswordunmask('assignsubmission_babelium
                                   new lang_string('secretaccesskey','assignsubmission_babelium'),
                                   new lang_string('secretaccesskey_help','assignsubmission_babelium'),
                               ''));
-
-

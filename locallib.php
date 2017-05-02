@@ -185,11 +185,11 @@ class assign_submission_babelium extends assign_submission_plugin
     public function get_babelium_form_elements(MoodleQuickForm $mform, $formdata)
     {
         global $PAGE;
-        $PAGE->requires->string_for_js('babeliumViewRecording', 'assignsubmission_babelium');
+        /*$PAGE->requires->string_for_js('babeliumViewRecording', 'assignsubmission_babelium');
         $PAGE->requires->string_for_js('babeliumViewExercise', 'assignsubmission_babelium');
         $PAGE->requires->string_for_js('babeliumStartRecording', 'assignsubmission_babelium');
-        $PAGE->requires->string_for_js('babeliumStopRecording', 'assignsubmission_babelium');
-        //$PAGE->requires->jquery();
+        $PAGE->requires->string_for_js('babeliumStopRecording', 'assignsubmission_babelium');*/
+        $PAGE->requires->jquery();
 
         list($data, $exinfo, $exroles, $exlangs, $exsubs, $recinfo) = $formdata;
 
@@ -240,19 +240,21 @@ class assign_submission_babelium extends assign_submission_plugin
         //TODO Currently, we only allow one language for the subtitles so this element is not needed for now
         //$mform->addElement('select', 'localeCombo', get_string('babeliumChooseSubLang', 'assignment_babelium'), $localeMenu);
 
-        $recmethods   = array();
+        /* No need to give them an option. just audio
+         * $recmethods   = array();
         $recmethods[] = $mform->createElement('radio', 'recmethod', 'none', get_string('babeliumMicOnly', 'assignsubmission_babelium'), 0);
         $recmethods[] = $mform->createElement('radio', 'recmethod', 'none', get_string('babeliumWebcamMic', 'assignsubmission_babelium'), 1);
         $mform->addGroup($recmethods, 'radioar', get_string('babeliumChooseRecMethod', 'assignsubmission_babelium'), array(
             ' '
-        ), false);
+        ), false);*/
 
         //TODO check how the help dynamic popups retrieve their texts to apply the same principle to the label of these two buttons
-        $babeliumactions   = array();
+        /* These actions will be defined using JS
+         * $babeliumactions   = array();
         $babeliumactions[] = $mform->createElement('button', 'startStopRecordingBtn', get_string('babeliumStartRecording', 'assignsubmission_babelium'));
         $babeliumactions[] = $mform->createElement('button', 'viewRecordingBtn', get_string('babeliumViewRecording', 'assignsubmission_babelium'), empty($data->responsehash) ? 'style="display:none;"' : null);
         $babeliumactions[] = $mform->createElement('button', 'viewExerciseBtn', get_string('babeliumViewExercise', 'assignsubmission_babelium'), empty($data->responsehash) ? 'style="display:none;"' : null);
-        $mform->addGroup($babeliumactions, 'babeliumActions', '', '', false);
+        $mform->addGroup($babeliumactions, 'babeliumActions', '', '', false);*/
     }
 
     /**

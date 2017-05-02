@@ -87,8 +87,8 @@ class babeliumservice{
 	private function get_babelium_settings(){
 		$bcfg = new stdClass();
 		$bcfg->babelium_babeliumWebDomain = get_config('assignsubmission_babelium','serverdomain');
-		$bcfg->babelium_babeliumWebPort = get_config('assignsubmission_babelium','serverport');
-		$bcfg->babelium_babeliumApiDomain = get_config('assignsubmission_babelium','apidomain');
+		//$bcfg->babelium_babeliumWebPort = get_config('assignsubmission_babelium','serverport');//removed
+		//$bcfg->babelium_babeliumApiDomain = get_config('assignsubmission_babelium','apidomain');
 		$bcfg->babelium_babeliumApiEndPoint = get_config('assignsubmission_babelium','apiendpoint');
 		$bcfg->babelium_babeliumApiAccessKey = get_config('assignsubmission_babelium','accesskey');
 		$bcfg->babelium_babeliumApiSecretAccessKey = get_config('assignsubmission_babelium','secretaccesskey');
@@ -149,26 +149,35 @@ class babeliumservice{
 			$request['parameters'] = $parameters;
 		}
 		
-		//Date timestamp formated following one of the standards allowed for HTTP 1.1 date headers (DATE_RFC1123)
-		$date = date("D, d M Y H:i:s O");
-		$referer = $_SERVER['HTTP_REFERER'];
-		$pieces = parse_url($referer);
-		$originhost = $_SERVER['HTTP_HOST']; 
-		$origin = $pieces['scheme'] . "://" . $originhost;
-		
-		$request['header']['date'] = $date;
-		$signature = "BMP ".$this->settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $this->settings->babelium_babeliumApiSecretAccessKey);
-		$request['header']['authorization'] = $signature;
+		//Date timestamp formated following one of the standards allowed for HTTP 1.1 date headers (DATE_RFC1123)                
+                $date = date("D, d M Y H:i:s O");
+                if (getenv("APPLICATION_ENV") == "development"){
+                    //auth bypass while development
+                    $fake_host = "babelium-dev.irontec.com";
+                    $referer = str_replace($_SERVER['HTTP_HOST'], $fake_host, $_SERVER['HTTP_REFERER']);
+                    $pieces = parse_url($referer);
+                    $originhost = $fake_host;
+                    $origin = $pieces['scheme'] . "://" . $originhost;
+                    $request['header']['date'] = $date;
+                    $signature = "BMP ".$this->settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $this->settings->babelium_babeliumApiSecretAccessKey);
+                    $request['header']['authorization'] = $signature;
+                }
+                else{
+                    //default
+                    $referer = $_SERVER['HTTP_REFERER'];
+                    $pieces = parse_url($referer);
+                    $originhost = $_SERVER['HTTP_HOST']; 
+                    $origin = $pieces['scheme'] . "://" . $originhost;
+
+                    $request['header']['date'] = $date;
+                    $signature = "BMP ".$this->settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $this->settings->babelium_babeliumApiSecretAccessKey);
+                    $request['header']['authorization'] = $signature;
+                }
 		
 		//See this workaround if the query parameters are written with &amp; : http://es.php.net/manual/es/function.http-build-query.php#102324
 		$request = http_build_query($request,'', '&');
 		
-		
-		$web_domain = $this->settings->babelium_babeliumWebDomain;
-		$api_domain = $this->settings->babelium_babeliumApiDomain;
-		$api_endpoint = $this->settings->babelium_babeliumApiEndPoint;
-		$api_url = $commProtocol . $api_domain . '/' . $api_endpoint;
-		$query_string = $api_url . '?' . $method;
+		$query_string = $this->get_query_string($method);
 		
 		//Check if proxy (if used) should be bypassed for this url
 		$proxybypass = function_exists('is_proxybypass') ? is_proxybypass($query_string) : false;
@@ -266,34 +275,15 @@ class babeliumservice{
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
 
-            /*if($type=='POST'){
-                //set curl post fields
-                curl_setopt($ch, CURLOPT_POST, 1);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $request_data);
-            }
-            else if($type=='GET'){
-                //set curl get fields
-            }
-            curl_setopt($ch, CURLOPT_HEADER, 1);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            if(isset($referer)){
-                curl_setopt($ch, CURLOPT_REFERER, $referer);
-            }
-            if(isset($origin)){
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array("Origin: $origin"));
-            }
-            $result = curl_exec($ch);
-            curl_close($ch);*/
-
             return $result;
         }
         
         public function get_query_string($method){
             $commProtocol = 'http://';
             $web_domain = $this->settings->babelium_babeliumWebDomain;
-            $api_domain = $this->settings->babelium_babeliumApiDomain;
-            $api_endpoint = $this->settings->belium_babeliumApiEndPoint;
-            $api_url = $commProtocol . $api_domain . '/' . $api_endpoint;
+            $api_domain = $web_domain;
+            $api_endpoint = $this->settings->babelium_babeliumApiEndPoint;
+            $api_url = $commProtocol . $api_domain . $api_endpoint;
             $query_string = $api_url . '?' . $method;
             return $query_string;
         }

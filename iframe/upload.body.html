@@ -1,5 +1,5 @@
 <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
 <!-- sweetalert css -->
 <link rel="stylesheet" href="//babelium-static.irontec.com/dist/sweetalert/sweetalert.css">
 <!-- base styles -->
@@ -16,18 +16,9 @@
 
 <div class="container">
  <div class="row">
-    <div class='col-md-6'>
-       <h1>
-          Moodle submission
-       </h1>
-       <div>
-          <p class="justified">
-             Make sure you are using a recent version of Google Chrome, Firefox or Edge. Also before you enable microphone input either plug in headphones or turn the volume down if you want to avoid ear splitting feedback! Please, record your assigment as you usually do. Press 'record' to start.
-          </p>
+    <div class='col-md-12'>
           <div class="centered">
-             <h2>Exercise</h2>
-             <p>Please, view the video first</p>
-             </br>
+          <p class="justified exdescription"></p>
              <video style="width:100%" poster="//babelium-static.irontec.com/_temp/poster.jpg" controls crossorigin="anonymous">
                 <source src="//babelium-static.irontec.com/_temp/video.mp4" type="video/mp4">
                 <source src="//babelium-static.irontec.com/_temp/video.webm" type="video/webm">
@@ -37,7 +28,7 @@
           </div>
        </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-12">
         <div class="centered">
             <h2>Audio recording controls</h2>
             <h3 class="clock">00:00:00</h3>
@@ -68,3 +59,10 @@
 <script src='//babelium-static.irontec.com/js/audio.js' language='javascript'></script>
 <!-- video player script -->
 <script src='//babelium-static.irontec.com/dist/plyr/dist/plyr.js' language='javascript'></script>
+
+<script type="text/javascript">
+// A $( document ).ready() block.
+$( document ).ready(function() {
+    $('.exdescription').text(exinfo.description);
+});
+</script>

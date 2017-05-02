@@ -38,6 +38,14 @@ require_once($CFG->dirroot . '/mod/assign/submission/babelium/babeliumservice.ph
 function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
 
 	global $SESSION, $CFG, $BCFG;
+        
+        $content_path = "";
+        if(getenv("APPLICATION_ENV") == 'development'){
+            $content_path = $CFG->wwwroot .'/mod/assign/submission/babelium/iframe/upload.body.html';
+        }
+        else{
+            $content_path =$CFG->wwwroot .'/var/www/html/babelium-plugin-shortcut/iframe/upload.body.html';
+        }
 
 	$exinfo = '""';
 	$exsubs = '""';
@@ -58,10 +66,10 @@ function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
 
 	$html_content = '';
 	if(isset($info['title'])){
-		$html_content.='<h2 id="babelium-exercise-title">'.$info['title'].'</h2>';
+		$html_content.='<h2 id="babelium-exercise-title" class="centered">'.$info['title'].'</h2>';
 	}
     //$html_content.="<iframe onload='javascript:(function(o){o.style.height=(o.contentWindow.document.body.scrollHeight*0.6)+\"px\";}(this));' style='height:100px;width:100%;border:none;overflow:hidden;' src='//babelium-dev.irontec.com/iframe/upload.html'></iframe>";
-    $html_content.= file_get_contents('/var/www/html/babelium-plugin-shortcut/iframe/upload.body.html', FILE_USE_INCLUDE_PATH);
+    $html_content.= file_get_contents($content_path, FILE_USE_INCLUDE_PATH);
     //HTML5 video player example
 
     /*
@@ -97,7 +105,8 @@ function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
 			<noscript><p>Either scripts and active content are not permitted to run or Adobe Flash Player version 11.1.0 or greater is not installed.</p></noscript>';
     */
 	$domain = get_config('assignsubmission_babelium','serverdomain');
-	$forcertmpt = get_config('assignsubmission_babelium','forcertmpt');
+	//$forcertmpt = get_config('assignsubmission_babelium','forcertmpt');
+        $forcertmpt = 0;
 	$lang = current_language();
 
 	$html_content .= '<script language="javascript" type="text/javascript">
