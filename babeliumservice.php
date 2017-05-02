@@ -28,8 +28,17 @@ class babeliumservice{
 	private $_curlHeaderHttpStatusMessage;
 	private $_curlResponse;
 	private $_curlOutput;
+        
+        private $settings;
+        private $logFilePath;
+        
+        function __construct() {
+            $this->settings = $this->get_babelium_settings();
+            global $CFG;
+            $this->logFilePath = $CFG->dataroot."/babelium.log";  
+        }
 
-	/**
+        	/**
 	 * Parses the output of cURL. The headers found in this output are stored in the $_curlHeaders class property.
 	 * The response object, which should be a JSON object, is stored in the $_curlResponse class property.
 	 * @param string $output
@@ -102,9 +111,6 @@ class babeliumservice{
 	public function newServiceCall($method,$parameters = null){
 
 		global $USER, $CFG;
-		//global $BCFG;
-		//TODO - Maybe it should be placed here and not in the locallib
-		$BCFG = $this->get_babelium_settings();
 		/*$config_fields = array('babelium_babeliumWebDomain',
 				       'babelium_babeliumWebPort',
 				       'babelium_babeliumApiDomain',
@@ -125,7 +131,7 @@ class babeliumservice{
 			}
 		}
 		*/
-		foreach($BCFG as $prop=>$value){
+		foreach($this->settings as $prop=>$value){
 			if(empty($value)){
 				$this->display_error('babeliumErrorConfigParameters');
 			}
@@ -151,16 +157,16 @@ class babeliumservice{
 		$origin = $pieces['scheme'] . "://" . $originhost;
 		
 		$request['header']['date'] = $date;
-		$signature = "BMP ".$BCFG->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $BCFG->babelium_babeliumApiSecretAccessKey);
+		$signature = "BMP ".$this->settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $this->settings->babelium_babeliumApiSecretAccessKey);
 		$request['header']['authorization'] = $signature;
 		
 		//See this workaround if the query parameters are written with &amp; : http://es.php.net/manual/es/function.http-build-query.php#102324
 		$request = http_build_query($request,'', '&');
 		
 		
-		$web_domain = $BCFG->babelium_babeliumWebDomain;
-		$api_domain = $BCFG->babelium_babeliumApiDomain;
-		$api_endpoint = $BCFG->babelium_babeliumApiEndPoint;
+		$web_domain = $this->settings->babelium_babeliumWebDomain;
+		$api_domain = $this->settings->babelium_babeliumApiDomain;
+		$api_endpoint = $this->settings->babelium_babeliumApiEndPoint;
 		$api_url = $commProtocol . $api_domain . '/' . $api_endpoint;
 		$query_string = $api_url . '?' . $method;
 		
@@ -229,10 +235,126 @@ class babeliumservice{
 			$result = $result['response'];
 		else
 			$result = false;
-			
-		
 		return $result;
 	}
+        
+        public function make_request($headers, $request_url){
+            //Prepare the cURL request
+            $ch = curl_init($request_url);
+            if (!$ch) {
+                    debugging('Can not init curl.');
+                    return false;
+            }
+
+            $referer = "";
+            $origin="";                
+
+            curl_setopt_array(
+                    $ch,
+                    array(
+                        CURLOPT_URL => $request_url,
+                        CURLOPT_HTTPHEADER  => $headers, //array('X-User: admin', 'X-Authorization: 123456'),
+                        CURLOPT_REFERER => $referer,
+                        //CURLOPT_VERBOSE => 1,
+                        //CURLOPT_HEADER => 1,
+                        CURLOPT_RETURNTRANSFER  =>true,
+                        CURLOPT_SSL_VERIFYPEER => false,
+                        CURLOPT_SSL_VERIFYHOST => false                        
+                    )
+            );
+            $result = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            /*if($type=='POST'){
+                //set curl post fields
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $request_data);
+            }
+            else if($type=='GET'){
+                //set curl get fields
+            }
+            curl_setopt($ch, CURLOPT_HEADER, 1);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            if(isset($referer)){
+                curl_setopt($ch, CURLOPT_REFERER, $referer);
+            }
+            if(isset($origin)){
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array("Origin: $origin"));
+            }
+            $result = curl_exec($ch);
+            curl_close($ch);*/
+
+            return $result;
+        }
+        
+        public function get_query_string($method){
+            $commProtocol = 'http://';
+            $web_domain = $this->settings->babelium_babeliumWebDomain;
+            $api_domain = $this->settings->babelium_babeliumApiDomain;
+            $api_endpoint = $this->settings->belium_babeliumApiEndPoint;
+            $api_url = $commProtocol . $api_domain . '/' . $api_endpoint;
+            $query_string = $api_url . '?' . $method;
+            return $query_string;
+        }
+        
+        public function build_headers($method, $parameters){
+            foreach($this->settings as $prop=>$value){
+                if(empty($value)){
+                        $this->display_error('babeliumErrorConfigParameters');
+                }
+                if(($prop == 'babelium_babeliumApiAccessKey' && strlen($value)!=20) ||
+                   ($prop == 'babelium_babeliumApiSecretAccessKey' && strlen($value)!=40)){
+                        $this->display_error('babeliumErrorConfigParameters');
+                }
+            }
+            $request = array();
+            $request['method'] = $method;
+            if($parameters != null && is_array($parameters) && count($parameters) > 0){
+                    $request['parameters'] = $parameters;
+            }
+
+            //Date timestamp formated following one of the standards allowed for HTTP 1.1 date headers (DATE_RFC1123)
+            $date = date("D, d M Y H:i:s O");
+            if (getenv("APPLICATION_ENV") == "development"){
+                //auth bypass while development
+                $fake_host = "babelium-dev.irontec.com";
+                $referer = str_replace($_SERVER['HTTP_HOST'], $fake_host, $_SERVER['HTTP_REFERER']);
+                $pieces = parse_url($referer);
+                $originhost = $fake_host;
+                $origin = $pieces['scheme'] . "://" . $originhost;
+            }
+            else{
+                //default
+                $referer = $_SERVER['HTTP_REFERER'];
+                $pieces = parse_url($referer);
+                $originhost = $_SERVER['HTTP_HOST']; 
+                $origin = $pieces['scheme'] . "://" . $originhost;
+
+                $request['header']['date'] = $date;
+                $signature = "BMP ".$this->settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $this->settings->babelium_babeliumApiSecretAccessKey);
+                $request['header']['authorization'] = $signature;
+            }
+
+            //See this workaround if the query parameters are written with &amp; : http://es.php.net/manual/es/function.http-build-query.php#102324
+            //$request = http_build_query($request,'', '&');
+            //return $request;
+            return array(
+                'Access-Key:'.$this->settings->babelium_babeliumApiAccessKey,
+                'Secret-Access:'.$this->settings->babelium_babeliumApiSecretAccessKey
+            );
+        }
+        
+        public function getExerciseList() {
+            $headers = $this->build_headers($method, $parameters);
+            $request_url = "https://babelium-server-dev.irontec.com/api/v3/exercises";
+            //Check if proxy (if used) should be bypassed for this url
+            $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($request_url) : false;
+            $result = $this->make_request($headers, $request_url);
+            //Parses the response output to separate the headers from the body of the response
+            //$this->parseCurlOutput($result);
+            return $this->decodeJsonResponse($result);
+        }
 	
 	/**
 	 * Makes a unique signature for each API request
@@ -244,10 +366,8 @@ class babeliumservice{
 	 * 		The authorization header of the request
 	 */
 	private function generateAuthorization($method, $date, $origin, $skey){
-		//global $BCFG;
 		$stringtosign = utf8_encode($method . "\n" . $date . "\n" . $origin);
-		    	
-		$digest = hash_hmac("sha256", $stringtosign, /*$BCFG->babelium_babeliumApiSecretAccessKey*/ $skey, false);
+		$digest = hash_hmac("sha256", $stringtosign, /*$this->setting->babelium_babeliumApiSecretAccessKey*/ $skey, false);
 		$signature = base64_encode($digest);	
 		return $signature;
 	}
@@ -260,29 +380,32 @@ class babeliumservice{
 	 * 		A moodle exception is thrown if we are working with moodle 2.x. Otherways the older error() function is used
 	 */
 	private function display_error($errorCode){
-		if(!$errorCode)
-			return;
-		
-		//We are in moodle 2.x
-		if(class_exists("moodle_exception")){
-			throw new moodle_exception($errorCode,'assignsubmission_babelium');
-		} else {
-			error(get_string($errorCode,'assignsubmission_babelium'));
-		}
+            if(!$errorCode)
+                return;
+
+            //We are in moodle 2.x
+            if(class_exists("moodle_exception")){
+                    throw new moodle_exception($errorCode,'assignsubmission_babelium');
+            } else {
+                    error(get_string($errorCode,'assignsubmission_babelium'));
+            }
 	}
 	
 	private function activity_log($user_id=0, $user_name='', $action='', $query_string='', $req_method='', $req_params='', $req_hdate='', $req_hdomain='', $req_hsignature='', $resp_http_status=0, $info=''){
-		global $CFG;
-		
-		$log_file_path = $CFG->dataroot."/babelium.log";
-		
 		$calling_ip = getremoteaddr(); //getremoteaddr() is a moodle's function
 		$time_now = time();
-		
 		$message = $time_now ."\t".$calling_ip."\t".$user_id."\t".$user_name."\t".$action."\t".$req_hdate."\t".$req_hdomain."\t".$req_hsignature."\t".$resp_http_status."\t".$query_string."\t".$req_method."\t".$req_params."\t".$info;
-		
-		
-		error_log($message."\n",3,$log_file_path);
+		error_log($message."\n",3, $this->logFilePath);
 	}
+
+    public function decodeJsonResponse($result) {
+        $result = json_decode($result,true);
+        if (count($result)>0) {
+            return $result;
+        }
+        else {
+            return false;
+        }
+    }
 
 }
