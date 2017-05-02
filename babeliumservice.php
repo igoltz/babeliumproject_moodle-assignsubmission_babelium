@@ -110,7 +110,7 @@ class babeliumservice{
 	 */
 	public function newServiceCall($method,$parameters = null){
 
-		global $USER;
+		global $USER, $CFG;
 		/*$config_fields = array('babelium_babeliumWebDomain',
 				       'babelium_babeliumWebPort',
 				       'babelium_babeliumApiDomain',
@@ -118,27 +118,75 @@ class babeliumservice{
 				       'babelium_babeliumApiAccessKey',
 				       'babelium_babeliumApiSecretAccessKey');
 		
-		if(!$this->setting || !is_object($this->setting)){
+		if(!$BCFG || !is_object($BCFG)){
 			$this->display_error('babeliumErrorConfigParameters');
 		}
 		foreach($config_fields as $cfield){
-			if(!isset($this->setting->$cfield) || empty($this->setting->$cfield)){
+			if(!isset($BCFG->$cfield) || empty($BCFG->$cfield)){
 				$this->display_error('babeliumErrorConfigParameters');
 			}
-			if(($cfield == 'babelium_babeliumApiAccessKey' && strlen($this->setting->$cfield)!=20 ) || 
-			   ($cfield == 'babelium_babeliumApiSecretAccessKey' && strlen($this->setting->$cfield)!=40)){
+			if(($cfield == 'babelium_babeliumApiAccessKey' && strlen($BCFG->$cfield)!=20 ) || 
+			   ($cfield == 'babelium_babeliumApiSecretAccessKey' && strlen($BCFG->$cfield)!=40)){
 				$this->display_error('babeliumErrorConfigParameters');
 			}
 		}
 		*/
-		$headers = $this->build_headers($method, $parameters);
-		$query_string = $this->get_query_string($method);
+		foreach($this->settings as $prop=>$value){
+			if(empty($value)){
+				$this->display_error('babeliumErrorConfigParameters');
+			}
+			if(($prop == 'babelium_babeliumApiAccessKey' && strlen($value)!=20) ||
+			   ($prop == 'babelium_babeliumApiSecretAccessKey' && strlen($value)!=40)){
+				$this->display_error('babeliumErrorConfigParameters');
+			}
+		}
+		
+		$commProtocol = 'http://';
 
+		$request = array();
+		$request['method'] = $method;
+		if($parameters != null && is_array($parameters) && count($parameters) > 0){
+			$request['parameters'] = $parameters;
+		}
+		
+		//Date timestamp formated following one of the standards allowed for HTTP 1.1 date headers (DATE_RFC1123)
+		$date = date("D, d M Y H:i:s O");
+		$referer = $_SERVER['HTTP_REFERER'];
+		$pieces = parse_url($referer);
+		$originhost = $_SERVER['HTTP_HOST']; 
+		$origin = $pieces['scheme'] . "://" . $originhost;
+		
+		$request['header']['date'] = $date;
+		$signature = "BMP ".$this->settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $this->settings->babelium_babeliumApiSecretAccessKey);
+		$request['header']['authorization'] = $signature;
+		
+		//See this workaround if the query parameters are written with &amp; : http://es.php.net/manual/es/function.http-build-query.php#102324
+		$request = http_build_query($request,'', '&');
+		
+		
+		$web_domain = $this->settings->babelium_babeliumWebDomain;
+		$api_domain = $this->settings->babelium_babeliumApiDomain;
+		$api_endpoint = $this->settings->babelium_babeliumApiEndPoint;
+		$api_url = $commProtocol . $api_domain . '/' . $api_endpoint;
+		$query_string = $api_url . '?' . $method;
+		
 		//Check if proxy (if used) should be bypassed for this url
 		$proxybypass = function_exists('is_proxybypass') ? is_proxybypass($query_string) : false;
 		
-		$result = $this->make_request($headers, $query_string);
-		/*
+		//Prepare the cURL request
+		if (!$ch = curl_init($query_string)) {
+			debugging('Can not init curl.');
+			return false;
+		}
+		
+		//curl_setopt($ch, CURLOPT_URL, $query_string);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_HEADER, 1);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_REFERER, $referer);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Origin: $origin"));
+		
 		//Check for proxy configuration		
 		if (!empty($CFG->proxyhost) and !$proxybypass) {
 			// SOCKS supported in PHP5 only
@@ -167,10 +215,13 @@ class babeliumservice{
 					curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC | CURLAUTH_NTLM);
 				}
 			}
-		}*/
+		}
+		
+		$result = curl_exec($ch);
+		curl_close($ch);
 		
 		//Parses the response output to separate the headers from the body of the response
-		//$this->parseCurlOutput($result);
+		$this->parseCurlOutput($result);
 		
 		//Add the service call to the activity log to better track down possible problems
 		$this->activity_log($USER->id,$USER->username, "service_call",$query_string, $method, is_array($parameters)?implode('&',$parameters):$parameters, $date, $_SERVER['HTTP_HOST'], $signature, $this->_curlHeaderHttpStatusCode, $this->_curlHeaderHttpStatusMessage);
@@ -179,7 +230,12 @@ class babeliumservice{
 		if(!$this->_curlResponse || $this->_curlHeaderHttpStatusCode != 200)
 			$this->display_error('babeliumApiErrorCode'.$this->_curlHeaderHttpStatusCode);
 		
-		return $this->decodeJsonResponse($result);
+		$result = json_decode($this->_curlResponse,true);
+		if($result['status'] == 'success' && $result['response'])
+			$result = $result['response'];
+		else
+			$result = false;
+		return $result;
 	}
         
         public function make_request($headers, $request_url){
