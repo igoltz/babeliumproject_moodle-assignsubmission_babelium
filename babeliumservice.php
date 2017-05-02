@@ -28,8 +28,14 @@ class babeliumservice{
 	private $_curlHeaderHttpStatusMessage;
 	private $_curlResponse;
 	private $_curlOutput;
+        
+        private $settings;
+        
+        function __construct() {
+            $this->settings = $this->get_babelium_settings();
+        }
 
-	/**
+        	/**
 	 * Parses the output of cURL. The headers found in this output are stored in the $_curlHeaders class property.
 	 * The response object, which should be a JSON object, is stored in the $_curlResponse class property.
 	 * @param string $output
@@ -101,10 +107,7 @@ class babeliumservice{
 	 */
 	public function newServiceCall($method,$parameters = null){
 
-		global $USER, $CFG;
-		//global $BCFG;
-		//TODO - Maybe it should be placed here and not in the locallib
-		$BCFG = $this->get_babelium_settings();
+		global $USER;
 		/*$config_fields = array('babelium_babeliumWebDomain',
 				       'babelium_babeliumWebPort',
 				       'babelium_babeliumApiDomain',
@@ -112,21 +115,21 @@ class babeliumservice{
 				       'babelium_babeliumApiAccessKey',
 				       'babelium_babeliumApiSecretAccessKey');
 		
-		if(!$BCFG || !is_object($BCFG)){
+		if(!$this->setting || !is_object($this->setting)){
 			$this->display_error('babeliumErrorConfigParameters');
 		}
 		foreach($config_fields as $cfield){
-			if(!isset($BCFG->$cfield) || empty($BCFG->$cfield)){
+			if(!isset($this->setting->$cfield) || empty($this->setting->$cfield)){
 				$this->display_error('babeliumErrorConfigParameters');
 			}
-			if(($cfield == 'babelium_babeliumApiAccessKey' && strlen($BCFG->$cfield)!=20 ) || 
-			   ($cfield == 'babelium_babeliumApiSecretAccessKey' && strlen($BCFG->$cfield)!=40)){
+			if(($cfield == 'babelium_babeliumApiAccessKey' && strlen($this->setting->$cfield)!=20 ) || 
+			   ($cfield == 'babelium_babeliumApiSecretAccessKey' && strlen($this->setting->$cfield)!=40)){
 				$this->display_error('babeliumErrorConfigParameters');
 			}
 		}
 		*/
-		$request = $this->build_request($BCFG, $method, $parameters);
-		$query_string = $this->get_query_string($BCFG, $method);
+		$request = $this->build_request($method, $parameters);
+		$query_string = $this->get_query_string($method);
 
 		//Check if proxy (if used) should be bypassed for this url
 		$proxybypass = function_exists('is_proxybypass') ? is_proxybypass($query_string) : false;
@@ -173,14 +176,7 @@ class babeliumservice{
 		if(!$this->_curlResponse || $this->_curlHeaderHttpStatusCode != 200)
 			$this->display_error('babeliumApiErrorCode'.$this->_curlHeaderHttpStatusCode);
 		
-		$result = json_decode($this->_curlResponse,true);
-		if($result['status'] == 'success' && $result['response'])
-			$result = $result['response'];
-		else
-			$result = false;
-			
-		
-		return $result;
+		return $this->decodeJsonResponse();
 	}
         
         public function make_request($request, $query, $type){
@@ -210,19 +206,19 @@ class babeliumservice{
                 return $result;
         }
         
-        public function get_query_string($BCFG, $method){
+        public function get_query_string($method){
             $commProtocol = 'http://';
-            $web_domain = $BCFG->babelium_babeliumWebDomain;
-            $api_domain = $BCFG->babelium_babeliumApiDomain;
-            $api_endpoint = $BCFG->babelium_babeliumApiEndPoint;
+            $web_domain = $this->settings->babelium_babeliumWebDomain;
+            $api_domain = $this->settings->babelium_babeliumApiDomain;
+            $api_endpoint = $this->settings->belium_babeliumApiEndPoint;
             $api_url = $commProtocol . $api_domain . '/' . $api_endpoint;
             $query_string = $api_url . '?' . $method;
             return $query_string;
         }
 
 
-        public function build_request($BCFG, $method, $parameters){
-            foreach($BCFG as $prop=>$value){
+        public function build_request($method, $parameters){
+            foreach($this->settings as $prop=>$value){
                 if(empty($value)){
                         $this->display_error('babeliumErrorConfigParameters');
                 }
@@ -248,8 +244,10 @@ class babeliumservice{
                 $origin = $pieces['scheme'] . "://" . $originhost;
 
                 $request['header']['date'] = $date;
-                $signature = "BMP ".$BCFG->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $BCFG->babelium_babeliumApiSecretAccessKey);
-                $request['header']['authorization'] = $signature;
+                $signature = "BMP ".$this->settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $this->settings->babelium_babeliumApiSecretAccessKey);
+                $request['header']['Access-Key'] = $signature;
+                $request['header']['authorization'] = "nVaWxwn2i1a03OJdSNQs";
+                $request['header']['Secret-Access'] = "_QH(`M!]p.SXJv^NVksTEjECWxMQvM}U,ixv0.zx";
             }
             else{
                 //default
@@ -259,7 +257,7 @@ class babeliumservice{
                 $origin = $pieces['scheme'] . "://" . $originhost;
 
                 $request['header']['date'] = $date;
-                $signature = "BMP ".$BCFG->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $BCFG->babelium_babeliumApiSecretAccessKey);
+                $signature = "BMP ".$this->settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $this->settings->babelium_babeliumApiSecretAccessKey);
                 $request['header']['authorization'] = $signature;
             }
 
@@ -269,23 +267,15 @@ class babeliumservice{
         }
         
         public function getExerciseList() {
-            global $CFG;
-            $BCFG = $this->get_babelium_settings();
-            $request = $this->build_request($BCFG, $method, $parameters);
+            $settings = $this->get_babelium_settings();
+            $request = $this->build_request($settings, $method, $parameters);
             $query_string = "https://babelium-server-dev.irontec.com/api/v3/exercises";
             //Check if proxy (if used) should be bypassed for this url
             $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($query_string) : false;
             $result = $this->make_request($request, $query_string, null);
             //Parses the response output to separate the headers from the body of the response
             $this->parseCurlOutput($result);
-            $result = json_decode($this->_curlResponse,true);
-            if($result['status'] == 'success' && $result['response'])
-                    $result = $result['response'];
-            else
-                    $result = false;
-
-
-            return $result;
+            return $this->decodeJsonResponse();
         }
 	
 	/**
@@ -298,10 +288,9 @@ class babeliumservice{
 	 * 		The authorization header of the request
 	 */
 	private function generateAuthorization($method, $date, $origin, $skey){
-		//global $BCFG;
 		$stringtosign = utf8_encode($method . "\n" . $date . "\n" . $origin);
 		    	
-		$digest = hash_hmac("sha256", $stringtosign, /*$BCFG->babelium_babeliumApiSecretAccessKey*/ $skey, false);
+		$digest = hash_hmac("sha256", $stringtosign, /*$this->setting->babelium_babeliumApiSecretAccessKey*/ $skey, false);
 		$signature = base64_encode($digest);	
 		return $signature;
 	}
@@ -338,4 +327,16 @@ class babeliumservice{
 		
 		error_log($message."\n",3,$log_file_path);
 	}
+
+    public function decodeJsonResponse() {
+        $result = json_decode($this->_curlResponse,true);
+        if ($result['status'] == 'success' && $result['response']) {
+            $result = $result['response'];
+        }
+        else {
+            $result = false;
+        }
+        return $result;
+    }
+
 }
