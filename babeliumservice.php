@@ -30,9 +30,12 @@ class babeliumservice{
 	private $_curlOutput;
         
         private $settings;
+        private $logFilePath;
         
         function __construct() {
             $this->settings = $this->get_babelium_settings();
+            global $CFG;
+            $this->logFilePath = $CFG->dataroot."/babelium.log";  
         }
 
         	/**
@@ -128,13 +131,13 @@ class babeliumservice{
 			}
 		}
 		*/
-		$request = $this->build_request($method, $parameters);
+		$headers = $this->build_headers($method, $parameters);
 		$query_string = $this->get_query_string($method);
 
 		//Check if proxy (if used) should be bypassed for this url
 		$proxybypass = function_exists('is_proxybypass') ? is_proxybypass($query_string) : false;
 		
-		$result = $this->make_request($request, $query_string, null);
+		$result = $this->make_request($headers, $query_string);
 		/*
 		//Check for proxy configuration		
 		if (!empty($CFG->proxyhost) and !$proxybypass) {
@@ -167,7 +170,7 @@ class babeliumservice{
 		}*/
 		
 		//Parses the response output to separate the headers from the body of the response
-		$this->parseCurlOutput($result);
+		//$this->parseCurlOutput($result);
 		
 		//Add the service call to the activity log to better track down possible problems
 		$this->activity_log($USER->id,$USER->username, "service_call",$query_string, $method, is_array($parameters)?implode('&',$parameters):$parameters, $date, $_SERVER['HTTP_HOST'], $signature, $this->_curlHeaderHttpStatusCode, $this->_curlHeaderHttpStatusMessage);
@@ -176,34 +179,57 @@ class babeliumservice{
 		if(!$this->_curlResponse || $this->_curlHeaderHttpStatusCode != 200)
 			$this->display_error('babeliumApiErrorCode'.$this->_curlHeaderHttpStatusCode);
 		
-		return $this->decodeJsonResponse();
+		return $this->decodeJsonResponse($result);
 	}
         
-        public function make_request($request, $query, $type){
+        public function make_request($headers, $request_url){
             //Prepare the cURL request
-                $ch = curl_init($query);
-		if (!$ch) {
-			debugging('Can not init curl.');
-			return false;
-		}
-		
-		//curl_setopt($ch, CURLOPT_URL, $query_string);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
-                if($type!=null){
-                    curl_setopt($ch, CURLOPT_POST, 1);
-                }		
-		curl_setopt($ch, CURLOPT_HEADER, 1);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		if(isset($referer)){
-                    curl_setopt($ch, CURLOPT_REFERER, $referer);
-                }
-                if(isset($origin)){
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, array("Origin: $origin"));
-                }
-                $result = curl_exec($ch);
-		curl_close($ch);
-                
-                return $result;
+            $ch = curl_init($request_url);
+            if (!$ch) {
+                    debugging('Can not init curl.');
+                    return false;
+            }
+
+            $referer = "";
+            $origin="";                
+
+            curl_setopt_array(
+                    $ch,
+                    array(
+                        CURLOPT_URL => $request_url,
+                        CURLOPT_HTTPHEADER  => $headers, //array('X-User: admin', 'X-Authorization: 123456'),
+                        CURLOPT_REFERER => $referer,
+                        //CURLOPT_VERBOSE => 1,
+                        //CURLOPT_HEADER => 1,
+                        CURLOPT_RETURNTRANSFER  =>true,
+                        CURLOPT_SSL_VERIFYPEER => false,
+                        CURLOPT_SSL_VERIFYHOST => false                        
+                    )
+            );
+            $result = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            /*if($type=='POST'){
+                //set curl post fields
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $request_data);
+            }
+            else if($type=='GET'){
+                //set curl get fields
+            }
+            curl_setopt($ch, CURLOPT_HEADER, 1);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            if(isset($referer)){
+                curl_setopt($ch, CURLOPT_REFERER, $referer);
+            }
+            if(isset($origin)){
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array("Origin: $origin"));
+            }
+            $result = curl_exec($ch);
+            curl_close($ch);*/
+
+            return $result;
         }
         
         public function get_query_string($method){
@@ -215,9 +241,8 @@ class babeliumservice{
             $query_string = $api_url . '?' . $method;
             return $query_string;
         }
-
-
-        public function build_request($method, $parameters){
+        
+        public function build_headers($method, $parameters){
             foreach($this->settings as $prop=>$value){
                 if(empty($value)){
                         $this->display_error('babeliumErrorConfigParameters');
@@ -242,12 +267,6 @@ class babeliumservice{
                 $pieces = parse_url($referer);
                 $originhost = $fake_host;
                 $origin = $pieces['scheme'] . "://" . $originhost;
-
-                $request['header']['date'] = $date;
-                $signature = "BMP ".$this->settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $this->settings->babelium_babeliumApiSecretAccessKey);
-                $request['header']['Access-Key'] = $signature;
-                $request['header']['authorization'] = "nVaWxwn2i1a03OJdSNQs";
-                $request['header']['Secret-Access'] = "_QH(`M!]p.SXJv^NVksTEjECWxMQvM}U,ixv0.zx";
             }
             else{
                 //default
@@ -262,20 +281,23 @@ class babeliumservice{
             }
 
             //See this workaround if the query parameters are written with &amp; : http://es.php.net/manual/es/function.http-build-query.php#102324
-            $request = http_build_query($request,'', '&');
-            return $request;
+            //$request = http_build_query($request,'', '&');
+            //return $request;
+            return array(
+                'Access-Key:'.$this->settings->babelium_babeliumApiAccessKey,
+                'Secret-Access:'.$this->settings->babelium_babeliumApiSecretAccessKey
+            );
         }
         
         public function getExerciseList() {
-            $settings = $this->get_babelium_settings();
-            $request = $this->build_request($settings, $method, $parameters);
-            $query_string = "https://babelium-server-dev.irontec.com/api/v3/exercises";
+            $headers = $this->build_headers($method, $parameters);
+            $request_url = "https://babelium-server-dev.irontec.com/api/v3/exercises";
             //Check if proxy (if used) should be bypassed for this url
-            $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($query_string) : false;
-            $result = $this->make_request($request, $query_string, null);
+            $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($request_url) : false;
+            $result = $this->make_request($headers, $request_url);
             //Parses the response output to separate the headers from the body of the response
-            $this->parseCurlOutput($result);
-            return $this->decodeJsonResponse();
+            //$this->parseCurlOutput($result);
+            return $this->decodeJsonResponse($result);
         }
 	
 	/**
@@ -289,7 +311,6 @@ class babeliumservice{
 	 */
 	private function generateAuthorization($method, $date, $origin, $skey){
 		$stringtosign = utf8_encode($method . "\n" . $date . "\n" . $origin);
-		    	
 		$digest = hash_hmac("sha256", $stringtosign, /*$this->setting->babelium_babeliumApiSecretAccessKey*/ $skey, false);
 		$signature = base64_encode($digest);	
 		return $signature;
@@ -303,40 +324,32 @@ class babeliumservice{
 	 * 		A moodle exception is thrown if we are working with moodle 2.x. Otherways the older error() function is used
 	 */
 	private function display_error($errorCode){
-		if(!$errorCode)
-			return;
-		
-		//We are in moodle 2.x
-		if(class_exists("moodle_exception")){
-			throw new moodle_exception($errorCode,'assignsubmission_babelium');
-		} else {
-			error(get_string($errorCode,'assignsubmission_babelium'));
-		}
+            if(!$errorCode)
+                return;
+
+            //We are in moodle 2.x
+            if(class_exists("moodle_exception")){
+                    throw new moodle_exception($errorCode,'assignsubmission_babelium');
+            } else {
+                    error(get_string($errorCode,'assignsubmission_babelium'));
+            }
 	}
 	
 	private function activity_log($user_id=0, $user_name='', $action='', $query_string='', $req_method='', $req_params='', $req_hdate='', $req_hdomain='', $req_hsignature='', $resp_http_status=0, $info=''){
-		global $CFG;
-		
-		$log_file_path = $CFG->dataroot."/babelium.log";
-		
 		$calling_ip = getremoteaddr(); //getremoteaddr() is a moodle's function
 		$time_now = time();
-		
 		$message = $time_now ."\t".$calling_ip."\t".$user_id."\t".$user_name."\t".$action."\t".$req_hdate."\t".$req_hdomain."\t".$req_hsignature."\t".$resp_http_status."\t".$query_string."\t".$req_method."\t".$req_params."\t".$info;
-		
-		
-		error_log($message."\n",3,$log_file_path);
+		error_log($message."\n",3, $this->logFilePath);
 	}
 
-    public function decodeJsonResponse() {
-        $result = json_decode($this->_curlResponse,true);
-        if ($result['status'] == 'success' && $result['response']) {
-            $result = $result['response'];
+    public function decodeJsonResponse($result) {
+        $result = json_decode($result,true);
+        if (count($result)>0) {
+            return $result;
         }
         else {
-            $result = false;
+            return false;
         }
-        return $result;
     }
 
 }
