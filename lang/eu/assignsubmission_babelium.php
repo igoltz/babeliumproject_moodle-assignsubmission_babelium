@@ -30,17 +30,25 @@ $string['pluginname'] = 'Babelium bidalketa';
 $string['babelium'] = 'Babelium bidalketa';
 $string['loginfo'] = 'Babelium GrabaketaId: {$a->responseid}, GrabaketaHash: {$a->responsehash}';
 
+/*
 $string['forcertmpt'] = 'RTMPT Derrigortu';
 $string['forcertmpt_help'] = 'Aukera hau gaitzeak erreproduzigailua defektuz RTMPT (kapsulatutako RMTP) erabiltzera derrigortzen du. Bestela, erreproduzigailua lehendabizi RTMP portua erabiliz konektatzen saiatzen da (1935)';
+*/
 
 $string['serverdomain'] = 'Zerbitzari domeinua';
 $string['serverdomain_help'] = 'Ariketak zein grabazioak gordetzeko erabiliko den Babelium zerbitzariaren domeinua';
+/*
 $string['serverport'] = 'Zerbitzari portua';
 $string['serverport_help'] = 'Zerbitzarira atzitzeko erabiltzen den portu zenbakia';
 $string['apidomain'] = 'API domeinua';
 $string['apidomain_help'] = 'Erabiltzaileari Babelium zerbitzarian dauden datuak atzitzea ahalbidetzen duen RPC-APIaren domeinua';
+*/
 $string['apiendpoint'] = 'APIaren endpointa';
 $string['apiendpoint_help'] = 'Eskaera guztiak kudeatzeko erabiltzen den APIaren domeinuaren barneko helbidea';
+
+$string['new_apiendpoint'] = 'API v3aren endpointa';
+$string['new_apiendpoint_help'] = 'Eskaera guztiak kudeatzeko erabiltzen den API v3aren domeinuaren barneko helbidea';
+
 $string['accesskey'] = 'Atzipen gakoa';
 $string['accesskey_help'] = 'Erabiltzaileak Babelium zerbitzariaren aurka RPC-APIaren bitartez egiten dituen eskaera guztiak identifikatzen dituen gako unibokoa';
 $string['secretaccesskey'] = 'Atzipen gako sekretua';

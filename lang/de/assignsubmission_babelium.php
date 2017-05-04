@@ -30,17 +30,25 @@ $string['pluginname']='Aufgabe Babelium';
 $string['babelium']='Aufgabe Babelium';
 $string['loginfo']='Babelium IdAufnahme: {$a->geantwortet}, HashAufnahme: {$a->Antworthash}';
 
+/*
 $string['forcertmpt'] = 'RTMPT erzwingen';
 $string['forcertmpt_help'] = 'Wenn diese Option markiert ist, versucht der Player eine Verbindung über RTMPT aufzubauen (gekapseltes RTMP). Ansonsten versucht der Player zunächst sich über den RTMP Port zu verbinden. (1935)';
+*/
 
 $string['serverdomain']='Server Domain';
 $string['serverdomain_help']='Die Babelium Server Domain, in der beide Übungen wie Aufnahmen gespeichert werden';
-$string['serverport']='Server-Port';
+
+/*$string['serverport']='Server-Port';
 $string['serverport_help']='Die Port-Nummer, mit der Sie auf den Server zugreifen';
 $string['apidomain']='Domain API';
 $string['apidomain_help']='Die Domain-RPC API, mit dem Nutzer auf die  auf dem Server gespeicherten Daten von Babelium zugreifen können';
+*/
 $string['apiendpoint']='API Endpunkt';
 $string['apiendpoint_help']='Eine Route, die zu der Domain des API gehört, und verwendet wird, um alle Anfragen zu verwalten';
+
+$string['new_apiendpoint']='API Endpunkt';
+$string['new_apiendpoint_help']='Eine Route, die zu der Domain des API gehört, und verwendet wird, um alle Anfragen zu verwalten';
+
 $string['accesskey']='Access Key';
 $string['accesskey_help']='Ein eindeutiger Schlüssel, der alle Anfragen, die der Nutzer über den Server-RPC API Babelium durchführt identifiziert';
 $string['secretaccesskey']='Geheimer Access Key';

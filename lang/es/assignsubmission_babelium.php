@@ -30,17 +30,25 @@ $string['pluginname'] = 'Entrega Babelium';
 $string['babelium'] = 'Entrega Babelium';
 $string['loginfo'] = 'Babelium IdGrabación: {$a->responseid}, HashGrabación: {$a->responsehash}';
 
+/*
 $string['forcertmpt'] = 'Forzar RTMPT';
 $string['forcertmpt_help'] = 'Activar esta opción fuerza al reproductor a usar RTMPT (RTMP encapsulado) por defecto. De otra manera, el reproductor primero intenta conectarse utilizando el puerto RTMP (1935)';
+*/
 
 $string['serverdomain'] = 'Dominio del servidor';
 $string['serverdomain_help'] = 'El dominio del servidor Babelium en el que se guardaran tanto los ejercicios como las grabaciones';
+/*
 $string['serverport'] = 'Puerto del servidor';
 $string['serverport_help'] = 'El número de puerto por el que se accede al servidor';
 $string['apidomain'] = 'Dominio del API';
 $string['apidomain_help'] = 'El dominio del API-RPC que permite al usuario acceder a los datos almacenados en el servidor Babelium';
+*/
 $string['apiendpoint'] = 'Endpoint del API';
 $string['apiendpoint_help'] = 'Una ruta que pertenece al dominio del API y que se usa para gestionar todas las peticiones';
+
+$string['new_apiendpoint'] = 'Endpoint del API v3';
+$string['new_apiendpoint_help'] = 'Una ruta que pertenece al dominio del API v3 y que se usa para gestionar todas las peticiones';
+
 $string['accesskey'] = 'Clave de acceso';
 $string['accesskey_help'] = 'Una clave única que identifica todas las peticiones que el usuario realiza al API-RPC del servidor Babelium';
 $string['secretaccesskey'] = 'Clave de acceso secreta';

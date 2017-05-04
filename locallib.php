@@ -580,7 +580,6 @@ class assign_submission_babelium extends assign_submission_plugin
 
     public function check_file_code($submissioncode)
     {
-
         global $OUTPUT;
 
         if (!$submissioncode || empty($submissioncode)) {

@@ -30,17 +30,26 @@ $string['pluginname'] = 'Babelium submissions';
 $string['babelium'] = 'Babelium submissions';
 $string['loginfo'] = 'Submission responseID: {$a->responseid}, responseHash: {$a->responsehash}';
 
+/*
 $string['forcertmpt'] = 'Force RTMPT';
 $string['forcertmpt_help'] = 'Enabling this option forces the player to use RTMPT (encapsulated RTMP) by default. Otherwise, the player first attempts to connect using the RTMP port (1935)';
+*/
 
 $string['serverdomain'] = 'Babelium server domain';
 $string['serverdomain_help'] = 'The domain of the Babelium server in which the resources are going to be stored';
-$string['serverport'] = 'Babelium server port';
+
+/*$string['serverport'] = 'Babelium server port';
 $string['serverport_help'] = 'Babelium server port';
 $string['apidomain'] = 'Babelium API domain';
 $string['apidomain_help'] = 'The domain of the RPC-API that allows us to access the data stored in the Babelium server';
+*/
+
 $string['apiendpoint'] = 'Babelium API endpoint';
 $string['apiendpoint_help'] = 'The place inside the RPC-API domain that is used to manage all the calls';
+
+$string['new_apiendpoint'] = 'Babelium API v3 endpoint';
+$string['new_apiendpoint_help'] = 'The place inside the RPC-API domain that is used to manage all the calls';
+
 $string['accesskey'] = 'Babelium access key';
 $string['accesskey_help'] = 'A unique key that identifies all your RPC-API requests against the Babelium server';
 $string['secretaccesskey'] = 'Babelium secret access key';

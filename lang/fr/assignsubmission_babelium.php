@@ -30,17 +30,26 @@
  $string['babelium'] = 'Dépôt Babelium';
  $string['loginfo'] = 'Enregistrement ResponseID: {$a->responseid}, ResponseHash: {$a->responsehash}';
 
+/*
  $string['forcertmpt'] = 'Force RTMPT';
  $string['forcertmpt_help'] = 'Activer cette option force le reproducteur à utiliser RTMPT (RTMP encapsulé) par défaut. Autrement,le reproducteur essaie d\'abord de se connecter en utilisant le port RTMP (1935)';
+*/
 
  $string['serverdomain'] = 'Domaine du serveur';
  $string['serverdomain_help'] = 'Domaine du serveur Babelium sur lequel sont conservés les exercices et les enregistrements';
+ /*
  $string['serverport'] = 'Port du serveur';
  $string['serverport_help'] = 'Numéro de port par lequel on accède au serveur';
  $string['apidomain'] = 'Domaine de l\'API';
  $string['apidomain_help'] = 'Domaine de l\'API-RPC permettant à l\'usager l\'accès aux données entreposées sur le serveur Babelium';
+ */
+
  $string['apiendpoint'] = 'Endpoint de l\'API';
  $string['apiendpoint_help'] = 'Chemin appartenant au domaine de l\'API utilisée pour gérer toutes les demandes';
+
+ $string['new_apiendpoint'] = 'Endpoint de l\'API v3';
+ $string['new_apiendpoint_help'] = 'Chemin appartenant au domaine de l\'API v3 utilisée pour gérer toutes les demandes';
+
  $string['accesskey'] = 'Code d\'accès';
  $string['accesskey_help'] = 'Code unique identifiant toutes les demandes que l\'usager fait à l\'API-RPC sur le serveur Babelium';
  $string['secretaccesskey'] = 'Code d\'accès secret';

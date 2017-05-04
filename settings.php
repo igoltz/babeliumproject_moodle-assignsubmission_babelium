@@ -25,7 +25,7 @@
 // Note this is on by default
 $settings->add(new admin_setting_configcheckbox('assignsubmission_babelium/default',
                                 new lang_string('default', 'assignsubmission_babelium'),
-                                new lang_string('default_help', 'assignsubmission_babelium'), 
+                                new lang_string('default_help', 'assignsubmission_babelium'),
                         0));
 
 $settings->add(new admin_setting_configtext('assignsubmission_babelium/serverdomain',
@@ -50,7 +50,16 @@ $settings->add(new admin_setting_configtext('assignsubmission_babelium/serverdom
                         new lang_string('apidomain_help','assignsubmission_babelium'),
                         'babeliumproject.com/api/v2',
                         PARAM_TEXT));*/
-                        
+
+$settings->add(
+  new admin_setting_configtext('assignsubmission_babelium/new_apiendpoint',
+    new lang_string('new_apiendpoint','assignsubmission_babelium'),
+    new lang_string('new_apiendpoint_help','assignsubmission_babelium'),
+    '/api/v3',
+    PARAM_TEXT
+  )
+);
+
 $settings->add(new admin_setting_configtext('assignsubmission_babelium/apiendpoint',
                         new lang_string('apiendpoint','assignsubmission_babelium'),
                         new lang_string('apiendpoint_help','assignsubmission_babelium'),
