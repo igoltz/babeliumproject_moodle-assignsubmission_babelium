@@ -28,14 +28,14 @@ class babeliumservice{
 	private $_curlHeaderHttpStatusMessage;
 	private $_curlResponse;
 	private $_curlOutput;
-        
+
         private $settings;
         private $logFilePath;
-        
+
         function __construct() {
             $this->settings = $this->get_babelium_settings();
             global $CFG;
-            $this->logFilePath = $CFG->dataroot."/babelium.log";  
+            $this->logFilePath = $CFG->dataroot."/babelium.log";
         }
 
         	/**
@@ -59,7 +59,7 @@ class babeliumservice{
 		}
 		$this->parseResponseHeaders();
 	}
-	
+
 	/**
 	 * Searches for a HTTP status code in the response headers. If no headers are returned
 	 * or the status code is different to 200 it throws an error
@@ -85,14 +85,19 @@ class babeliumservice{
 	 * @return stdClass - An array of properties (keys) and their values (values)
 	 */
 	private function get_babelium_settings(){
-		$bcfg = new stdClass();
-		$bcfg->babelium_babeliumWebDomain = get_config('assignsubmission_babelium','serverdomain');
-		//$bcfg->babelium_babeliumWebPort = get_config('assignsubmission_babelium','serverport');//removed
-		//$bcfg->babelium_babeliumApiDomain = get_config('assignsubmission_babelium','apidomain');
-		$bcfg->babelium_babeliumApiEndPoint = get_config('assignsubmission_babelium','apiendpoint');
-		$bcfg->babelium_babeliumApiAccessKey = get_config('assignsubmission_babelium','accesskey');
-		$bcfg->babelium_babeliumApiSecretAccessKey = get_config('assignsubmission_babelium','secretaccesskey');
-		return $bcfg;
+		if(!isset($this->settings)){
+			$bcfg = new stdClass();
+			$bcfg->babelium_babeliumWebDomain = get_config('assignsubmission_babelium','serverdomain');
+			//$bcfg->babelium_babeliumWebPort = get_config('assignsubmission_babelium','serverport');//removed
+			//$bcfg->babelium_babeliumApiDomain = get_config('assignsubmission_babelium','apidomain');
+			$bcfg->babelium_babeliumApiEndPoint = get_config('assignsubmission_babelium','apiendpoint');
+			$bcfg->babelium_new_api_endpoint = get_config('assignsubmission_babelium','new_apiendpoint');
+
+			$bcfg->babelium_babeliumApiAccessKey = get_config('assignsubmission_babelium','accesskey');
+			$bcfg->babelium_babeliumApiSecretAccessKey = get_config('assignsubmission_babelium','secretaccesskey');
+			$this->settings = $bcfg;
+		}
+		return $this->settings;
 	}
 
 
@@ -103,7 +108,7 @@ class babeliumservice{
 	 * @param mixed $parameters
 	 * 		The parameters of the API request can be either an associative array or simple data types
 	 * @return mixed $result
-	 * 		An array of data when the API request was successful, false on error. 
+	 * 		An array of data when the API request was successful, false on error.
 	 * 		Make sure you use the identical operator to check the response (!==FALSE) some response may be 0
 	 * @throws moodle_exception
 	 * 		The required configuration parameters of the API are not set
@@ -117,7 +122,7 @@ class babeliumservice{
 				       'babelium_babeliumApiEndPoint',
 				       'babelium_babeliumApiAccessKey',
 				       'babelium_babeliumApiSecretAccessKey');
-		
+
 		if(!$BCFG || !is_object($BCFG)){
 			$this->display_error('babeliumErrorConfigParameters');
 		}
@@ -125,7 +130,7 @@ class babeliumservice{
 			if(!isset($BCFG->$cfield) || empty($BCFG->$cfield)){
 				$this->display_error('babeliumErrorConfigParameters');
 			}
-			if(($cfield == 'babelium_babeliumApiAccessKey' && strlen($BCFG->$cfield)!=20 ) || 
+			if(($cfield == 'babelium_babeliumApiAccessKey' && strlen($BCFG->$cfield)!=20 ) ||
 			   ($cfield == 'babelium_babeliumApiSecretAccessKey' && strlen($BCFG->$cfield)!=40)){
 				$this->display_error('babeliumErrorConfigParameters');
 			}
@@ -140,7 +145,7 @@ class babeliumservice{
 				$this->display_error('babeliumErrorConfigParameters');
 			}
 		}
-		
+
 		$commProtocol = 'http://';
 
 		$request = array();
@@ -148,8 +153,8 @@ class babeliumservice{
 		if($parameters != null && is_array($parameters) && count($parameters) > 0){
 			$request['parameters'] = $parameters;
 		}
-		
-		//Date timestamp formated following one of the standards allowed for HTTP 1.1 date headers (DATE_RFC1123)                
+
+		//Date timestamp formated following one of the standards allowed for HTTP 1.1 date headers (DATE_RFC1123)
                 $date = date("D, d M Y H:i:s O");
                 if (getenv("APPLICATION_ENV") == "development"){
                     //auth bypass while development
@@ -166,28 +171,28 @@ class babeliumservice{
                     //default
                     $referer = $_SERVER['HTTP_REFERER'];
                     $pieces = parse_url($referer);
-                    $originhost = $_SERVER['HTTP_HOST']; 
+                    $originhost = $_SERVER['HTTP_HOST'];
                     $origin = $pieces['scheme'] . "://" . $originhost;
 
                     $request['header']['date'] = $date;
                     $signature = "BMP ".$this->settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $this->settings->babelium_babeliumApiSecretAccessKey);
                     $request['header']['authorization'] = $signature;
                 }
-		
+
 		//See this workaround if the query parameters are written with &amp; : http://es.php.net/manual/es/function.http-build-query.php#102324
 		$request = http_build_query($request,'', '&');
-		
+
 		$query_string = $this->get_query_string($method);
-		
+
 		//Check if proxy (if used) should be bypassed for this url
 		$proxybypass = function_exists('is_proxybypass') ? is_proxybypass($query_string) : false;
-		
+
 		//Prepare the cURL request
 		if (!$ch = curl_init($query_string)) {
 			debugging('Can not init curl.');
 			return false;
 		}
-		
+
 		//curl_setopt($ch, CURLOPT_URL, $query_string);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
 		curl_setopt($ch, CURLOPT_POST, 1);
@@ -195,8 +200,8 @@ class babeliumservice{
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_REFERER, $referer);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Origin: $origin"));
-		
-		//Check for proxy configuration		
+
+		//Check for proxy configuration
 		if (!empty($CFG->proxyhost) and !$proxybypass) {
 			// SOCKS supported in PHP5 only
 			if (!empty($CFG->proxytype) and ($CFG->proxytype == 'SOCKS5')) {
@@ -216,7 +221,7 @@ class babeliumservice{
 			} else {
 				curl_setopt($ch, CURLOPT_PROXY, $CFG->proxyhost.':'.$CFG->proxyport);
 			}
-				
+
 			if (!empty($CFG->proxyuser) and !empty($CFG->proxypassword)) {
 				curl_setopt($ch, CURLOPT_PROXYUSERPWD, $CFG->proxyuser.':'.$CFG->proxypassword);
 				if (defined('CURLOPT_PROXYAUTH')) {
@@ -225,20 +230,20 @@ class babeliumservice{
 				}
 			}
 		}
-		
+
 		$result = curl_exec($ch);
 		curl_close($ch);
-		
+
 		//Parses the response output to separate the headers from the body of the response
 		$this->parseCurlOutput($result);
-		
+
 		//Add the service call to the activity log to better track down possible problems
 		$this->activity_log($USER->id,$USER->username, "service_call",$query_string, $method, is_array($parameters)?implode('&',$parameters):$parameters, $date, $_SERVER['HTTP_HOST'], $signature, $this->_curlHeaderHttpStatusCode, $this->_curlHeaderHttpStatusMessage);
-		
+
 		//If the body of the response is empty or the HTTP status code is not 200 display an error message
 		if(!$this->_curlResponse || $this->_curlHeaderHttpStatusCode != 200)
 			$this->display_error('babeliumApiErrorCode'.$this->_curlHeaderHttpStatusCode);
-		
+
 		$result = json_decode($this->_curlResponse,true);
 		if($result['status'] == 'success' && $result['response'])
 			$result = $result['response'];
@@ -246,7 +251,7 @@ class babeliumservice{
 			$result = false;
 		return $result;
 	}
-        
+
         public function make_request($headers, $request_url){
             //Prepare the cURL request
             $ch = curl_init($request_url);
@@ -256,7 +261,7 @@ class babeliumservice{
             }
 
             $referer = "";
-            $origin="";                
+            $origin="";
 
             curl_setopt_array(
                     $ch,
@@ -268,7 +273,7 @@ class babeliumservice{
                         //CURLOPT_HEADER => 1,
                         CURLOPT_RETURNTRANSFER  =>true,
                         CURLOPT_SSL_VERIFYPEER => false,
-                        CURLOPT_SSL_VERIFYHOST => false                        
+                        CURLOPT_SSL_VERIFYHOST => false
                     )
             );
             $result = curl_exec($ch);
@@ -277,7 +282,7 @@ class babeliumservice{
 
             return $result;
         }
-        
+
         public function get_query_string($method){
             $commProtocol = 'http://';
             $web_domain = $this->settings->babelium_babeliumWebDomain;
@@ -287,7 +292,7 @@ class babeliumservice{
             $query_string = $api_url . '?' . $method;
             return $query_string;
         }
-        
+
         public function build_headers($method, $parameters){
             foreach($this->settings as $prop=>$value){
                 if(empty($value)){
@@ -318,7 +323,7 @@ class babeliumservice{
                 //default
                 $referer = $_SERVER['HTTP_REFERER'];
                 $pieces = parse_url($referer);
-                $originhost = $_SERVER['HTTP_HOST']; 
+                $originhost = $_SERVER['HTTP_HOST'];
                 $origin = $pieces['scheme'] . "://" . $originhost;
 
                 $request['header']['date'] = $date;
@@ -334,10 +339,10 @@ class babeliumservice{
                 'Secret-Access:'.$this->settings->babelium_babeliumApiSecretAccessKey
             );
         }
-        
+
         public function getExerciseList() {
             $headers = $this->build_headers($method, $parameters);
-            $request_url = "https://babelium-server-dev.irontec.com/api/v3/exercises";
+            $request_url = $this->settings->babelium_babeliumWebDomain.$this->settings->babelium_new_api_endpoint."/exercises";
             //Check if proxy (if used) should be bypassed for this url
             $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($request_url) : false;
             $result = $this->make_request($headers, $request_url);
@@ -345,7 +350,7 @@ class babeliumservice{
             //$this->parseCurlOutput($result);
             return $this->decodeJsonResponse($result);
         }
-	
+
 	/**
 	 * Makes a unique signature for each API request
 	 * @param String $method
@@ -358,10 +363,10 @@ class babeliumservice{
 	private function generateAuthorization($method, $date, $origin, $skey){
 		$stringtosign = utf8_encode($method . "\n" . $date . "\n" . $origin);
 		$digest = hash_hmac("sha256", $stringtosign, /*$this->setting->babelium_babeliumApiSecretAccessKey*/ $skey, false);
-		$signature = base64_encode($digest);	
+		$signature = base64_encode($digest);
 		return $signature;
 	}
-	
+
 	/**
 	 * A small function for displaying the API errors. This is done via a function for compatibility issues between moodle 1.9 and moodle 2.x
 	 * @param String $errorCode
@@ -380,7 +385,7 @@ class babeliumservice{
                     error(get_string($errorCode,'assignsubmission_babelium'));
             }
 	}
-	
+
 	private function activity_log($user_id=0, $user_name='', $action='', $query_string='', $req_method='', $req_params='', $req_hdate='', $req_hdomain='', $req_hsignature='', $resp_http_status=0, $info=''){
 		$calling_ip = getremoteaddr(); //getremoteaddr() is a moodle's function
 		$time_now = time();
