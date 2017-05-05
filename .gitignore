@@ -20,4 +20,4 @@ bin-release/
 dist/
 
 #ignore phpintel folder
-//.phpintel//
+\.phpintel/

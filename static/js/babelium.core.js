@@ -5,7 +5,7 @@ var secret = "abcd";
 var host = "http://babelium-server-dev.irontec.com/api/v3";
 
 window.onload = function() {
-    if(window.jQuery === undefined ){
+    if(window.jQuery === undefined || $ === undefined){
         var script = document.createElement('script');
         document.head.appendChild(script);
         script.type = 'text/javascript';
@@ -21,16 +21,15 @@ function start(){
     var subtitleId = exsubs[0].subtitleId;
     loadSubtitles(subtitleId);
     loadVideo(exinfo.id, subtitleId);
+    loadExerciseDescription(exinfo.description);
 }
 
 function loadSubtitles(id){
     var onSuccess = function(response){
-        alert("subtitle request done [OK]");
-        alert(response);
+        console.log("Success: "+response);
     };
     var onError = function(response){
-        alert("subtitle request done [FAILED]");
-        alert(response);
+        console.log("Error: "+response);
     };
     rpc("GET", getSubtitlesURL(id), onSuccess, onError);
 }
@@ -45,6 +44,11 @@ function loadVideo(videoId, subtitleId) {
     //append video element to div
     $('.videocontent').html(videoStr);
 }
+
+function loadExerciseDescription(description) {
+    $('.exdescription').text(description);
+}
+
 function rpc(method, url, onSuccess, onError){
     // Request with custom header
     jQuery.ajax(
