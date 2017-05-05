@@ -6,8 +6,8 @@ var host = "http://babelium-server-dev.irontec.com/api/v3";
 
 window.onload = function() {
     if(window.jQuery === undefined ){
-        var script = document.createElement('script'); 
-        document.head.appendChild(script);  
+        var script = document.createElement('script');
+        document.head.appendChild(script);
         script.type = 'text/javascript';
         script.src = "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js";
         script.onload = start;
@@ -18,8 +18,9 @@ window.onload = function() {
 };
 
 function start(){
-    var subtitleId = 2220;
+    var subtitleId = exsubs[0].subtitleId;
     loadSubtitles(subtitleId);
+    loadVideo(exinfo.id, subtitleId);
 }
 
 function loadSubtitles(id){
@@ -31,9 +32,19 @@ function loadSubtitles(id){
         alert("subtitle request done [FAILED]");
         alert(response);
     };
-    rpc("GET", "/sub-titles/"+id, onSuccess, onError);
+    rpc("GET", getSubtitlesURL(id), onSuccess, onError);
 }
 
+function loadVideo(videoId, subtitleId) {
+    var videoStr = "\
+    <video style='width:100%' poster='"+getPosterUrl(videoId)+"' controls crossorigin='anonymous'>\
+        <source src='"+getMP4video(videoId)+"' type='video/mp4'>\
+        <source src='"+getWEBMvideo(videoId)+"' type='video/webm'>\
+        <track kind='captions' label='"+getSubtitlesLangCaption(subtitleId)+"' src='"+getSubtitlesURL(subtitleId)+"' srclang='"+getSubtitlesLang(subtitleId)+"' default>\
+    </video>";
+    //append video element to div
+    $('.videocontent').html(videoStr);
+}
 function rpc(method, url, onSuccess, onError){
     // Request with custom header
     jQuery.ajax(
@@ -56,4 +67,29 @@ function rpc(method, url, onSuccess, onError){
             }
         }
     );
+}
+
+
+function getSubtitlesURL(subtitleId){
+    return host+"/sub-titles/"+subtitleId+".vtt";
+}
+
+function getSubtitlesLang(subtitleId) {
+    return "en";
+}
+
+function getSubtitlesLangCaption(subtitleId) {
+    return "English captions";
+}
+
+function getPosterUrl(videoId) {
+    return "//babelium-static.irontec.com/_temp/poster.jpg";
+}
+
+function getMP4video(videoId) {
+    return "//babelium-static.irontec.com/_temp/video.mp4";
+}
+
+function getWEBMvideo(videoId) {
+    return "//babelium-static.irontec.com/_temp/video.webm";
 }

@@ -37,90 +37,79 @@ require_once($CFG->dirroot . '/mod/assign/submission/babelium/babeliumservice.ph
  */
 function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
 
-	global $SESSION, $CFG, $BCFG;
-        
-        $content_path = "";
-        if(getenv("APPLICATION_ENV") == 'development'){
-            $content_path = $CFG->wwwroot .'/mod/assign/submission/babelium/iframe/upload.body.html';
-        }
-        else{
-            $content_path =$CFG->wwwroot .'/var/www/html/babelium-plugin-shortcut/iframe/upload.body.html';
-        }
+    global $SESSION, $CFG, $BCFG;
 
-	$exinfo = '""';
-	$exsubs = '""';
-	$rsinfo = '""';
-	$rssubs = '""';
-	$recinfo = '""';
+    $content_path = "";
+    if(getenv("APPLICATION_ENV") == 'development'){
+        $content_path = $CFG->wwwroot .'/mod/assign/submission/babelium/iframe/upload.body.html';
+    }
+    else{
+        $content_path =$CFG->wwwroot .'/var/www/html/babelium-plugin-shortcut/iframe/upload.body.html';
+    }
 
-	if($mode){
-		$rsinfo = json_encode($info);
-		$rssubs = json_encode($subs);
-	} else {
-		$exinfo = json_encode($info);
-		$exsubs = json_encode($subs);
-	}
+    $exinfo = '""';
+    $exsubs = '""';
+    $rsinfo = '""';
+    $rssubs = '""';
+    $recinfo = '""';
 
-	if($rmedia)
-		$recinfo = json_encode($rmedia);
+    if($mode){
+            $rsinfo = json_encode($info);
+            $rssubs = json_encode($subs);
+    } else {
+            $exinfo = json_encode($info);
+            $exsubs = json_encode($subs);
+    }
 
-	$html_content = '';
-	if(isset($info['title'])){
-		$html_content.='<h2 id="babelium-exercise-title" class="centered">'.$info['title'].'</h2>';
-	}
-    //$html_content.="<iframe onload='javascript:(function(o){o.style.height=(o.contentWindow.document.body.scrollHeight*0.6)+\"px\";}(this));' style='height:100px;width:100%;border:none;overflow:hidden;' src='//babelium-dev.irontec.com/iframe/upload.html'></iframe>";
+    if($rmedia)
+            $recinfo = json_encode($rmedia);
+
+    $html_content = '';
+    if(isset($info['title'])){
+            $html_content.='<h2 id="babelium-exercise-title" class="centered">'.$info['title'].'</h2>';
+    }
     $html_content.= file_get_contents($content_path, FILE_USE_INCLUDE_PATH);
-    //HTML5 video player example
 
-    /*
-    $html_content.='<h1>Reproduccion de video sin Flash</h1>';
-    $html_content.="<script src='//babelium-static.irontec.com/plyr/dist/plyr.js' language='javascript'></script>";
-    $html_content.="<link rel='stylesheet' href='//babelium-static.irontec.com/plyr/dist/plyr.css'>";
-    $html_content.='<iframe width="560" height="315" src="https://www.youtube.com/embed/8SpASXsPwl0" frameborder="0" allowfullscreen></iframe>';
-    $html_content.='<video style="width:100%" poster="//babelium-static.irontec.com/_temp/poster.jpg" controls crossorigin="anonymous">
-  <source src="//babelium-static.irontec.com/_temp/video.mp4" type="video/mp4">
-  <source src="//babelium-static.irontec.com/_temp/video.webm" type="video/webm">
-  <!-- Captions are optional -->
-  <track kind="captions" label="English captions" src="//babelium-static.irontec.com/_temp/subs.vtt" srclang="en" default>
-    </video>';
-    */
+	//load jquery just in case
+    $html_content.='<!-- jquery -->
+                    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+                    <script>window.jQuery || document.write("<script src="jquery.js">\x3C/script>")</script>'.PHP_EOL;
 
-	$html_content.='<script src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/babelium.moodle.js" language="javascript"></script>';
-	$html_content.='<script src="//babelium-static.irontec.com/js/babelium.core.js" language="javascript"></script>';
-    $html_content.='<script type="text/javascript"> var $bjq = jQuery.noConflict(); </script>';
+    $domain = get_config('assignsubmission_babelium','serverdomain');
+    $lang = current_language();
 
+    $html_content .= '<script language="javascript" type="text/javascript">
+                            var domain = "'.$domain.'";
+                            var lang = "'.$lang.'";
+                            var exinfo = '.$exinfo.';
+                            var exsubs = '.$exsubs.';
+                            var rsinfo = '.$rsinfo.';
+                            var rssubs = '.$rssubs.';
+                            var recinfo = '.$recinfo.';
+                            init(exinfo, exsubs, rsinfo, rssubs, recinfo);
+                      </script>'.PHP_EOL;
 
-	//disable SWF integration
-
-	/*
-	$html_content.='<script src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/swfobject.js" language="javascript"></script>';
-	$html_content.='<div id="flashContent">
-			 <p>To view this page ensure that Adobe Flash Player version 11.1.0 or greater is installed. </p>
-			 <script type="text/javascript">
-				var pageHost = ((document.location.protocol == "https:") ? "https://" : "http://");
-				document.write("<a href=\'"+pageHost+"://www.adobe.com/go/getflashplayer\'><img src=\'"
-						+ pageHost + "www.adobe.com/images/shared/download_buttons/get_flash_player.gif\' alt=\'Get Adobe Flash player\' /></a>" );
-			</script>
-			</div>
-			<noscript><p>Either scripts and active content are not permitted to run or Adobe Flash Player version 11.1.0 or greater is not installed.</p></noscript>';
-    */
-	$domain = get_config('assignsubmission_babelium','serverdomain');
-	//$forcertmpt = get_config('assignsubmission_babelium','forcertmpt');
-        $forcertmpt = 0;
-	$lang = current_language();
-
-	$html_content .= '<script language="javascript" type="text/javascript">
-						var domain = "'.$domain.'";
-						var lang = "'.$lang.'";
-						var forcertmpt = '.$forcertmpt.';
-						var exinfo = '.$exinfo.';
-						var exsubs = '.$exsubs.';
-						var rsinfo = '.$rsinfo.';
-						var rssubs = '.$rssubs.';
-						var recinfo = '.$recinfo.';
-						init(domain, lang, forcertmpt, exinfo, exsubs, rsinfo, rssubs, recinfo);
-					  </script>';
-	return $html_content;
+    if(getenv("APPLICATION_ENV") !== 'development'){
+    	$html_content.='<script
+                            src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/babelium.moodle.js"
+                            language="javascript">
+                        </script>'.PHP_EOL;
+    	$html_content.='<script
+                            src="//babelium-static.irontec.com/js/babelium.core.js"
+                            language="javascript">
+                        </script>'.PHP_EOL;
+    }
+    else{
+    	$html_content.='<script
+                            src="http://197.0.11.3/mod/assign/submission/babelium/script/babelium.moodle.js"
+                            language="javascript">
+                        </script>'.PHP_EOL;
+    	$html_content.='<script
+                            src="http://197.0.11.3/mod/assign/submission/babelium/static/js/babelium.core.js"
+                            language="javascript">
+                        </script>'.PHP_EOL;
+    }
+    return $html_content;
 }
 
 /**

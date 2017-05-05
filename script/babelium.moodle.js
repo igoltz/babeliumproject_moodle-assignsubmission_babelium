@@ -16,7 +16,7 @@ function logMessage(message) {
     if (debug && window.console) console.log(message);
 }
 
-function init(babeliumDomain, locale, forcertmpt, exInfo, exSubs, rInfo, rSubs, recInfo) {
+function init(exInfo, exSubs, rInfo, rSubs, recInfo) {
 
     if (exInfo && exSubs) {
         exerciseInfo = exInfo;

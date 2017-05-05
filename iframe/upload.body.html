@@ -19,12 +19,7 @@
     <div class='col-md-12'>
           <div class="centered">
           <p class="justified exdescription"></p>
-             <video style="width:100%" poster="//babelium-static.irontec.com/_temp/poster.jpg" controls crossorigin="anonymous">
-                <source src="//babelium-static.irontec.com/_temp/video.mp4" type="video/mp4">
-                <source src="//babelium-static.irontec.com/_temp/video.webm" type="video/webm">
-                <!-- Captions are optional -->
-                <track kind="captions" label="English captions" src="//babelium-static.irontec.com/_temp/6.vtt" srclang="en" default>
-             </video>
+           <div class="videocontent"></div>
           </div>
        </div>
     </div>
@@ -49,6 +44,10 @@
  </div>
 </div>
 
+<!-- jquery -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="jquery.js">\x3C/script>')</script>
+
 <!-- sweet alert-->
 <script src="//babelium-static.irontec.com/dist/sweetalert/sweetalert.min.js"></script>
 <!-- audio recorder -->
@@ -59,10 +58,3 @@
 <script src='//babelium-static.irontec.com/js/audio.js' language='javascript'></script>
 <!-- video player script -->
 <script src='//babelium-static.irontec.com/dist/plyr/dist/plyr.js' language='javascript'></script>
-
-<script type="text/javascript">
-// A $( document ).ready() block.
-$( document ).ready(function() {
-    $('.exdescription').text(exinfo.description);
-});
-</script>
