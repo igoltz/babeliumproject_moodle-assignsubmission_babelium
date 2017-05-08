@@ -46,8 +46,8 @@ $string['apidomain_help'] = 'Erabiltzaileari Babelium zerbitzarian dauden datuak
 $string['apiendpoint'] = 'APIaren endpointa';
 $string['apiendpoint_help'] = 'Eskaera guztiak kudeatzeko erabiltzen den APIaren domeinuaren barneko helbidea';
 
-$string['new_apiendpoint'] = 'API v3aren endpointa';
-$string['new_apiendpoint_help'] = 'Eskaera guztiak kudeatzeko erabiltzen den API v3aren domeinuaren barneko helbidea';
+$string['newapiendpoint'] = 'API v3aren endpointa';
+$string['newapiendpoint_help'] = 'Eskaera guztiak kudeatzeko erabiltzen den API v3aren domeinuaren barneko helbidea';
 
 $string['accesskey'] = 'Atzipen gakoa';
 $string['accesskey_help'] = 'Erabiltzaileak Babelium zerbitzariaren aurka RPC-APIaren bitartez egiten dituen eskaera guztiak identifikatzen dituen gako unibokoa';

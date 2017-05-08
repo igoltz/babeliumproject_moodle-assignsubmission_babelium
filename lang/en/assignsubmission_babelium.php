@@ -47,8 +47,8 @@ $string['apidomain_help'] = 'The domain of the RPC-API that allows us to access 
 $string['apiendpoint'] = 'Babelium API endpoint';
 $string['apiendpoint_help'] = 'The place inside the RPC-API domain that is used to manage all the calls';
 
-$string['new_apiendpoint'] = 'Babelium API v3 endpoint';
-$string['new_apiendpoint_help'] = 'The place inside the RPC-API domain that is used to manage all the calls';
+$string['newapiendpoint'] = 'Babelium API v3 endpoint';
+$string['newapiendpoint_help'] = 'The place inside the RPC-API domain that is used to manage all the calls';
 
 $string['accesskey'] = 'Babelium access key';
 $string['accesskey_help'] = 'A unique key that identifies all your RPC-API requests against the Babelium server';

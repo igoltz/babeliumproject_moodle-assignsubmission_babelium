@@ -18,7 +18,7 @@
 
     //custom recorder settings
     config = {
-        sampleRate : 64000, // 64kbps = 64000 sample rate in bits,
+        sampleRate : 48000, // 48kbps = 48000 sample rate in bits,
         numChannels: 1,
         bufferLen: 1024
     };
@@ -27,17 +27,6 @@
     recorder = new Recorder(input, config);
     cstm_log('Recorder initialised.');
  }
-
- /*function playRecording(button) {
-    if(!is_recording){
-        if(audio_recorded){
-            //play audio
-        }
-        else{
-            sweetAlert("Audio player", "You have to record an AUDIO first", "error");
-        }
-    }
- }*/
 
  function startRecording(button) {
     if(!is_recording){

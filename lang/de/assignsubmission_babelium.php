@@ -46,8 +46,8 @@ $string['apidomain_help']='Die Domain-RPC API, mit dem Nutzer auf die  auf dem S
 $string['apiendpoint']='API Endpunkt';
 $string['apiendpoint_help']='Eine Route, die zu der Domain des API gehört, und verwendet wird, um alle Anfragen zu verwalten';
 
-$string['new_apiendpoint']='API Endpunkt';
-$string['new_apiendpoint_help']='Eine Route, die zu der Domain des API gehört, und verwendet wird, um alle Anfragen zu verwalten';
+$string['newapiendpoint']='API v3 Endpunkt';
+$string['newapiendpoint_help']='Eine Route, die zu der Domain des API v3 gehört, und verwendet wird, um alle Anfragen zu verwalten';
 
 $string['accesskey']='Access Key';
 $string['accesskey_help']='Ein eindeutiger Schlüssel, der alle Anfragen, die der Nutzer über den Server-RPC API Babelium durchführt identifiziert';

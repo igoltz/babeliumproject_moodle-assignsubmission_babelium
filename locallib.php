@@ -56,7 +56,6 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function get_settings(MoodleQuickForm $mform)
     {
-
         global $CFG, $COURSE;
 
         $defaultexerciseid = $this->get_config('exerciseid') > 0 ? $this->get_config('exerciseid') : 0;
@@ -542,7 +541,6 @@ class assign_submission_babelium extends assign_submission_plugin
     public function is_empty(stdClass $submission)
     {
         $babeliumsubmission = $this->get_babelium_submission($submission->id);
-
         return empty($babeliumsubmission->responsehash);
     }
 

@@ -47,8 +47,8 @@
  $string['apiendpoint'] = 'Endpoint de l\'API';
  $string['apiendpoint_help'] = 'Chemin appartenant au domaine de l\'API utilisée pour gérer toutes les demandes';
 
- $string['new_apiendpoint'] = 'Endpoint de l\'API v3';
- $string['new_apiendpoint_help'] = 'Chemin appartenant au domaine de l\'API v3 utilisée pour gérer toutes les demandes';
+ $string['newapiendpoint'] = 'Endpoint de l\'API v3';
+ $string['newapiendpoint_help'] = 'Chemin appartenant au domaine de l\'API v3 utilisée pour gérer toutes les demandes';
 
  $string['accesskey'] = 'Code d\'accès';
  $string['accesskey_help'] = 'Code unique identifiant toutes les demandes que l\'usager fait à l\'API-RPC sur le serveur Babelium';

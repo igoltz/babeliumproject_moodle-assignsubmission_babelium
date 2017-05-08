@@ -71,9 +71,9 @@ $settings->add(
 
 $settings->add(
   new admin_setting_configtext(
-    'assignsubmission_babelium/new_apiendpoint',
-    new lang_string('new_apiendpoint','assignsubmission_babelium'),
-    new lang_string('new_apiendpoint_help','assignsubmission_babelium'),
+    'assignsubmission_babelium/newapiendpoint',
+    new lang_string('newapiendpoint','assignsubmission_babelium'),
+    new lang_string('newapiendpoint_help','assignsubmission_babelium'),
     '/api/v3',
     PARAM_TEXT
   )
