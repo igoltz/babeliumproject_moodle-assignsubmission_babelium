@@ -6,6 +6,12 @@
 */
 class BabeliumHelper
 {
+    const DEVELOPMENT_ENVIRONMENT = 'development';
+    
+    private static $environment;
+    private static $config;
+    private static $rootPath;
+    
     const PRACTICE_MODE = 0;
     const REVIEW_MODE = 1;
 
@@ -45,7 +51,10 @@ class BabeliumHelper
     private $submission;
 
     function __construct() {
-
+        global $SESSION, $CFG, $BCFG;
+        self::$config = $CFG;
+        self::$environment = getenv("APPLICATION_ENV");
+        self::$rootPath = $CFG->wwwroot;
     }
 
     public function getDefaultExerciseId($plugin){
@@ -205,6 +214,147 @@ class BabeliumHelper
             $DB->insert_record('assignsubmission_babelium', $babeliumsubmission);
         }
         return true;
+    }
+
+    public function format_for_log($submission) {
+        // format the info for each submission plugin add_to_log
+        $babeliumsubmission = $this->getBabeliumSumbission($submission->id);
+        $babeliumloginfo    = '';
+        $babeliumloginfo .= get_string('loginfo', 'assignsubmission_babelium', array(
+            'responseid' => $babeliumsubmission->responseid,
+            'responsehash' => $babeliumsubmission->responsehash
+        ));
+
+        return $babeliumloginfo;
+    }
+
+    public function upgradeSubmission($plugin, $oldcontext, $oldassignment, $oldsubmission, $submission, $log) {
+        global $DB;
+
+        $babeliumsubmission               = new stdClass();
+        $babeliumsubmission->responseid   = $oldsubmission->data1;
+        $babeliumsubmission->responsehash = $oldsubmission->data2;
+
+        $babeliumsubmission->submission = $submission->id;
+        $babeliumsubmission->assignment = $plugin->assignment->get_instance()->id;
+
+        if ($babeliumsubmission->responseid === null) {
+            $babeliumsubmission->responseid = 0;
+        }
+
+        if ($babeliumsubmission->responsehash === null) {
+            $onlinetextsubmission->responsehash = '';
+        }
+
+        if (!$DB->insert_record('assignsubmission_babelium', $babeliumsubmission) > 0) {
+            $log .= get_string('couldnotconvertsubmission', 'mod_assign', $submission->userid);
+            return false;
+        }
+        return true;
+    }
+
+    public function upgradeSettings($oldcontext, $oldassignment, $log) {
+        if ($oldassignment->assignmenttype == 'babelium') {
+            $this->set_config('exerciseid', $oldassignment->var1);
+            return true;
+        }
+    }
+    
+    /**
+    * Returns html code for displaying the babelium widget with the provided information
+    *
+    * @param int $mode
+    *	States whether we should return the widget in play ($mode = 0) or review ($mode = 1) status
+    * @param array $info
+    *	Information about the exercise/response the widget is going to display
+    * @param array $subs
+    *	The subtitles & roles this exercise/response is going to use
+    * @return String $html_content
+    *	An html snippet that loads the babelium player and its related scripts
+    */
+   function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
+
+       global $SESSION, $CFG, $BCFG;
+
+       $content_path = $this->getSumbissionHTMLPath();
+
+       $exinfo = '""';
+       $exsubs = '""';
+       $rsinfo = '""';
+       $rssubs = '""';
+       $recinfo = '""';
+
+       if($mode){
+               $rsinfo = json_encode($info);
+               $rssubs = json_encode($subs);
+       } else {
+               $exinfo = json_encode($info);
+               $exsubs = json_encode($subs);
+       }
+
+       if($rmedia)
+               $recinfo = json_encode($rmedia);
+
+       $html_content = '';
+       if(isset($info['title'])){
+               $html_content.='<h2 id="babelium-exercise-title" class="centered">'.$info['title'].'</h2>';
+       }
+       $html_content.= file_get_contents($content_path, FILE_USE_INCLUDE_PATH);
+
+           //load jquery just in case
+       $html_content.='<!-- jquery -->
+                       <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+                       <script>window.jQuery || document.write("<script src="jquery.js">\x3C/script>")</script>'.PHP_EOL;
+
+       $domain = get_config('assignsubmission_babelium','serverdomain');
+       $lang = current_language();
+
+       $html_content .= '<script language="javascript" type="text/javascript">
+                               var domain = "'.$domain.'";
+                               var lang = "'.$lang.'";
+                               var exinfo = '.$exinfo.';
+                               var exsubs = '.$exsubs.';
+                               var rsinfo = '.$rsinfo.';
+                               var rssubs = '.$rssubs.';
+                               var recinfo = '.$recinfo.';
+                               init(exinfo, exsubs, rsinfo, rssubs, recinfo);
+                         </script>'.PHP_EOL;
+
+       if(getenv("APPLICATION_ENV") !== 'development'){
+           $html_content.='<script
+                               src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/babelium.moodle.js"
+                               language="javascript">
+                           </script>'.PHP_EOL;
+           $html_content.='<script
+                               src="//babelium-static.irontec.com/js/babelium.core.js"
+                               language="javascript">
+                           </script>'.PHP_EOL;
+       }
+       else{
+           $html_content.='<script
+                               src="http://197.0.11.3/mod/assign/submission/babelium/script/babelium.moodle.js"
+                               language="javascript">
+                           </script>'.PHP_EOL;
+           $html_content.='<script
+                               src="http://197.0.11.3/mod/assign/submission/babelium/static/js/babelium.core.js"
+                               language="javascript">
+                           </script>'.PHP_EOL;
+       }
+       return $html_content;
+   }
+   
+    public function getSumbissionHTMLPath() {
+         if($this->isDevelopment()){
+             $content_path = self::rootPath  .'/mod/assign/submission/babelium/iframe/upload.body.html';
+         }
+         else{
+             $content_path = '/var/www/html/babelium-plugin-shortcut/iframe/upload.body.html';
+         }
+         return $content_path;
+     }
+
+    public function isDevelopment() {
+        return self::$environment == DEVELOPMENT_ENVIRONMENT;
     }
 
 }

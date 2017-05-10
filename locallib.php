@@ -16,7 +16,7 @@ defined('MOODLE_INTERNAL') || die();
 define('ASSIGNSUBMISSION_BABELIUM_FILEAREA', 'submissions_babelium');
 
 /** Include babelium helper classes **/
-require_once($CFG->dirroot . '/mod/assign/submission/babelium/babeliumlib.php');
+require_once($CFG->dirroot . '/mod/assign/submission/babelium/BabeliumConnector.php');
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/BabeliumHelper.php');
 
 class assign_submission_babelium extends assign_submission_plugin
@@ -25,6 +25,7 @@ class assign_submission_babelium extends assign_submission_plugin
     const REVIEW_MODE = 1;
     
     private static $helper;
+    private static $babeliumConnector;
 
         /**
      * Get the name of the babelium submission plugin
@@ -41,7 +42,7 @@ class assign_submission_babelium extends assign_submission_plugin
      * @param int $submissionid
      * @return mixed
      */
-    private function get_babelium_submission($submissionid)
+    public function get_babelium_submission($submissionid)
     {
         return $this->getBabeliumHelper()->getBabeliumSumbission($submissionid);
     }
@@ -67,7 +68,7 @@ class assign_submission_babelium extends assign_submission_plugin
 
         try {
             //$exercises = babeliumsubmission_get_available_exercise_list();
-            $exercises = babeliumsubmission_get_available_exercise_list();
+            $exercises = $this->getBabeliumConnector()->babeliumsubmission_get_available_exercise_list();
 
             if ($exercises && count($exercises) > 0) {
                 foreach ($exercises as $exercise) {
@@ -154,7 +155,7 @@ class assign_submission_babelium extends assign_submission_plugin
 
         }
 
-        $exercise_data = !empty($data->responsehash) ? babeliumsubmission_get_exercise_data(0, $data->responseid) : babeliumsubmission_get_exercise_data($exerciseid);
+        $exercise_data = !empty($data->responsehash) ? $this->getBabeliumConnector()->babeliumsubmission_get_exercise_data(0, $data->responseid) : $this->getBabeliumConnector()->babeliumsubmission_get_exercise_data($exerciseid);
         if (!$exercise_data)
             throw new dml_exception("Error while retrieving Babelium external data");
 
@@ -227,7 +228,7 @@ class assign_submission_babelium extends assign_submission_plugin
         //error_log(print_r($recinfo,true),3,"/tmp/error.log");
 
         //Returns a string with all the html and script tags needed to init the babelium widget
-        $html_content = babeliumsubmission_html_output(self::PRACTICE_MODE, $exinfo, $exsubs, $recinfo);
+        $html_content = $this->getBabeliumHelper()->babeliumsubmission_html_output(self::PRACTICE_MODE, $exinfo, $exsubs, $recinfo);
 
         $mform->addElement('html', $html_content);
         $mform->addElement('select', 'roleCombo', get_string('babeliumChooseRole', 'assignsubmission_babelium'), $roleMenu);
@@ -315,7 +316,7 @@ class assign_submission_babelium extends assign_submission_plugin
 
         if ($babeliumsubmission) {
             if ($babeliumsubmission->responsehash != $data->responsehash) {
-                $responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'), $data->subtitleId, $data->recordedRole, $data->responsehash);
+                $responsedata = $this->getBabeliumConnector()->babeliumsubmission_save_response_data($this->get_config('exerciseid'), $data->subtitleId, $data->recordedRole, $data->responsehash);
                 if (!$responsedata)
                     throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
                 $babeliumsubmission->responseid = $responsedata['responseId'];
@@ -333,7 +334,7 @@ class assign_submission_babelium extends assign_submission_plugin
             $babeliumsubmission               = new stdClass();
             $babeliumsubmission->responsehash = $data->responsehash;
 
-            $responsedata = babeliumsubmission_save_response_data($this->get_config('exerciseid'), $data->subtitleId, $data->recordedRole, $data->responsehash);
+            $responsedata = $this->getBabeliumConnector()->babeliumsubmission_save_response_data($this->get_config('exerciseid'), $data->subtitleId, $data->recordedRole, $data->responsehash);
             if (!$responsedata)
                 throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
             $babeliumsubmission->responseid = $responsedata['responseId'];
@@ -412,7 +413,7 @@ class assign_submission_babelium extends assign_submission_plugin
         if ($babeliumsubmission) {
             $result          = '<div class="no-overflow">';
             $babeliumcontent = '';
-            $response_data   = babeliumsubmission_get_response_data($babeliumsubmission->responseid);
+            $response_data   = $this->getBabeliumConnector()->babeliumsubmission_get_response_data($babeliumsubmission->responseid);
             if ($response_data)
                 $babeliumcontent = babeliumsubmission_html_output(self::REVIEW_MODE, $response_data['info'], $response_data['subtitles'], null);
             $result .= $babeliumcontent;
@@ -450,10 +451,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function upgrade_settings(context $oldcontext, stdClass $oldassignment, &$log)
     {
-        if ($oldassignment->assignmenttype == 'babelium') {
-            $this->set_config('exerciseid', $oldassignment->var1);
-            return true;
-        }
+        return $this->getBabeliumHelper()->upgradeSettings($oldcontext, $oldassignment, $log);
     }
 
     /**
@@ -468,29 +466,14 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function upgrade(context $oldcontext, stdClass $oldassignment, stdClass $oldsubmission, stdClass $submission, &$log)
     {
-        global $DB;
-
-        $babeliumsubmission               = new stdClass();
-        $babeliumsubmission->responseid   = $oldsubmission->data1;
-        $babeliumsubmission->responsehash = $oldsubmission->data2;
-
-        $babeliumsubmission->submission = $submission->id;
-        $babeliumsubmission->assignment = $this->assignment->get_instance()->id;
-
-        if ($babeliumsubmission->responseid === null) {
-            $babeliumsubmission->responseid = 0;
-        }
-
-        if ($babeliumsubmission->responsehash === null) {
-            $onlinetextsubmission->responsehash = '';
-        }
-
-        if (!$DB->insert_record('assignsubmission_babelium', $babeliumsubmission) > 0) {
-            $log .= get_string('couldnotconvertsubmission', 'mod_assign', $submission->userid);
-            return false;
-        }
-
-        return true;
+        return $this->getBabeliumHelper()->upgradeSubmission(
+                $this,
+                $oldcontext,
+                $oldassignment,
+                $oldsubmission,
+                $submission,
+                $log
+        );
     }
 
     /**
@@ -502,16 +485,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function format_for_log(stdClass $submission)
     {
-
-        // format the info for each submission plugin add_to_log
-        $babeliumsubmission = $this->get_babelium_submission($submission->id);
-        $babeliumloginfo    = '';
-        $babeliumloginfo .= get_string('loginfo', 'assignsubmission_babelium', array(
-            'responseid' => $babeliumsubmission->responseid,
-            'responsehash' => $babeliumsubmission->responsehash
-        ));
-
-        return $babeliumloginfo;
+        return $this->getBabeliumHelper()->format_for_log($submission);
     }
 
     /**
@@ -521,13 +495,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function delete_instance()
     {
-        global $DB;
-        // will throw exception on failure
-        $DB->delete_records('assignsubmission_babelium', array(
-            'assignment' => $this->assignment->get_instance()->id
-        ));
-
-        return true;
+        return $this->getBabeliumHelper()->deleteInstance($this);
     }
 
     /**
@@ -536,8 +504,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function is_empty(stdClass $submission)
     {
-        $babeliumsubmission = $this->get_babelium_submission($submission->id);
-        return empty($babeliumsubmission->responsehash);
+        return $this->getBabeliumHelper()->isEmptySubmission($this, $submission);
     }
 
     /**
@@ -572,6 +539,13 @@ class assign_submission_babelium extends assign_submission_plugin
             self::$helper = new BabeliumHelper();
         }
         return self::$helper;
+    }
+    
+    public function getBabeliumConnector() {
+        if(!isset(self::$babeliumConnector)){
+            self::$babeliumConnector = new BabeliumConnector();
+        }
+        return self::$babeliumConnector;
     }
 
 }
