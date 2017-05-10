@@ -29,11 +29,11 @@ class babeliumservice{
     private $_curlResponse;
     private $_curlOutput;
 
-    private $settings;
+    private static $settings;
     private $logFilePath;
 
     function __construct() {
-        $this->settings = $this->get_babelium_settings();
+        self::$settings = $this->get_babelium_settings();
         global $CFG;
         $this->logFilePath = $CFG->dataroot."/babelium.log";
     }
@@ -85,7 +85,7 @@ class babeliumservice{
      * @return stdClass - An array of properties (keys) and their values (values)
      */
     private function get_babelium_settings(){
-        if(!isset($this->settings)){
+        if(!isset(self::$settings)){
                 $bcfg = new stdClass();
                 $bcfg->babelium_babeliumWebDomain = get_config('assignsubmission_babelium','serverdomain');
                 //$bcfg->babelium_babeliumWebPort = get_config('assignsubmission_babelium','serverport');//removed
@@ -94,9 +94,9 @@ class babeliumservice{
                 $bcfg->babelium_new_api_endpoint = get_config('assignsubmission_babelium','newapiendpoint');
                 $bcfg->babelium_babeliumApiAccessKey = get_config('assignsubmission_babelium','accesskey');
                 $bcfg->babelium_babeliumApiSecretAccessKey = get_config('assignsubmission_babelium','secretaccesskey');
-                $this->settings = $bcfg;
+                self::$settings = $bcfg;
         }
-        return $this->settings;
+        return self::$settings;
     }
 
 
@@ -135,7 +135,7 @@ class babeliumservice{
                     }
             }
             */
-            foreach($this->settings as $prop=>$value){
+            foreach(self::$settings as $prop=>$value){
                     if(empty($value)){
                             $this->display_error('babeliumErrorConfigParameters');
                     }
@@ -163,7 +163,7 @@ class babeliumservice{
                 $originhost = $fake_host;
                 $origin = $pieces['scheme'] . "://" . $originhost;
                 $request['header']['date'] = $date;
-                $signature = "BMP ".$this->settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $this->settings->babelium_babeliumApiSecretAccessKey);
+                $signature = "BMP ".self::$settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, self::$settings->babelium_babeliumApiSecretAccessKey);
                 $request['header']['authorization'] = $signature;
             }
             else{
@@ -174,7 +174,7 @@ class babeliumservice{
                 $origin = $pieces['scheme'] . "://" . $originhost;
 
                 $request['header']['date'] = $date;
-                $signature = "BMP ".$this->settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $this->settings->babelium_babeliumApiSecretAccessKey);
+                $signature = "BMP ".self::$settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, self::$settings->babelium_babeliumApiSecretAccessKey);
                 $request['header']['authorization'] = $signature;
             }
 
@@ -284,16 +284,16 @@ class babeliumservice{
 
     public function get_query_string($method){
         $commProtocol = 'http://';
-        $web_domain = $this->settings->babelium_babeliumWebDomain;
+        $web_domain = self::$settings->babelium_babeliumWebDomain;
         $api_domain = $web_domain;
-        $api_endpoint = $this->settings->babelium_babeliumApiEndPoint;
+        $api_endpoint = self::$settings->babelium_babeliumApiEndPoint;
         $api_url = $commProtocol . $api_domain . $api_endpoint;
         $query_string = $api_url . '?' . $method;
         return $query_string;
     }
 
     public function build_headers($method, $parameters){
-        foreach($this->settings as $prop=>$value){
+        foreach(self::$settings as $prop=>$value){
             if(empty($value)){
                     $this->display_error('babeliumErrorConfigParameters');
             }
@@ -326,7 +326,7 @@ class babeliumservice{
             $origin = $pieces['scheme'] . "://" . $originhost;
 
             $request['header']['date'] = $date;
-            $signature = "BMP ".$this->settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, $this->settings->babelium_babeliumApiSecretAccessKey);
+            $signature = "BMP ".self::$settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, self::$settings->babelium_babeliumApiSecretAccessKey);
             $request['header']['authorization'] = $signature;
         }
 
@@ -334,14 +334,14 @@ class babeliumservice{
         //$request = http_build_query($request,'', '&');
         //return $request;
         return array(
-            'Access-Key:'.$this->settings->babelium_babeliumApiAccessKey,
-            'Secret-Access:'.$this->settings->babelium_babeliumApiSecretAccessKey
+            'Access-Key:'.self::$settings->babelium_babeliumApiAccessKey,
+            'Secret-Access:'.self::$settings->babelium_babeliumApiSecretAccessKey
         );
     }
 
     public function getExerciseList() {
         $headers = $this->build_headers($method, $parameters);
-        $request_url = $this->settings->babelium_babeliumWebDomain.$this->settings->babelium_new_api_endpoint."/exercises";
+        $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/exercises";
         //Check if proxy (if used) should be bypassed for this url
         $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($request_url) : false;
         $result = $this->make_request($headers, $request_url);

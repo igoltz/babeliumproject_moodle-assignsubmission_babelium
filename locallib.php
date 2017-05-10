@@ -17,20 +17,22 @@ define('ASSIGNSUBMISSION_BABELIUM_FILEAREA', 'submissions_babelium');
 
 /** Include babelium helper classes **/
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/babeliumlib.php');
+require_once($CFG->dirroot . '/mod/assign/submission/babelium/BabeliumHelper.php');
 
 class assign_submission_babelium extends assign_submission_plugin
 {
-
     const PRACTICE_MODE = 0;
     const REVIEW_MODE = 1;
+    
+    private static $helper;
 
-    /**
+        /**
      * Get the name of the babelium submission plugin
      * @return string
      */
     public function get_name()
     {
-        return get_string('babelium', 'assignsubmission_babelium');
+        return $this->getBabeliumHelper()->get_plugin_name();
     }
 
     /**
@@ -41,10 +43,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     private function get_babelium_submission($submissionid)
     {
-        global $DB;
-        return $DB->get_record('assignsubmission_babelium', array(
-            'submission' => $submissionid
-        ));
+        return $this->getBabeliumHelper()->getBabeliumSumbission($submissionid);
     }
 
     /**
@@ -58,7 +57,7 @@ class assign_submission_babelium extends assign_submission_plugin
     {
         global $CFG, $COURSE;
 
-        $defaultexerciseid = $this->get_config('exerciseid') > 0 ? $this->get_config('exerciseid') : 0;
+        $defaultexerciseid = $this->getBabeliumHelper()->getDefaultExerciseId($this);
 
         $exercises      = array();
         $exercisesMenu  = array();
@@ -119,10 +118,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function save_settings(stdClass $data)
     {
-        if (isset($data->assignsubmission_babelium_exerciseid)) {
-            $this->set_config('exerciseid', $data->assignsubmission_babelium_exerciseid);
-        }
-        return true;
+        return $this->getBabeliumHelper()->saveSubmissionConfiguration($this, $data);
     }
 
     /**
@@ -563,28 +559,19 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function copy_submission(stdClass $sourcesubmission, stdClass $destsubmission)
     {
-
-        global $DB;
-
-        // Copy the assignsubmission_babelium record.
-        $babeliumsubmission = $this->get_babelium_submission($sourcesubmission->id);
-        if ($babeliumsubmission) {
-            unset($babeliumsubmission->id);
-            $babeliumsubmission->submission = $destsubmission->id;
-            $DB->insert_record('assignsubmission_babelium', $babeliumsubmission);
-        }
-        return true;
+        return $this->getBabeliumHelper()->copy_submission($sourcesubmission, $destsubmission);
     }
 
     public function check_file_code($submissioncode)
     {
-        global $OUTPUT;
-
-        if (!$submissioncode || empty($submissioncode)) {
-            $errormsg = get_string('responsehashnotset', 'assignsubmission_babelium');
-            return $OUTPUT->error_text($errormsg);
-        } else {
-            return null;
-        }
+        return $this->getBabeliumHelper()->check_file_code($submissioncode);
     }
+
+    public function getBabeliumHelper() {
+        if(!isset(self::$helper)){
+            self::$helper = new BabeliumHelper();
+        }
+        return self::$helper;
+    }
+
 }
