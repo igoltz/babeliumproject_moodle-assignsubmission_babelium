@@ -90,7 +90,7 @@ class babeliumservice{
                 $bcfg->babelium_babeliumWebDomain = get_config('assignsubmission_babelium','serverdomain');
                 //$bcfg->babelium_babeliumWebPort = get_config('assignsubmission_babelium','serverport');//removed
                 //$bcfg->babelium_babeliumApiDomain = get_config('assignsubmission_babelium','apidomain');
-                $bcfg->babelium_babeliumApiEndPoint = get_config('assignsubmission_babelium','apiendpoint');
+                //$bcfg->babelium_babeliumApiEndPoint = get_config('assignsubmission_babelium','apiendpoint');
                 $bcfg->babelium_new_api_endpoint = get_config('assignsubmission_babelium','newapiendpoint');
                 $bcfg->babelium_babeliumApiAccessKey = get_config('assignsubmission_babelium','accesskey');
                 $bcfg->babelium_babeliumApiSecretAccessKey = get_config('assignsubmission_babelium','secretaccesskey');
@@ -286,9 +286,9 @@ class babeliumservice{
         $commProtocol = 'http://';
         $web_domain = self::$settings->babelium_babeliumWebDomain;
         $api_domain = $web_domain;
-        $api_endpoint = self::$settings->babelium_babeliumApiEndPoint;
+        $api_endpoint = self::$settings->babelium_new_api_endpoint;
         $api_url = $commProtocol . $api_domain . $api_endpoint;
-        $query_string = $api_url . '?' . $method;
+        $query_string = $api_url . '/' . $method;
         return $query_string;
     }
 
@@ -349,6 +349,28 @@ class babeliumservice{
         //$this->parseCurlOutput($result);
         return $this->decodeJsonResponse($result);
     }
+    
+    public function getExerciseInformation($exerciseId) {
+        $headers = $this->build_headers($method, $parameters);
+        $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/exercises/".$exerciseId;
+        //Check if proxy (if used) should be bypassed for this url
+        $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($request_url) : false;
+        $result = $this->make_request($headers, $request_url);
+        //Parses the response output to separate the headers from the body of the response
+        //$this->parseCurlOutput($result);
+        return $this->decodeJsonResponse($result);
+    }
+    
+    public function getCaptions($subtitleId, $mediaId) {
+        $headers = $this->build_headers($method, $parameters);
+        $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/sub-titles/".$subtitleId;
+        //Check if proxy (if used) should be bypassed for this url
+        $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($request_url) : false;
+        $result = $this->make_request($headers, $request_url);
+        //Parses the response output to separate the headers from the body of the response
+        //$this->parseCurlOutput($result);
+        return $this->decodeJsonResponse($result);
+    }
 
     /**
      * Makes a unique signature for each API request
@@ -401,5 +423,4 @@ class babeliumservice{
             return false;
         }
     }
-
 }

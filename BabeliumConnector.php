@@ -60,18 +60,20 @@ class BabeliumConnector {
    function babeliumsubmission_get_exercise_data($exerciseid,$responseid=0){
            $g = $this->getBabeliumRemoteService();
 
+           $data = null;
            if($responseid){
                    $data = $g->newServiceCall('getResponseById', array("responseId"=>$responseid));
            } else {
-                   $data = $g->newServiceCall('getExerciseById', array("id"=>$exerciseid));
+                   $data = $g->getExerciseInformation($exerciseid);
            }
            if(!$data){
                    return null;
            }
+           $media = $data['media'][0];
 
-           $subtitleId = isset($data['subtitleId']) ? $data['subtitleId'] : 0;
-           $mediaId= isset($data['media']) ? $data['media']['id'] : 0;
-           $captions = $g->newServiceCall('getSubtitleLines', array("id" => $subtitleId, "mediaid" => $mediaId));
+           $subtitleId = isset($media['subtitleId']) ? $media['subtitleId'] : 0;
+           $mediaId= isset($media['id']) ? $media['id']: 0;
+           $captions = $g->getCaptions($subtitleId,$mediaId);
 
            if(!$captions){
                    return null;
@@ -84,7 +86,8 @@ class BabeliumConnector {
                            $exerciseRoles[] = $role;
            }
 
-           $recordInfo = $g->newServiceCall('requestRecordingSlot');
+           //WTF??
+           //$recordInfo = $g->newServiceCall('requestRecordingSlot');
 
            if($data && $exerciseRoles && $captions && is_array($exerciseRoles[0]) && is_array($captions[0])){
                    $exercise = array(

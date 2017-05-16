@@ -7,11 +7,11 @@
 class BabeliumHelper
 {
     const DEVELOPMENT_ENVIRONMENT = 'development';
-    
+
     private static $environment;
     private static $config;
     private static $rootPath;
-    
+
     const PRACTICE_MODE = 0;
     const REVIEW_MODE = 1;
 
@@ -41,9 +41,7 @@ class BabeliumHelper
     * Key-pair list for holding <select> content
     **/
     private $exercisesMenu  = array();
-    private $classattribute = array(
-        'class' => 'error'
-    );
+    private $classattribute = array('class' => 'error');
 
     private $exerciseid;
     private $data;
@@ -86,7 +84,7 @@ class BabeliumHelper
                     $data->assignsubmission_babelium_exerciseid
             );
     }
-    
+
     public function saveSubmissionConfiguration($plugin, $data){
         if (isset($data->assignsubmission_babelium_exerciseid)) {
             $plugin->set_config('exerciseid', $data->assignsubmission_babelium_exerciseid);
@@ -202,7 +200,7 @@ class BabeliumHelper
         }
         return null;
     }
-        
+
     public function copy_submission($sourcesubmission, $destsubmission){
         global $DB;
 
@@ -259,7 +257,7 @@ class BabeliumHelper
             return true;
         }
     }
-    
+
     /**
     * Returns html code for displaying the babelium widget with the provided information
     *
@@ -303,22 +301,10 @@ class BabeliumHelper
 
            //load jquery just in case
        $html_content.='<!-- jquery -->
-                       <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-                       <script>window.jQuery || document.write("<script src="jquery.js">\x3C/script>")</script>'.PHP_EOL;
+                       <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>'.PHP_EOL;
 
        $domain = get_config('assignsubmission_babelium','serverdomain');
        $lang = current_language();
-
-       $html_content .= '<script language="javascript" type="text/javascript">
-                               var domain = "'.$domain.'";
-                               var lang = "'.$lang.'";
-                               var exinfo = '.$exinfo.';
-                               var exsubs = '.$exsubs.';
-                               var rsinfo = '.$rsinfo.';
-                               var rssubs = '.$rssubs.';
-                               var recinfo = '.$recinfo.';
-                               init(exinfo, exsubs, rsinfo, rssubs, recinfo);
-                         </script>'.PHP_EOL;
 
        if(getenv("APPLICATION_ENV") !== 'development'){
            $html_content.='<script
@@ -332,17 +318,29 @@ class BabeliumHelper
        }
        else{
            $html_content.='<script
-                               src="http://197.0.11.3/mod/assign/submission/babelium/script/babelium.moodle.js"
+                               src="http://192.168.1.13/mod/assign/submission/babelium/script/babelium.moodle.js"
                                language="javascript">
                            </script>'.PHP_EOL;
            $html_content.='<script
-                               src="http://197.0.11.3/mod/assign/submission/babelium/static/js/babelium.core.js"
+                               src="http://192.168.1.13/mod/assign/submission/babelium/static/js/babelium.core.js"
                                language="javascript">
                            </script>'.PHP_EOL;
        }
+
+       $html_content .= '<script language="javascript" type="text/javascript">
+                               var domain = "'.$domain.'";
+                               var lang = "'.$lang.'";
+                               var exinfo = '.$exinfo.';
+                               var exsubs = '.$exsubs.';
+                               var rsinfo = '.$rsinfo.';
+                               var rssubs = '.$rssubs.';
+                               var recinfo = '.$recinfo.';
+                               init(exinfo, exsubs, rsinfo, rssubs, recinfo);
+                         </script>'.PHP_EOL;
+
        return $html_content;
    }
-   
+
     public function getSumbissionHTMLPath() {
          if($this->isDevelopment()){
              $content_path = self::rootPath  .'/mod/assign/submission/babelium/iframe/upload.body.html';
@@ -355,6 +353,26 @@ class BabeliumHelper
 
     public function isDevelopment() {
         return self::$environment == DEVELOPMENT_ENVIRONMENT;
+    }
+
+    public function canUpgrade($type, $version) {
+        return $type == 'babelium' && $version >= 2011112900;
+    }
+
+    public function displayVideoResponse($plugin, $submissionid){
+        $result = "";
+        $babeliumsubmission = $this->getBabeliumSumbission($submissionid);
+        if ($babeliumsubmission) {
+            $result          = '<div class="no-overflow">';
+            $babeliumcontent = '';
+            $response_data   = $plugin->getBabeliumConnector()->babeliumsubmission_get_response_data($babeliumsubmission->responseid);
+            if ($response_data){
+                $babeliumcontent = $this->babeliumsubmission_html_output(self::REVIEW_MODE, $response_data['info'], $response_data['subtitles'], null);
+            }
+            $result .= $babeliumcontent;
+            $result .= '</div>';
+        }
+        return $result;
     }
 
 }

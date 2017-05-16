@@ -407,20 +407,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function view(stdClass $submission)
     {
-        $result = '';
-
-        $babeliumsubmission = $this->get_babelium_submission($submission->id);
-        if ($babeliumsubmission) {
-            $result          = '<div class="no-overflow">';
-            $babeliumcontent = '';
-            $response_data   = $this->getBabeliumConnector()->babeliumsubmission_get_response_data($babeliumsubmission->responseid);
-            if ($response_data)
-                $babeliumcontent = babeliumsubmission_html_output(self::REVIEW_MODE, $response_data['info'], $response_data['subtitles'], null);
-            $result .= $babeliumcontent;
-            $result .= '</div>';
-        }
-
-        return $result;
+        return $this->getBabeliumHelper()->displayVideoResponse($this, $submission);
     }
 
     /**
@@ -433,10 +420,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function can_upgrade($type, $version)
     {
-        if ($type == 'babelium' && $version >= 2011112900) {
-            return true;
-        }
-        return false;
+        return $this->getBabeliumHelper()->canUpgrade($type, $version);
     }
 
 

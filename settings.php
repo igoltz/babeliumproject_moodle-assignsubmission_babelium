@@ -59,7 +59,7 @@ $settings->add(
                         'babeliumproject.com/api/v2',
                         PARAM_TEXT));*/
 
-$settings->add(
+/*$settings->add(
   new admin_setting_configtext(
     'assignsubmission_babelium/apiendpoint',
     new lang_string('apiendpoint','assignsubmission_babelium'),
@@ -67,7 +67,7 @@ $settings->add(
     '/api/v2/rest.php',
     PARAM_TEXT
   )
-);
+);*/
 
 $settings->add(
   new admin_setting_configtext(

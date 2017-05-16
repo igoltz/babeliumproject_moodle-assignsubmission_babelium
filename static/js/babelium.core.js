@@ -53,7 +53,7 @@ function rpc(method, url, onSuccess, onError){
     // Request with custom header
     jQuery.ajax(
         {
-            url: host+url,
+            url: url,
             headers:
             {
                 'access-key': key,
