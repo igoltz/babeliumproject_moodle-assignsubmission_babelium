@@ -31,6 +31,8 @@ class BabeliumHelper
     const JSON_TITLE = 'title';
 
     const EMPTY_STRING = '';
+    const SUBMISSION_TYPE = "babelium";
+    const MIN_MOODLE_VERSION = 2011112900;
 
     /**
     * Available babelium exercise list
@@ -184,7 +186,7 @@ class BabeliumHelper
         return get_string('babelium', 'assignsubmission_babelium');
     }
 
-    public function getBabeliumSumbission($submissionid) {
+    public function getBabeliumSubmission($submissionid) {
         global $DB;
         return $DB->get_record('assignsubmission_babelium', array(
             'submission' => $submissionid
@@ -216,7 +218,7 @@ class BabeliumHelper
 
     public function format_for_log($submission) {
         // format the info for each submission plugin add_to_log
-        $babeliumsubmission = $this->getBabeliumSumbission($submission->id);
+        $babeliumsubmission = $this->getBabeliumSubmission($submission->id);
         $babeliumloginfo    = '';
         $babeliumloginfo .= get_string('loginfo', 'assignsubmission_babelium', array(
             'responseid' => $babeliumsubmission->responseid,
@@ -282,16 +284,18 @@ class BabeliumHelper
        $rssubs = '""';
        $recinfo = '""';
 
-       if($mode){
-               $rsinfo = json_encode($info);
-               $rssubs = json_encode($subs);
-       } else {
-               $exinfo = json_encode($info);
-               $exsubs = json_encode($subs);
-       }
+        if($mode == self::REVIEW_MODE){
+            $rsinfo = json_encode($info);
+            $rssubs = json_encode($subs);
+        }
+        else if($mode == self::PRACTICE_MODE){
+            $exinfo = json_encode($info);
+            $exsubs = json_encode($subs);
+        }
 
-       if($rmedia)
-               $recinfo = json_encode($rmedia);
+        if($rmedia){
+            $recinfo = json_encode($rmedia);
+        }
 
        $html_content = '';
        if(isset($info['title'])){
@@ -340,7 +344,7 @@ class BabeliumHelper
 
     public function getSumbissionHTMLPath() {
          if($this->isDevelopment()){
-             $content_path = self::$rootPath  .'/mod/assign/submission/babelium/iframe/upload.body.html';
+             $content_path = self::$rootPath.'/mod/assign/submission/babelium/iframe/upload.body.html';
          }
          else{
              $content_path = '/var/www/html/babelium-plugin-shortcut/iframe/upload.body.html';
@@ -353,12 +357,12 @@ class BabeliumHelper
     }
 
     public function canUpgrade($type, $version) {
-        return $type == 'babelium' && $version >= 2011112900;
+        return ($type == self::SUBMISSION_TYPE && $version >= self::MIN_MOODLE_VERSION);
     }
 
-    public function displayVideoResponse($plugin, $submissionid){
+    public function displayVideoResponse($submission){
         $result = "";
-        $babeliumsubmission = $this->getBabeliumSumbission($submissionid);
+        $babeliumsubmission = $this->getBabeliumSubmission($submission);
         if ($babeliumsubmission) {
             $result          = '<div class="no-overflow">';
             $babeliumcontent = '';

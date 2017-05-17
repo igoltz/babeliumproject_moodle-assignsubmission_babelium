@@ -292,47 +292,7 @@ class babeliumservice{
         return $query_string;
     }
 
-    public function build_headers($method, $parameters){
-        foreach(self::$settings as $prop=>$value){
-            if(empty($value)){
-                    $this->display_error('babeliumErrorConfigParameters');
-            }
-            if(($prop == 'babelium_babeliumApiAccessKey' && strlen($value)!=20) ||
-               ($prop == 'babelium_babeliumApiSecretAccessKey' && strlen($value)!=40)){
-                    $this->display_error('babeliumErrorConfigParameters');
-            }
-        }
-        $request = array();
-        $request['method'] = $method;
-        if($parameters != null && is_array($parameters) && count($parameters) > 0){
-                $request['parameters'] = $parameters;
-        }
-
-        //Date timestamp formated following one of the standards allowed for HTTP 1.1 date headers (DATE_RFC1123)
-        $date = date("D, d M Y H:i:s O");
-        if (getenv("APPLICATION_ENV") == "development"){
-            //auth bypass while development
-            $fake_host = "babelium-dev.irontec.com";
-            $referer = str_replace($_SERVER['HTTP_HOST'], $fake_host, $_SERVER['HTTP_REFERER']);
-            $pieces = parse_url($referer);
-            $originhost = $fake_host;
-            $origin = $pieces['scheme'] . "://" . $originhost;
-        }
-        else{
-            //default
-            $referer = $_SERVER['HTTP_REFERER'];
-            $pieces = parse_url($referer);
-            $originhost = $_SERVER['HTTP_HOST'];
-            $origin = $pieces['scheme'] . "://" . $originhost;
-
-            $request['header']['date'] = $date;
-            $signature = "BMP ".self::$settings->babelium_babeliumApiAccessKey.":".$this->generateAuthorization($method, $date, $originhost, self::$settings->babelium_babeliumApiSecretAccessKey);
-            $request['header']['authorization'] = $signature;
-        }
-
-        //See this workaround if the query parameters are written with &amp; : http://es.php.net/manual/es/function.http-build-query.php#102324
-        //$request = http_build_query($request,'', '&');
-        //return $request;
+    public function build_headers(){
         return array(
             'Access-Key:'.self::$settings->babelium_babeliumApiAccessKey,
             'Secret-Access:'.self::$settings->babelium_babeliumApiSecretAccessKey
@@ -340,30 +300,24 @@ class babeliumservice{
     }
 
     public function getExerciseList() {
-        $headers = $this->build_headers($method, $parameters);
+        $headers = $this->build_headers();
         $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/exercises";
-        //Check if proxy (if used) should be bypassed for this url
-        $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($request_url) : false;
-        $result = $this->make_request($headers, $request_url);
-        //Parses the response output to separate the headers from the body of the response
-        //$this->parseCurlOutput($result);
-        return $this->decodeJsonResponse($result);
+        return $this->makeApiV3Request($request_url, $headers);
     }
     
     public function getExerciseInformation($exerciseId) {
-        $headers = $this->build_headers($method, $parameters);
+        $headers = $this->build_headers();
         $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/exercises/".$exerciseId;
-        //Check if proxy (if used) should be bypassed for this url
-        $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($request_url) : false;
-        $result = $this->make_request($headers, $request_url);
-        //Parses the response output to separate the headers from the body of the response
-        //$this->parseCurlOutput($result);
-        return $this->decodeJsonResponse($result);
+        return $this->makeApiV3Request($request_url, $headers);
     }
     
     public function getCaptions($subtitleId, $mediaId) {
-        $headers = $this->build_headers($method, $parameters);
+        $headers = $this->build_headers();
         $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/sub-titles/".$subtitleId;
+        return $this->makeApiV3Request($request_url, $headers);
+    }
+    
+    private function makeApiV3Request($request_url, $headers){
         //Check if proxy (if used) should be bypassed for this url
         $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($request_url) : false;
         $result = $this->make_request($headers, $request_url);

@@ -69,7 +69,7 @@ class BabeliumConnector {
            if(!$data){
                    return null;
            }
-           $media = $data['media'][0];
+           $media = $data['media'];
 
            $subtitleId = isset($media['subtitleId']) ? $media['subtitleId'] : 0;
            $mediaId= isset($media['id']) ? $media['id']: 0;
