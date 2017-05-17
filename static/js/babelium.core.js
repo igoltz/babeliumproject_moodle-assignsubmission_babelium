@@ -98,7 +98,8 @@ function getSubtitlesLangCaption(subtitleId) {
 }
 
 function getPosterUrl(videoId) {
-    if(exinfo!==undefined && exinfo.media[0]!==undefined && exinfo.media[0].thumbnail!==undefined){
+    hasMedia = exinfo!==undefined && exinfo.media !== undefined && exinfo.media[0]!==undefined;
+    if(hasMedia && exinfo.media[0].thumbnail!==undefined){
         var urlData = contentServerUrl+exinfo.media[0].thumbnail;
         return urlData;
     }
@@ -110,7 +111,8 @@ function getPosterUrl(videoId) {
 function getMP4video(videoId) {
     //test for partial content 206
     return "http://test218.irontec.com/babelium-zf2/media/1491389671_aFGX92NU6CAQjq8x.mp4";
-    if(exinfo!==undefined && exinfo.media[0]!==undefined && exinfo.media[0].thumbnail!==undefined){
+    hasMedia = exinfo!==undefined && exinfo.media !== undefined && exinfo.media[0]!==undefined;
+    if(hasMedia && exinfo.media[0].thumbnail!==undefined){
         return contentServerUrl+exinfo.media[0].mediaUrl;
     }
     else{
@@ -119,7 +121,8 @@ function getMP4video(videoId) {
 }
 
 function getWEBMvideo(videoId) {
-    if(exinfo!==undefined && exinfo.media[0]!==undefined && exinfo.media[0].webmvideo!==undefined){
+    hasMedia = exinfo!==undefined && exinfo.media !== undefined && exinfo.media[0]!==undefined;
+    if(hasMedia && exinfo.media[0].webmvideo!==undefined){
         return contentServerUrl+exinfo.media[0].webmvideo;
     }
     else{
