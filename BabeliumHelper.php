@@ -58,12 +58,12 @@ class BabeliumHelper
     }
 
     public function getDefaultExerciseId($plugin){
-        $id = $plugin->get_config(KEY_EXERCISE_ID);
-        return $id > MIN_EXERCISE_ID ? $id : DEFAULT_EXERCISE_ID;
+        $id = $plugin->get_config(self::KEY_EXERCISE_ID);
+        return $id > self::MIN_EXERCISE_ID ? $id : self::DEFAULT_EXERCISE_ID;
     }
 
     public function areValidExercises(){
-            $this->exercises && count($this->exercises) > MIN_EXERCISE_NUMBER;
+            $this->exercises && count($this->exercises) > self::MIN_EXERCISE_NUMBER;
     }
 
     public function getAvailableExercises(){
@@ -72,7 +72,7 @@ class BabeliumHelper
 
     public function createExerciseList(){
             foreach ($this->exercises as $exercise) {
-                $this->exercisesMenu[$exercise[JSON_ID]] = $exercise[JSON_TITLE];
+                $this->exercisesMenu[$exercise[self::JSON_ID]] = $exercise[self::JSON_TITLE];
             }
     }
 
@@ -82,7 +82,7 @@ class BabeliumHelper
 
     public function saveThisExercise($plugin, $data){
             $plugin->set_config(
-                    KEY_EXERCISE_ID,
+                    self::KEY_EXERCISE_ID,
                     $data->assignsubmission_babelium_exerciseid
             );
     }
@@ -95,22 +95,22 @@ class BabeliumHelper
     }
 
     public function getSubmissionId($submission){
-            $this->submission = $submission ? $submission->id : DEFAULT_SUBMISSION_ID;
+            $this->submission = $submission ? $submission->id : self::DEFAULT_SUBMISSION_ID;
     }
 
     public function isExerciseIdAvailable($plugin){
-            $this->exerciseid = $plugin->get_config(KEY_EXERCISE_ID);
-            return $this->exerciseid <= MIN_EXERCISE_ID;
+            $this->exerciseid = $plugin->get_config(self::KEY_EXERCISE_ID);
+            return $this->exerciseid <= self::MIN_EXERCISE_ID;
     }
 
     public function checkReceivedData($data){
         $this->data = $data;
         if (!isset($this->data->responseid)) {
-            $this->data->responseid = EMPTY_STRING;
+            $this->data->responseid = self::EMPTY_STRING;
         }
 
         if (!isset($this->data->responsehash)) {
-            $this->data->responsehash = EMPTY_STRING;
+            $this->data->responsehash = self::EMPTY_STRING;
         }
         return $this->data;
     }
@@ -158,7 +158,7 @@ class BabeliumHelper
         if ($babeliumsubmission) {
             unset($babeliumsubmission->id);
             $babeliumsubmission->submission = $dest->id;
-            $DB->insert_record(KEY_ASSIGNMENT_RECORD, $babeliumsubmission);
+            $DB->insert_record(self::KEY_ASSIGNMENT_RECORD, $babeliumsubmission);
         }
     }
 
@@ -175,7 +175,7 @@ class BabeliumHelper
         global $DB;
         // will throw exception on failure
         $DB->delete_records(
-            ASSIGNSUBMISSION_BABELIUM,
+            self::ASSIGNSUBMISSION_BABELIUM,
             array(
                 'assignment' => $plugin->assignment->get_instance()->id
             )
