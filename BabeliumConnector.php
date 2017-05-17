@@ -59,10 +59,9 @@ class BabeliumConnector {
     */
    function babeliumsubmission_get_exercise_data($exerciseid,$responseid=0){
            $g = $this->getBabeliumRemoteService();
-
            $data = null;
            if($responseid){
-                   $data = $g->newServiceCall('getResponseById', array("responseId"=>$responseid));
+                   $data = $g->getResponseInformation($responseid);
            } else {
                    $data = $g->getExerciseInformation($exerciseid);
            }
@@ -79,29 +78,12 @@ class BabeliumConnector {
                    return null;
            }
 
-           $exerciseRoles = array();
-           foreach($captions as $subline){
-                   $role = array("id"=>$subline['exerciseRoleId'], "characterName"=>$subline['exerciseRoleName']);
-                   if(!in_array($role,$exerciseRoles))
-                           $exerciseRoles[] = $role;
-           }
+           $exerciseRoles = $this->getExerciseRoles($captions);
 
            //WTF??
-           //$recordInfo = $g->newServiceCall('requestRecordingSlot');
-
-           if($data && $exerciseRoles && $captions && is_array($exerciseRoles[0]) && is_array($captions[0])){
-                   $exercise = array(
-                           "info" => $data,
-                           "roles" => $exerciseRoles,
-                           "subtitles" => $captions,
-                           "languages" => null,
-                           "recinfo" => $recordInfo
-                   );
-                   return $exercise;
-           } else {
-                   //TODO add some kind of log function here so that the admin knows what happened: add_to_log() maybe
-                   return;
-           }
+           //$recinfo = $g->newServiceCall('requestRecordingSlot');
+           $recinfo = null;
+           return $this->getResponseInfo($data, $captions, $exerciseRoles, $recinfo);
    }
 
    /**
@@ -120,26 +102,9 @@ class BabeliumConnector {
            if (!$captions)
                    return;
 
-           $exerciseRoles = array();
-           foreach($captions as $subline){
-                   $role = array("id"=>$subline['exerciseRoleId'], "characterName"=>$subline['exerciseRoleName']);
-                   if(!in_array($role,$exerciseRoles))
-                           $exerciseRoles[] = $role;
-           }
-
-           if($data && $captions && $exerciseRoles && is_array($captions[0]) && is_array($exerciseRoles[0])){
-                   $response = array(
-                           "info" => $data,
-                           "subtitles" => $captions,
-                           "roles" => $exerciseRoles,
-                           "languages" => null,
-                           "recinfo" => null
-                   );
-                   return $response;
-           } else {
-                   //TODO add logging for failure
-                   return;
-           }
+           $exerciseRoles = $this->getExerciseRoles($captions);
+           $recinfo = null;
+           return $this->getResponseInfo($data, $captions,$exerciseRoles, $recinfo);
    }
 
    /**
@@ -174,6 +139,32 @@ class BabeliumConnector {
             self::$babeliumService = new babeliumservice();
         }
         return self::$babeliumService;
+    }
+
+    public function getExerciseRoles($captions){
+        $exerciseRoles = array();
+        foreach($captions as $subline){
+                $role = array("id"=>$subline['exerciseRoleId'], "characterName"=>$subline['exerciseRoleName']);
+                if(!in_array($role,$exerciseRoles))
+                        $exerciseRoles[] = $role;
+        }
+        return $exerciseRoles;
+    }
+
+    public function getResponseInfo($data, $captions,$exerciseRoles, $recinfo) {
+        if($data && $captions && $exerciseRoles && is_array($captions[0]) && is_array($exerciseRoles[0])){
+                   $response = array(
+                           "info" => $data,
+                           "subtitles" => $captions,
+                           "roles" => $exerciseRoles,
+                           "languages" => null,
+                           "recinfo" => $recinfo
+                   );
+                   return $response;
+           } else {
+                   //TODO add logging for failure
+                   return;
+           }
     }
 
 }
