@@ -360,7 +360,7 @@ class BabeliumHelper
         return ($type == self::SUBMISSION_TYPE && $version >= self::MIN_MOODLE_VERSION);
     }
 
-    public function displayVideoResponse($submission){
+    public function displayVideoResponse($plugin, $submission){
         $result = "";
         $babeliumsubmission = $this->getBabeliumSubmission($submission->id);
         if ($babeliumsubmission) {

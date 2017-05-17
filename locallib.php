@@ -406,7 +406,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function view(stdClass $submission)
     {
-        return $this->getBabeliumHelper()->displayVideoResponse($submission);
+        return $this->getBabeliumHelper()->displayVideoResponse($this, $submission);
     }
 
     /**
