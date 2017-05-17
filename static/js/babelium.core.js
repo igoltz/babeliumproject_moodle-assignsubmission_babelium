@@ -98,19 +98,29 @@ function getSubtitlesLangCaption(subtitleId) {
 }
 
 function getPosterUrl(videoId) {
-    if(exinfo!==undefined && exinfo.media[0]!==undefined && exinfo.media[0].thumbnail!==undefined)
-        //return contentServerUrl+exinfo.media[0].thumbnail;
-    return "//babelium-static.irontec.com/_temp/novideo.jpg";
+    if(exinfo!==undefined && exinfo.media[0]!==undefined && exinfo.media[0].thumbnail!==undefined){
+        var urlData = contentServerUrl+exinfo.media[0].thumbnail;
+        return urlData;
+    }
+    else{
+        return "//babelium-static.irontec.com/_temp/novideo.jpg";
+    }
 }
 
 function getMP4video(videoId) {
-    if(exinfo!==undefined && exinfo.media[0]!==undefined && exinfo.media[0].thumbnail!==undefined)
+    if(exinfo!==undefined && exinfo.media[0]!==undefined && exinfo.media[0].thumbnail!==undefined){
         return contentServerUrl+exinfo.media[0].mediaUrl;
-    return "//babelium-static.irontec.com/_temp/video.mp4";
+    }
+    else{
+        return "//babelium-static.irontec.com/_temp/video.mp4";
+    }
 }
 
 function getWEBMvideo(videoId) {
-    if(exinfo!==undefined && exinfo.media[0]!==undefined && exinfo.media[0].webmvideo!==undefined)
+    if(exinfo!==undefined && exinfo.media[0]!==undefined && exinfo.media[0].webmvideo!==undefined){
         return contentServerUrl+exinfo.media[0].webmvideo;
-    return "//babelium-static.irontec.com/_temp/video.webm";
+    }
+    else{
+        return "//babelium-static.irontec.com/_temp/video.webm";
+    }
 }

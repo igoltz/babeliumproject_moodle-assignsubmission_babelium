@@ -17,7 +17,6 @@ function logMessage(message) {
 }
 
 function init(exInfo, exSubs, rInfo, rSubs, recInfo) {
-
     if (exInfo && exSubs) {
         exerciseInfo = exInfo;
         exerciseSubs = exSubs;

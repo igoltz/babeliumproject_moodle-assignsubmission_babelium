@@ -48,7 +48,7 @@
     }
     else{
         //shoe error
-        sweetAlert("Audio player", "You have to start a record first", "error");
+        sweetAlert("Babelium recorder", "You have to start a record first", "error");
     }
  }
 
@@ -74,7 +74,7 @@
     });
  }
 
- window.onload = function init() {
+function initRecorder() {
     if(generateMp3){
         extension = ".mp3";
     }
@@ -111,7 +111,9 @@
     });
  };
 
- function upload(blob, filename, url) {
+window.onload = initRecorder;
+
+function upload(blob, filename, url) {
     //first, self download the file from blob
     var xhr=new XMLHttpRequest();
     xhr.onload=function(e) {
@@ -123,9 +125,9 @@
     };
     xhr.open("GET",blob,true);
     xhr.send();
- }
+}
 
- function send(filename, data, url){
+function send(filename, data, url){
     var xhr=new XMLHttpRequest();
     xhr.onload=function(e) {
         if(this.readyState === 4) {
@@ -137,4 +139,4 @@
     fd.append("audiofile",data);
     xhr.open("POST",url,true);
     xhr.send(fd);
- }
+}
