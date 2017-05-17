@@ -65,11 +65,11 @@ function rpc(method, url, onSuccess, onError){
     jQuery.ajax(
         {
             url: url,
-            headers:
+            /*headers:
             {
                 'access-key': key,
                 'secret': secret
-            },
+            },*/
             success: function(xhr, ajaxOptions, thrownError){
                 if(onSuccess !== undefined){
                     onSuccess(xhr.responseText);
