@@ -62,16 +62,20 @@ class BabeliumConnector {
            $data = null;
            if($responseid){
                    $data = $g->getResponseInformation($responseid);
+                    if(!$data){
+                        return null;
+                    }
+                   $subtitleId = isset($data['subtitleId']) ? $data['subtitleId'] : 0;
+                   $mediaId= isset($data['mediaId']) ? $data['mediaId']: 0;
            } else {
                    $data = $g->getExerciseInformation($exerciseid);
+                   if(!$data){
+                        return null;
+                    }
+                   $media = $data['media'];
+                   $subtitleId = isset($media['subtitleId']) ? $media['subtitleId'] : 0;
+                   $mediaId= isset($media['id']) ? $media['id']: 0;
            }
-           if(!$data){
-                   return null;
-           }
-           //$media = $data['media'];
-
-           $subtitleId = isset($data['subtitleId']) ? $data['subtitleId'] : 0;
-           $mediaId= isset($data['mediaId']) ? $data['mediaId']: 0;
            $captions = $g->getCaptions($subtitleId,$mediaId);
            if(!$captions){
                    return null;
