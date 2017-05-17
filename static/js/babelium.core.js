@@ -2,7 +2,8 @@
 
 var key = "1234";
 var secret = "abcd";
-var host = "http://babelium-server-dev.irontec.com/api/v3";
+var host = "//babelium-server-dev.irontec.com/api/v3";
+var contentServerUrl = "//babelium-server-dev.irontec.com/";
 
 window.onload = function() {
     if(window.jQuery === undefined || $ === undefined){
@@ -46,7 +47,17 @@ function loadVideo(videoId, subtitleId) {
 }
 
 function loadExerciseDescription(description) {
-    $('.exdescription').text(description);
+    if(isHTMLdescription(description)){
+        //warning: possible XSS injection if value of description is not correctly sanitized
+        $('.exdescription').html(description);
+    }
+    else{
+        $('.exdescription').text(description);
+    }
+}
+
+function isHTMLdescription(description) {
+    return description.indexOf("><") !== -1;
 }
 
 function rpc(method, url, onSuccess, onError){
@@ -87,13 +98,19 @@ function getSubtitlesLangCaption(subtitleId) {
 }
 
 function getPosterUrl(videoId) {
-    return "//babelium-static.irontec.com/_temp/poster.jpg";
+    if(exinfo!==undefined && exinfo.media[0]!==undefined && exinfo.media[0].thumbnail!==undefined)
+        //return contentServerUrl+exinfo.media[0].thumbnail;
+    return "//babelium-static.irontec.com/_temp/novideo.jpg";
 }
 
 function getMP4video(videoId) {
+    if(exinfo!==undefined && exinfo.media[0]!==undefined && exinfo.media[0].thumbnail!==undefined)
+        return contentServerUrl+exinfo.media[0].mediaUrl;
     return "//babelium-static.irontec.com/_temp/video.mp4";
 }
 
 function getWEBMvideo(videoId) {
+    if(exinfo!==undefined && exinfo.media[0]!==undefined && exinfo.media[0].webmvideo!==undefined)
+        return contentServerUrl+exinfo.media[0].webmvideo;
     return "//babelium-static.irontec.com/_temp/video.webm";
 }

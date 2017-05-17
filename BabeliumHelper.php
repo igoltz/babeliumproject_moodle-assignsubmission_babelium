@@ -61,16 +61,16 @@ class BabeliumHelper
     }
 
     public function areValidExercises(){
-            $exercises && count($exercises) > MIN_EXERCISE_NUMBER;
+            $this->exercises && count($this->exercises) > MIN_EXERCISE_NUMBER;
     }
 
     public function getAvailableExercises(){
-            $exercises = babeliumsubmission_get_available_exercise_list();
+            $this->exercises = babeliumsubmission_get_available_exercise_list();
     }
 
     public function createExerciseList(){
-            foreach ($exercises as $exercise) {
-                $exercisesMenu[$exercise[JSON_ID]] = $exercise[JSON_TITLE];
+            foreach ($this->exercises as $exercise) {
+                $this->exercisesMenu[$exercise[JSON_ID]] = $exercise[JSON_TITLE];
             }
     }
 
@@ -97,7 +97,7 @@ class BabeliumHelper
     }
 
     public function isExerciseIdAvailable($plugin){
-            $exerciseid = $plugin->get_config(KEY_EXERCISE_ID);
+            $this->exerciseid = $plugin->get_config(KEY_EXERCISE_ID);
             return $this->exerciseid <= MIN_EXERCISE_ID;
     }
 
@@ -140,22 +140,22 @@ class BabeliumHelper
 
     public function getFormData($plugin, $mform){
         $plugin->get_babelium_form_elements($mform, array(
-            $data,
-            $exercise_data['info'],
-            $exercise_data['roles'],
-            $exercise_data['languages'],
-            $exercise_data['subtitles'],
-            $exercise_data['recinfo']
+            $this->data,
+            $this->exercise_data['info'],
+            $this->exercise_data['roles'],
+            $this->exercise_data['languages'],
+            $this->exercise_data['subtitles'],
+            $this->exercise_data['recinfo']
         ));
     }
 
     public function copySubmission($plugin, $source, $dest){
         // Copy the assignsubmission_babelium record.
         global $DB;
-        $babeliumsubmission = $plugin->get_babelium_submission($sourcesubmission->id);
+        $babeliumsubmission = $plugin->get_babelium_submission($source->id);
         if ($babeliumsubmission) {
             unset($babeliumsubmission->id);
-            $babeliumsubmission->submission = $destsubmission->id;
+            $babeliumsubmission->submission = $dest->id;
             $DB->insert_record(KEY_ASSIGNMENT_RECORD, $babeliumsubmission);
         }
     }
@@ -298,10 +298,8 @@ class BabeliumHelper
                $html_content.='<h2 id="babelium-exercise-title" class="centered">'.$info['title'].'</h2>';
        }
        $html_content.= file_get_contents($content_path, FILE_USE_INCLUDE_PATH);
-
-           //load jquery just in case
-       $html_content.='<!-- jquery -->
-                       <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>'.PHP_EOL;
+        //load jquery just in case
+       $html_content.='<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>'.PHP_EOL;
 
        $domain = get_config('assignsubmission_babelium','serverdomain');
        $lang = current_language();
@@ -337,13 +335,12 @@ class BabeliumHelper
                                var recinfo = '.$recinfo.';
                                init(exinfo, exsubs, rsinfo, rssubs, recinfo);
                          </script>'.PHP_EOL;
-
        return $html_content;
    }
 
     public function getSumbissionHTMLPath() {
          if($this->isDevelopment()){
-             $content_path = self::rootPath  .'/mod/assign/submission/babelium/iframe/upload.body.html';
+             $content_path = self::$rootPath  .'/mod/assign/submission/babelium/iframe/upload.body.html';
          }
          else{
              $content_path = '/var/www/html/babelium-plugin-shortcut/iframe/upload.body.html';
@@ -352,7 +349,7 @@ class BabeliumHelper
      }
 
     public function isDevelopment() {
-        return self::$environment == DEVELOPMENT_ENVIRONMENT;
+        return self::$environment == self::DEVELOPMENT_ENVIRONMENT;
     }
 
     public function canUpgrade($type, $version) {
