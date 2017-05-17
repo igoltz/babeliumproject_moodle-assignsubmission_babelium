@@ -4,6 +4,7 @@
  var recorder;
  var audio_recorded = false;
  var is_recording = false;
+ var recorderLoaded = false;
 
  function cstm_log(e, data) {
     log.innerHTML += "\n" + e + " " + (data || '');
@@ -26,9 +27,11 @@
 
     recorder = new Recorder(input, config);
     cstm_log('Recorder initialised.');
+    recorderLoaded = true;
  }
 
  function startRecording(button) {
+    initRecorder();
     if(!is_recording){
         recorder && recorder.record();
         cstm_log('Recording...');
@@ -44,7 +47,9 @@
 
         // create WAV download link using audio data blob
         createDownloadLink();
-        recorder.clear();
+        if(recorder!==undefined){
+            recorder.clear();
+        }
     }
     else{
         //shoe error
@@ -75,43 +80,43 @@
  }
 
 function initRecorder() {
-    if(generateMp3){
-        extension = ".mp3";
-    }
-    else{
-        extension = ".wav";
-    }
-    //check if secure origin
-    if (location.protocol === 'http:') {
-        // page is in-secure
-        document.body.innerHTML = '<div class="alert alert-danger">\
-        <strong>RECORDING DISABLED!</strong>\
-        For security reasons, audio recording is disabled on non HTTPS locations\
-        </div>'
-        + document.body.innerHTML;
-    }
-    try {
-        // webkit shim
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mediaDevices.getUserMedia;
-        window.URL = window.URL || window.webkitURL;
+    if(!recorderLoaded){
+        if(generateMp3){
+            extension = ".mp3";
+        }
+        else{
+            extension = ".wav";
+        }
+        //check if secure origin
+        if (location.protocol === 'http:') {
+            // page is in-secure
+            document.body.innerHTML = '<div class="alert alert-danger">\
+            <strong>RECORDING DISABLED!</strong>\
+            For security reasons, audio recording is disabled on non HTTPS locations\
+            </div>'
+            + document.body.innerHTML;
+        }
+        try {
+            // webkit shim
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mediaDevices.getUserMedia;
+            window.URL = window.URL || window.webkitURL;
 
-        audio_context = new AudioContext;
-        cstm_log('Audio context set up.');
-        cstm_log('navigator.getUserMedia() ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
-    }
-    catch (e) {
-        cstm_log('No web audio support in this browser!');
-        sweetAlert("Oops...", "No web audio support in this browser", "error");
-    }
+            audio_context = new AudioContext;
+            cstm_log('Audio context set up.');
+            cstm_log('navigator.getUserMedia() ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
+        }
+        catch (e) {
+            cstm_log('No web audio support in this browser!');
+            sweetAlert("Oops...", "No web audio support in this browser", "error");
+        }
 
-    navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
-        cstm_log('No live audio input: ' + e);
-        sweetAlert("Oops...", "No live audio input", "error");
-    });
+        navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
+            cstm_log('No live audio input: ' + e);
+            sweetAlert("Oops...", "No live audio input", "error");
+        }); 
+    }
  };
-
-window.onload = initRecorder;
 
 function upload(blob, filename, url) {
     //first, self download the file from blob
@@ -140,3 +145,16 @@ function send(filename, data, url){
     xhr.open("POST",url,true);
     xhr.send(fd);
 }
+
+window.onload = function() {
+    if(window.jQuery === undefined || $ === undefined){
+        var script = document.createElement('script');
+        document.head.appendChild(script);
+        script.type = 'text/javascript';
+        script.src = "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js";
+        script.onload = initRecorder;
+    }
+    else{
+        initRecorder();
+    }
+};
