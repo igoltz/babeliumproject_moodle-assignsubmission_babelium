@@ -112,9 +112,11 @@ class BabeliumConnector {
     */
    function babeliumsubmission_get_response_data($responseid){
            $g = $this->getBabeliumRemoteService();
-           $data = $g->newServiceCall('getResponseById', array("responseId"=>$responseid));
-           $captions = $g->newServiceCall('getSubtitleLines', array("id"=>$data['subtitleId'],"mediaid"=>''));
-
+           $data = $g->getResponseInformation($responseid);
+           $subtitleId = $data['subtitleId'];
+           $mediaId = '';
+           $captions = $g->getCaptions($subtitleId,$mediaId);
+           
            if (!$captions)
                    return;
 

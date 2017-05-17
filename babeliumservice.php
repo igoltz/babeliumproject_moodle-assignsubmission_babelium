@@ -311,6 +311,12 @@ class babeliumservice{
         return $this->makeApiV3Request($request_url, $headers);
     }
     
+    public function getResponseInformation($responseId) {
+        $headers = $this->build_headers();
+        $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/reponse/".$responseId;
+        return $this->makeApiV3Request($request_url, $headers);
+    }
+    
     public function getCaptions($subtitleId, $mediaId) {
         $headers = $this->build_headers();
         $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/sub-titles/".$subtitleId;
