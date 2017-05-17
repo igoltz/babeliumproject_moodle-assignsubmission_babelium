@@ -362,7 +362,7 @@ class BabeliumHelper
 
     public function displayVideoResponse($submission){
         $result = "";
-        $babeliumsubmission = $this->getBabeliumSubmission($submission);
+        $babeliumsubmission = $this->getBabeliumSubmission($submission->id);
         if ($babeliumsubmission) {
             $result          = '<div class="no-overflow">';
             $babeliumcontent = '';
