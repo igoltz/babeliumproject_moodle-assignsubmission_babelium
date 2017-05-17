@@ -69,6 +69,7 @@ class assign_submission_babelium extends assign_submission_plugin
         try {
             //$exercises = babeliumsubmission_get_available_exercise_list();
             $exercises = $this->getBabeliumConnector()->babeliumsubmission_get_available_exercise_list();
+
             if ($exercises && count($exercises) > 0) {
                 foreach ($exercises as $exercise) {
                     $exercisesMenu[$exercise['id']] = $exercise['title'];

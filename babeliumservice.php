@@ -313,7 +313,7 @@ class babeliumservice{
     
     public function getResponseInformation($responseId) {
         $headers = $this->build_headers();
-        $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/reponse/".$responseId;
+        $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/response/".$responseId;
         return $this->makeApiV3Request($request_url, $headers);
     }
     

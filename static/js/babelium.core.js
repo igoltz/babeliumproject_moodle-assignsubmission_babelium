@@ -108,6 +108,8 @@ function getPosterUrl(videoId) {
 }
 
 function getMP4video(videoId) {
+    //test for partial content 206
+    return "http://test218.irontec.com/babelium-zf2/media/1491389671_aFGX92NU6CAQjq8x.mp4";
     if(exinfo!==undefined && exinfo.media[0]!==undefined && exinfo.media[0].thumbnail!==undefined){
         return contentServerUrl+exinfo.media[0].mediaUrl;
     }

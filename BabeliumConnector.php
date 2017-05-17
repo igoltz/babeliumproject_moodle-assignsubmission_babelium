@@ -68,12 +68,11 @@ class BabeliumConnector {
            if(!$data){
                    return null;
            }
-           $media = $data['media'];
+           //$media = $data['media'];
 
-           $subtitleId = isset($media['subtitleId']) ? $media['subtitleId'] : 0;
-           $mediaId= isset($media['id']) ? $media['id']: 0;
+           $subtitleId = isset($data['subtitleId']) ? $data['subtitleId'] : 0;
+           $mediaId= isset($data['mediaId']) ? $data['mediaId']: 0;
            $captions = $g->getCaptions($subtitleId,$mediaId);
-
            if(!$captions){
                    return null;
            }
@@ -83,7 +82,8 @@ class BabeliumConnector {
            //WTF??
            //$recinfo = $g->newServiceCall('requestRecordingSlot');
            $recinfo = null;
-           return $this->getResponseInfo($data, $captions, $exerciseRoles, $recinfo);
+           $returnData = $this->getResponseInfo($data, $captions, $exerciseRoles, $recinfo);
+            return $returnData;
    }
 
    /**
@@ -95,13 +95,11 @@ class BabeliumConnector {
    function babeliumsubmission_get_response_data($responseid){
            $g = $this->getBabeliumRemoteService();
            $data = $g->getResponseInformation($responseid);
-           $subtitleId = $data['subtitleId'];
+            $subtitleId = $data['subtitleId'];
            $mediaId = '';
            $captions = $g->getCaptions($subtitleId,$mediaId);
-           
            if (!$captions)
                    return;
-
            $exerciseRoles = $this->getExerciseRoles($captions);
            $recinfo = null;
            return $this->getResponseInfo($data, $captions,$exerciseRoles, $recinfo);
