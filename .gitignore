@@ -17,7 +17,6 @@ Config.php
 .settings/
 bin-debug/
 bin-release/
-dist/
 
 #ignore phpintel folder
 \.phpintel/
