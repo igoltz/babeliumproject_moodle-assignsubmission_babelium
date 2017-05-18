@@ -106,7 +106,7 @@ class BabeliumConnector {
                    return;
            $exerciseRoles = $this->getExerciseRoles($captions);
            $recinfo = null;
-           return $this->getResponseInfo($data, $captions,$exerciseRoles, $recinfo);
+           return $this->getResponseInfo($data, $captions, $exerciseRoles, $recinfo);
    }
 
    /**
@@ -154,23 +154,31 @@ class BabeliumConnector {
     }
 
     public function getResponseInfo($data, $captions, $exerciseRoles, $recinfo) {
-        $validData = isset($data) && isset($captions) && isset($exerciseRoles);
-        if( ! $validData ){
-          return;
-        }
-        if($data && $captions && $exerciseRoles && is_array($captions[0]) && is_array($exerciseRoles[0])){
-                   $response = array(
-                           "info" => $data,
-                           "subtitles" => $captions,
-                           "roles" => $exerciseRoles,
-                           "languages" => null,
-                           "recinfo" => $recinfo
-                   );
-                   return $response;
-           } else {
-                   //TODO add logging for failure
-                   return;
-           }
+
+      $validData = isset($data)
+      && isset($captions)
+      && isset($captions[0])
+      && isset($exerciseRoles)
+      && isset($exerciseRoles[0]);
+
+      if( ! $validData ){
+        //TODO add logging for failure
+        return;
+      }
+      else if($data && $captions && $exerciseRoles && is_array($captions[0]) && is_array($exerciseRoles[0])){
+        $response = array(
+               "info" => $data,
+               "subtitles" => $captions,
+               "roles" => $exerciseRoles,
+               "languages" => null,
+               "recinfo" => $recinfo
+        );
+        return $response;
+      }
+      else {
+        //TODO add logging for failure
+        return;
+      }
     }
 
 }
