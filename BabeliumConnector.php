@@ -145,10 +145,19 @@ class BabeliumConnector {
 
     public function getExerciseRoles($captions){
         $exerciseRoles = array();
-        foreach($captions as $subline){
-                $role = array("id"=>$subline['exerciseRoleId'], "characterName"=>$subline['exerciseRoleName']);
-                if(!in_array($role,$exerciseRoles))
-                        $exerciseRoles[] = $role;
+        if(isset($captions)){
+          foreach($captions as $subline){
+            $validData = isset($subline['exerciseRoleId']) && isset($subline['exerciseRoleName']);
+            if($validData){
+              $role = array(
+                "id"=>$subline['exerciseRoleId'],
+                "characterName"=>$subline['exerciseRoleName']
+              );
+              if(!in_array($role, $exerciseRoles)){
+                $exerciseRoles[] = $role;
+              }
+            }
+          }
         }
         return $exerciseRoles;
     }
