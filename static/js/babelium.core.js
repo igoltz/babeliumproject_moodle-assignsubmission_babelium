@@ -109,8 +109,8 @@ function getPosterUrl(videoId) {
 
 function getMP4video(videoId) {
     hasMedia = exinfo!==undefined && exinfo.media !== undefined;
-    if(hasMedia && exinfo.media.mediaUrl!==undefined){
-        return exinfo.media.mediaUrl;
+    if(hasMedia && exinfo.media.mp4Url!==undefined){
+        return exinfo.media.mp4Url;
     }
     else{
         return "//babelium-static.irontec.com/_temp/video.mp4";
@@ -119,8 +119,8 @@ function getMP4video(videoId) {
 
 function getWEBMvideo(videoId) {
     hasMedia = exinfo!==undefined && exinfo.media !== undefined;
-    if(hasMedia && exinfo.media.mediaUrl!==undefined){
-        return exinfo.media.mediaUrl;
+    if(hasMedia && exinfo.media.webpUrl!==undefined){
+        return exinfo.media.webpUrl;
     }
     else{
         return "//babelium-static.irontec.com/_temp/video.webm";
