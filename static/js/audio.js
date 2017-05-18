@@ -30,7 +30,7 @@
     recorderLoaded = true;
  }
 
- function startRecording(button) {
+ function startRecording() {
     initRecorder();
     if(!is_recording){
         recorder && recorder.record();
@@ -39,15 +39,16 @@
     }
  }
 
- function stopRecording(button) {
+ function stopRecording() {
     if(is_recording){
         is_recording = false;
-        recorder && recorder.stop();
-        cstm_log('Stopped recording.');
 
-        // create WAV download link using audio data blob
-        createDownloadLink();
         if(recorder!==undefined){
+            recorder && recorder.stop();
+            cstm_log('Stopped recording.');
+            cstm_log('Creating audio link...');
+            // create WAV download link using audio data blob
+            createDownloadLink();
             recorder.clear();
         }
     }

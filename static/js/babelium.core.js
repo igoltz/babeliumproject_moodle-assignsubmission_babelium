@@ -129,4 +129,5 @@ function getWEBMvideo(videoId) {
 
 function onVideoPlay(){
     console.log("playing video...");
+    startRecording();
 }
