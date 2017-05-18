@@ -37,7 +37,7 @@ function loadSubtitles(id){
 
 function loadVideo(videoId, subtitleId) {
     var videoStr = "\
-    <video style='width:100%' poster='"+getPosterUrl(videoId)+"' controls crossorigin='anonymous'>\
+    <video style='width:100%' poster='"+getPosterUrl(videoId)+"' controls crossorigin='anonymous' onplay='onVideoPlay();'>\
         <source src='"+getMP4video(videoId)+"' type='video/mp4'>\
         <source src='"+getWEBMvideo(videoId)+"' type='video/webm'>\
         <track kind='captions' label='"+getSubtitlesLangCaption(subtitleId)+"' src='"+getSubtitlesURL(subtitleId)+"' srclang='"+getSubtitlesLang(subtitleId)+"' default>\
@@ -125,4 +125,8 @@ function getWEBMvideo(videoId) {
     else{
         return "//babelium-static.irontec.com/_temp/video.webm";
     }
+}
+
+function onVideoPlay(){
+    console.log("playing video...");
 }
