@@ -96,18 +96,24 @@ class BabeliumConnector {
     * @return mixed $response
     * 		An associative array with the info, the roles, the languages and the subtitle lines of the response, or false on error/when empty query results
     */
-   function babeliumsubmission_get_response_data($responseid){
-           $g = $this->getBabeliumRemoteService();
-           $data = $g->getResponseInformation($responseid);
-            $subtitleId = $data['subtitleId'];
-           $mediaId = '';
-           $captions = $g->getCaptions($subtitleId,$mediaId);
-           if (!$captions)
-                   return;
-           $exerciseRoles = $this->getExerciseRoles($captions);
-           $recinfo = null;
-           return $this->getResponseInfo($data, $captions, $exerciseRoles, $recinfo);
-   }
+  function babeliumsubmission_get_response_data($responseid){
+    $g = $this->getBabeliumRemoteService();
+    $data = $g->getResponseInformation($responseid);
+    $captions = null;
+    if(isset($data) && isset($data['subtitleId'])){
+      $subtitleId = $data['subtitleId'];
+      $mediaId = '';
+      $captions = $g->getCaptions($subtitleId, $mediaId);
+    }
+    if (!$captions){
+      return;
+    }
+    else{
+      $exerciseRoles = $this->getExerciseRoles($captions);
+      $recinfo = null;
+      return $this->getResponseInfo($data, $captions, $exerciseRoles, $recinfo);
+    }
+  }
 
    /**
     * Saves the data of a new response recorded using the plugin
