@@ -1,4 +1,4 @@
- var generateMp3 = true;
+ var generateMp3 = false;
  var extension;
  var audio_context;
  var recorder;
@@ -114,7 +114,7 @@ function initRecorder() {
         navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
             cstm_log('No live audio input: ' + e);
             sweetAlert("Oops...", "No live audio input", "error");
-        }); 
+        });
     }
  };
 

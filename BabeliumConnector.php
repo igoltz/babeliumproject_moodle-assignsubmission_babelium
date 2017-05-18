@@ -153,7 +153,11 @@ class BabeliumConnector {
         return $exerciseRoles;
     }
 
-    public function getResponseInfo($data, $captions,$exerciseRoles, $recinfo) {
+    public function getResponseInfo($data, $captions, $exerciseRoles, $recinfo) {
+        $validData = isset($data) && isset($captions) && isset($exerciseRoles);
+        if( ! $validData ){
+          return;
+        }
         if($data && $captions && $exerciseRoles && is_array($captions[0]) && is_array($exerciseRoles[0])){
                    $response = array(
                            "info" => $data,
