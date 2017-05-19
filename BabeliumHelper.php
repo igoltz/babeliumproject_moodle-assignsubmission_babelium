@@ -25,7 +25,8 @@ class BabeliumHelper
 
     //keys
     const KEY_EXERCISE_ID = 'exerciseid';
-    const KEY_ASSIGNMENT_RECORD = 'assignsubmission_babelium';
+    const KEY_ASSIGNMENT = 'assignment';
+    const KEY_CONFIG_BABELIUM_NAME = 'babelium';
 
     const JSON_ID = 'id';
     const JSON_TITLE = 'title';
@@ -63,39 +64,51 @@ class BabeliumHelper
     }
 
     public function areValidExercises(){
-            $this->exercises && count($this->exercises) > self::MIN_EXERCISE_NUMBER;
+        return isset($this->exercises) && count($this->exercises) > self::MIN_EXERCISE_NUMBER;
     }
 
     public function getAvailableExercises(){
             $this->exercises = babeliumsubmission_get_available_exercise_list();
+            return $this->exercises;
     }
 
     public function createExerciseList(){
             foreach ($this->exercises as $exercise) {
-                $this->exercisesMenu[$exercise[self::JSON_ID]] = $exercise[self::JSON_TITLE];
+                $hasValidData = isset($exercise) && isset($exercise[self::JSON_ID]) && $exercise[self::JSON_TITLE];
+                if($hasValidData){
+                    $this->exercisesMenu[$exercise[self::JSON_ID]] = $exercise[self::JSON_TITLE];
+                }
             }
     }
 
     public function isValidExercise($data){
-            return isset($data->assignsubmission_babelium_exerciseid);
+            if(isset($data)){
+                return isset($data->assignsubmission_babelium_exerciseid);
+            }
+            return false;
     }
 
     public function saveThisExercise($plugin, $data){
-            $plugin->set_config(
-                    self::KEY_EXERCISE_ID,
-                    $data->assignsubmission_babelium_exerciseid
-            );
+        $hasValidData = isset($data) && isset($data->assignsubmission_babelium_exerciseid);
+            if($hasValidData){
+                $plugin->set_config(
+                        self::KEY_EXERCISE_ID,
+                        $data->assignsubmission_babelium_exerciseid
+                );
+            }
     }
 
     public function saveSubmissionConfiguration($plugin, $data){
-        if (isset($data->assignsubmission_babelium_exerciseid)) {
-            $plugin->set_config('exerciseid', $data->assignsubmission_babelium_exerciseid);
+        $hasValidData = isset($data) && isset($data->assignsubmission_babelium_exerciseid);
+        if($hasValidData){
+            $plugin->set_config(self::KEY_EXERCISE_ID, $data->assignsubmission_babelium_exerciseid);
         }
         return true;
     }
 
     public function getSubmissionId($submission){
-            $this->submission = $submission ? $submission->id : self::DEFAULT_SUBMISSION_ID;
+            $this->submission = isset($submission) ? $submission->id : self::DEFAULT_SUBMISSION_ID;
+            return $this->submission;
     }
 
     public function isExerciseIdAvailable($plugin){
@@ -104,22 +117,26 @@ class BabeliumHelper
     }
 
     public function checkReceivedData($data){
-        $this->data = $data;
-        if (!isset($this->data->responseid)) {
-            $this->data->responseid = self::EMPTY_STRING;
-        }
+        if(isset($data)){
+            $this->data = $data;
+            if (!isset($this->data->responseid)) {
+                $this->data->responseid = self::EMPTY_STRING;
+            }
 
-        if (!isset($this->data->responsehash)) {
-            $this->data->responsehash = self::EMPTY_STRING;
+            if (!isset($this->data->responsehash)) {
+                $this->data->responsehash = self::EMPTY_STRING;
+            }
         }
         return $this->data;
     }
 
     public function populateWithBabeliumData($plugin, $submission){
-        $babeliumsubmission = $plugin->get_babelium_submission($submission->id);
-        if ($babeliumsubmission) {
-            $this->data->responseid   = $babeliumsubmission->responseid;
-            $this->data->responsehash = $babeliumsubmission->responsehash;
+        if(isset($submission)){
+            $babeliumsubmission = $plugin->get_babelium_submission($submission->id);
+            if ($babeliumsubmission) {
+                $this->data->responseid   = $babeliumsubmission->responseid;
+                $this->data->responsehash = $babeliumsubmission->responsehash;
+            }
         }
         return $this->data;
     }
@@ -128,7 +145,8 @@ class BabeliumHelper
         //original code
         //$exercise_data = !empty($data->responsehash) ? babeliumsubmission_get_exercise_data(0, $data->responseid) : babeliumsubmission_get_exercise_data($exerciseid);
         if( !empty($data->responsehash) ){
-            $this->exercise_data = babeliumsubmission_get_exercise_data(0, $data->responseid);
+            $defaultExerciseId = 0;
+            $this->exercise_data = babeliumsubmission_get_exercise_data($defaultExerciseId, $data->responseid);
         }
         else{
             $this->exercise_data = babeliumsubmission_get_exercise_data($this->exerciseid);
@@ -141,24 +159,29 @@ class BabeliumHelper
     }
 
     public function getFormData($plugin, $mform){
-        $plugin->get_babelium_form_elements($mform, array(
-            $this->data,
-            $this->exercise_data['info'],
-            $this->exercise_data['roles'],
-            $this->exercise_data['languages'],
-            $this->exercise_data['subtitles'],
-            $this->exercise_data['recinfo']
-        ));
+        $plugin->get_babelium_form_elements($mform,
+            array(
+                $this->data,
+                $this->exercise_data['info'],
+                $this->exercise_data['roles'],
+                $this->exercise_data['languages'],
+                $this->exercise_data['subtitles'],
+                $this->exercise_data['recinfo']
+            )
+        );
     }
 
     public function copySubmission($plugin, $source, $dest){
         // Copy the assignsubmission_babelium record.
         global $DB;
-        $babeliumsubmission = $plugin->get_babelium_submission($source->id);
-        if ($babeliumsubmission) {
-            unset($babeliumsubmission->id);
-            $babeliumsubmission->submission = $dest->id;
-            $DB->insert_record(self::KEY_ASSIGNMENT_RECORD, $babeliumsubmission);
+        $hasValidData = isset($source) && isset($dest);
+        if($hasValidData){
+            $babeliumsubmission = $plugin->get_babelium_submission($source->id);
+            if ($babeliumsubmission) {
+                unset($babeliumsubmission->id);
+                $babeliumsubmission->submission = $dest->id;
+                $DB->insert_record(self::ASSIGNSUBMISSION_BABELIUM, $babeliumsubmission);
+            }
         }
     }
 
@@ -167,8 +190,12 @@ class BabeliumHelper
     * @param stdClass $submission
     */
     public function isEmptySubmission($plugin, $submission){
-        $babeliumsubmission = $plugin->get_babelium_submission($submission->id);
-        return empty($babeliumsubmission->responsehash);
+        $hasValidData = isset($submission);
+        if($hasValidData){
+            $babeliumsubmission = $plugin->get_babelium_submission($submission->id);
+            return empty($babeliumsubmission->responsehash);
+        }
+        return true;
     }
 
     public function deleteInstance($plugin){
@@ -177,27 +204,30 @@ class BabeliumHelper
         $DB->delete_records(
             self::ASSIGNSUBMISSION_BABELIUM,
             array(
-                'assignment' => $plugin->assignment->get_instance()->id
+                self::KEY_ASSIGNMENT => $plugin->assignment->get_instance()->id
             )
         );
     }
 
     public function get_plugin_name() {
-        return get_string('babelium', 'assignsubmission_babelium');
+        return get_string(self::KEY_CONFIG_BABELIUM_NAME, self::ASSIGNSUBMISSION_BABELIUM);
     }
 
     public function getBabeliumSubmission($submissionid) {
-        global $DB;
-        return $DB->get_record('assignsubmission_babelium', array(
-            'submission' => $submissionid
-        ));
+        $hasValidData = isset($submissionid);
+        if($hasValidData){
+            global $DB;
+            return $DB->get_record(self::ASSIGNSUBMISSION_BABELIUM, array(
+                self::SUBMISSION_TYPE => $submissionid
+            ));
+        }
     }
 
     public function check_file_code($submissioncode) {
         global $OUTPUT;
 
         if (!$submissioncode || empty($submissioncode)) {
-            $errormsg = get_string('responsehashnotset', 'assignsubmission_babelium');
+            $errormsg = get_string('responsehashnotset', self::ASSIGNSUBMISSION_BABELIUM);
             return $OUTPUT->error_text($errormsg);
         }
         return null;
@@ -205,22 +235,25 @@ class BabeliumHelper
 
     public function copy_submission($sourcesubmission, $destsubmission){
         global $DB;
-
-        // Copy the assignsubmission_babelium record.
-        $babeliumsubmission = $this->get_babelium_submission($sourcesubmission->id);
-        if ($babeliumsubmission) {
-            unset($babeliumsubmission->id);
-            $babeliumsubmission->submission = $destsubmission->id;
-            $DB->insert_record('assignsubmission_babelium', $babeliumsubmission);
+        $hasValidData = isset($sourcesubmission) && isset($destsubmission);
+        if($hasValidData){
+            // Copy the assignsubmission_babelium record.
+            $babeliumsubmission = $this->get_babelium_submission($sourcesubmission->id);
+            if ($babeliumsubmission) {
+                unset($babeliumsubmission->id);
+                $babeliumsubmission->submission = $destsubmission->id;
+                $DB->insert_record(self::ASSIGNSUBMISSION_BABELIUM, $babeliumsubmission);
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 
     public function format_for_log($submission) {
         // format the info for each submission plugin add_to_log
         $babeliumsubmission = $this->getBabeliumSubmission($submission->id);
         $babeliumloginfo    = '';
-        $babeliumloginfo .= get_string('loginfo', 'assignsubmission_babelium', array(
+        $babeliumloginfo .= get_string('loginfo', self::ASSIGNSUBMISSION_BABELIUM, array(
             'responseid' => $babeliumsubmission->responseid,
             'responsehash' => $babeliumsubmission->responsehash
         ));
@@ -246,7 +279,7 @@ class BabeliumHelper
             $onlinetextsubmission->responsehash = '';
         }
 
-        if (!$DB->insert_record('assignsubmission_babelium', $babeliumsubmission) > 0) {
+        if (!$DB->insert_record(self::ASSIGNSUBMISSION_BABELIUM, $babeliumsubmission) > 0) {
             $log .= get_string('couldnotconvertsubmission', 'mod_assign', $submission->userid);
             return false;
         }
@@ -254,7 +287,7 @@ class BabeliumHelper
     }
 
     public function upgradeSettings($oldcontext, $oldassignment, $log) {
-        if ($oldassignment->assignmenttype == 'babelium') {
+        if ($oldassignment->assignmenttype == self::SUBMISSION_TYPE) {
             $this->set_config('exerciseid', $oldassignment->var1);
             return true;
         }
@@ -305,7 +338,7 @@ class BabeliumHelper
         //load jquery just in case
        $html_content.='<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>'.PHP_EOL;
 
-       $domain = get_config('assignsubmission_babelium','serverdomain');
+       $domain = get_config(self::ASSIGNSUBMISSION_BABELIUM,'serverdomain');
        $lang = current_language();
 
        if(getenv("APPLICATION_ENV") !== 'development'){
@@ -357,23 +390,33 @@ class BabeliumHelper
     }
 
     public function canUpgrade($type, $version) {
-        return ($type == self::SUBMISSION_TYPE && $version >= self::MIN_MOODLE_VERSION);
+        if(isset($type) && isset($version)){
+            return ($type == self::SUBMISSION_TYPE && $version >= self::MIN_MOODLE_VERSION);
+        }
+        return false;
     }
 
     public function displayVideoResponse($plugin, $submission){
         $result = "";
-        $babeliumsubmission = $this->getBabeliumSubmission($submission->id);
-        if ($babeliumsubmission) {
-            $result          = '<div class="no-overflow">';
-            $babeliumcontent = '';
-            $response_data   = $plugin->getBabeliumConnector()->babeliumsubmission_get_response_data($babeliumsubmission->responseid);
-            if ($response_data){
-                $babeliumcontent = $this->babeliumsubmission_html_output(self::REVIEW_MODE, $response_data['info'], $response_data['subtitles'], null);
+        if(isset($submission)){
+            $babeliumsubmission = $this->getBabeliumSubmission($submission->id);
+            if ($babeliumsubmission) {
+                $result          = '<div class="no-overflow">';
+                $babeliumcontent = '';
+                $responseid = $babeliumsubmission->responseid;
+                $response_data = $plugin->getBabeliumConnector()->babeliumsubmission_get_response_data($responseid);
+                if ($response_data){
+                    $babeliumcontent = $this->babeliumsubmission_html_output(self::REVIEW_MODE, $response_data['info'], $response_data['subtitles'], null);
+                }
+                $result .= $babeliumcontent;
+                $result .= '</div>';
             }
-            $result .= $babeliumcontent;
-            $result .= '</div>';
         }
         return $result;
     }
+    //1c 2g 10ssd 3,7e
+    //x10
+    //10c 20g 100ssd 37e
+
 
 }
