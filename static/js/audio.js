@@ -44,6 +44,7 @@
         is_recording = false;
         if(recorder!==undefined){
             recorder && recorder.stop();
+            autoStopVideo();
             cstm_log('Stopped recording.');
             cstm_log('Creating audio link...');
             // create WAV download link using audio data blob

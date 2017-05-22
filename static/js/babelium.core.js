@@ -141,6 +141,13 @@ function onVideoPlay(){
     }
 }
 
+function autoStopVideo() {
+    var video = document.getElementById('submission_video');
+    if(video !== undefined && video !== null){
+        video.pause();
+    }
+}
+
 function setStatus(text){
     var status = document.getElementById('status_text');
     if(status !== undefined && status !== null && text !== null && text !== undefined){
