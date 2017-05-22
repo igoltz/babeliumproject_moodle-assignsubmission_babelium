@@ -84,7 +84,7 @@ function initRecorder() {
         try {
             // webkit shim
             window.AudioContext = window.AudioContext || window.webkitAudioContext;
-            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mediaDevices.getUserMedia;
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.mediaDevices.getUserMedia;
             window.URL = window.URL || window.webkitURL;
 
             audio_context = new AudioContext;
