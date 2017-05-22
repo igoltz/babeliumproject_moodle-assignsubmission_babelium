@@ -42,7 +42,6 @@
  function stopRecording() {
     if(is_recording){
         is_recording = false;
-
         if(recorder!==undefined){
             recorder && recorder.stop();
             cstm_log('Stopped recording.');
@@ -56,6 +55,7 @@
         //shoe error
         sweetAlert("Babelium recorder", "You have to start a record first", "error");
     }
+    setStatus("Audio recording controls");
  }
 
  function createDownloadLink() {

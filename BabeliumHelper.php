@@ -33,6 +33,7 @@ class BabeliumHelper
 
     const EMPTY_STRING = '';
     const SUBMISSION_TYPE = "babelium";
+    const REQUEST_TYPE = "submission";
     const MIN_MOODLE_VERSION = 2011112900;
 
     /**
@@ -52,7 +53,7 @@ class BabeliumHelper
     private $submission;
 
     function __construct() {
-        global $SESSION, $CFG, $BCFG;
+        global $CFG;
         self::$config = $CFG;
         self::$environment = getenv("APPLICATION_ENV");
         self::$rootPath = $CFG->wwwroot;
@@ -214,12 +215,15 @@ class BabeliumHelper
     }
 
     public function getBabeliumSubmission($submissionid) {
+        global $DB;
         $hasValidData = isset($submissionid);
         if($hasValidData){
-            global $DB;
-            return $DB->get_record(self::ASSIGNSUBMISSION_BABELIUM, array(
-                self::SUBMISSION_TYPE => $submissionid
-            ));
+            return $DB->get_record(
+                    self::ASSIGNSUBMISSION_BABELIUM,
+                    array(
+                        self::REQUEST_TYPE => $submissionid
+                    )
+            );
         }
     }
 
@@ -380,7 +384,7 @@ class BabeliumHelper
              $content_path = self::$rootPath.'/mod/assign/submission/babelium/iframe/upload.body.html';
          }
          else{
-             $content_path = '/var/www/html/babelium-plugin-shortcut/iframe/upload.body.html';
+             $content_path = '/var/www/babelium-moodle/moodle32/iframe/upload.body.html';
          }
          return $content_path;
      }
@@ -405,7 +409,7 @@ class BabeliumHelper
                 $babeliumcontent = '';
                 $responseid = $babeliumsubmission->responseid;
                 $response_data = $plugin->getBabeliumConnector()->babeliumsubmission_get_response_data($responseid);
-                if ($response_data){
+                if (isset($response_data)){
                     $babeliumcontent = $this->babeliumsubmission_html_output(self::REVIEW_MODE, $response_data['info'], $response_data['subtitles'], null);
                 }
                 $result .= $babeliumcontent;
@@ -414,9 +418,4 @@ class BabeliumHelper
         }
         return $result;
     }
-    //1c 2g 10ssd 3,7e
-    //x10
-    //10c 20g 100ssd 37e
-
-
 }

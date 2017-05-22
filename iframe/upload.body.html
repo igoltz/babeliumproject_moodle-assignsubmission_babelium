@@ -26,13 +26,13 @@
     </div>
     <div class="col-md-12">
         <div class="centered">
-            <h2>Audio recording controls</h2>
+            <h2 id="status_text">Audio recording controls</h2>
             <h3 class="clock">00:00:00</h3>
         </div>
 
         <div class="button-container">
             <!--button class='button -dark center' onclick="playRecording(this);">Play</button>-->
-            <a class='button -green center startRecord'>Record</a>
+            <a class='button -green center startRecord' onclick='onVideoPlay();'>Record</a>
             <a class='button -salmon center stopRecord' onclick="stopRecording(this);">Stop</a>
         </div>
 

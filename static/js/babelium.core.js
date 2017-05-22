@@ -37,7 +37,7 @@ function loadSubtitles(id){
 
 function loadVideo(videoId, subtitleId) {
     var videoStr = "\
-    <video style='width:100%' poster='"+getPosterUrl(videoId)+"' controls crossorigin='anonymous' onplay='onVideoPlay();'>\
+    <video id='submission_video' style='width:100%' poster='"+getPosterUrl(videoId)+"' controls crossorigin='anonymous'>\
         <source src='"+getMP4video(videoId)+"' type='video/mp4'>\
         <source src='"+getWEBMvideo(videoId)+"' type='video/webm'>\
         <track kind='captions' label='"+getSubtitlesLangCaption(subtitleId)+"' src='"+getSubtitlesURL(subtitleId)+"' srclang='"+getSubtitlesLang(subtitleId)+"' default>\
@@ -128,6 +128,22 @@ function getWEBMvideo(videoId) {
 }
 
 function onVideoPlay(){
-    console.log("playing video...");
-    startRecording();
+    var video = document.getElementById('submission_video');
+    if(video !== undefined && video !== null){
+        console.log("playing video...");
+        //start video at the beginning
+        video.currentTime = 0;
+        //play video
+        video.play();
+        console.log("recording...");
+        startRecording();
+        setStatus("Recording...");
+    }
+}
+
+function setStatus(text){
+    var status = document.getElementById('status_text');
+    if(status !== undefined && status !== null && text !== null && text !== undefined){
+        status.textContent = text;
+    }
 }
