@@ -11,11 +11,14 @@
  }
 
  function startRecording() {
-    initRecorder();
     if(!is_recording){
-        recorder && recorder.record();
-        cstm_log('Recording...');
-        is_recording = true;
+        if(recorder !== undefined){
+            recorder.record();
+            recorder && recorder.stop();
+            recorder && recorder.record();
+            cstm_log('Recording...');
+            is_recording = true;
+        }
     }
  }
 
@@ -95,13 +98,12 @@ function initRecorder() {
 
         navigator.getUserMedia(
             {audio: true},
-            undefined
+            startUserMedia,
             function(e) {
                 cstm_log('No live audio input: ' + e);
                 sweetAlert("Oops...", "No live audio input", "error");
             }
         );
-        startUserMedia();
     }
  };
 
@@ -153,16 +155,3 @@ function send(filename, data, url){
     xhr.open("POST",url,true);
     xhr.send(fd);
 }
-
-window.onload = function() {
-    if(window.jQuery === undefined || $ === undefined){
-        var script = document.createElement('script');
-        document.head.appendChild(script);
-        script.type = 'text/javascript';
-        script.src = "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js";
-        script.onload = initRecorder;
-    }
-    else{
-        initRecorder();
-    }
-};

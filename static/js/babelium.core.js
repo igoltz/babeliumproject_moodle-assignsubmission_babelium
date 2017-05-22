@@ -19,6 +19,8 @@ window.onload = function() {
 };
 
 function start(){
+    //init voice recorder
+    initRecorder();
     var subtitleId = exsubs[0].subtitleId;
     loadSubtitles(subtitleId);
     loadVideo(exinfo.id, subtitleId);
