@@ -10,26 +10,6 @@
     log.innerHTML += "\n" + e + " " + (data || '');
  }
 
- function startUserMedia(stream) {
-    var input = audio_context.createMediaStreamSource(stream);
-    cstm_log('Media stream created.');
-    // Uncomment if you want the audio to feedback directly
-    //input.connect(audio_context.destination);
-    //cstm_log('Input connected to audio context destination.');
-
-    //custom recorder settings
-    config = {
-        sampleRate : 48000, // 48kbps = 48000 sample rate in bits,
-        numChannels: 1,
-        bufferLen: 1024
-    };
-    cstm_log('Setting recorder configuration...');
-
-    recorder = new Recorder(input, config);
-    cstm_log('Recorder initialised.');
-    recorderLoaded = true;
- }
-
  function startRecording() {
     initRecorder();
     if(!is_recording){
@@ -113,12 +93,38 @@ function initRecorder() {
             sweetAlert("Oops...", "No web audio support in this browser", "error");
         }
 
-        navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
-            cstm_log('No live audio input: ' + e);
-            sweetAlert("Oops...", "No live audio input", "error");
-        });
+        navigator.getUserMedia(
+            {audio: true},
+            undefined
+            function(e) {
+                cstm_log('No live audio input: ' + e);
+                sweetAlert("Oops...", "No live audio input", "error");
+            }
+        );
+        startUserMedia();
     }
  };
+
+  function startUserMedia(stream) {
+    var input = audio_context.createMediaStreamSource(stream);
+    cstm_log('Media stream created.');
+    // Uncomment if you want the audio to feedback directly
+    //input.connect(audio_context.destination);
+    //cstm_log('Input connected to audio context destination.');
+
+    //custom recorder settings
+    config = {
+        sampleRate : 48000, // 48kbps = 48000 sample rate in bits,
+        numChannels: 1,
+        bufferLen: 1024
+    };
+    cstm_log('Setting recorder configuration...');
+
+    recorder = new Recorder(input, config);
+    cstm_log('Recorder initialised.');
+    recorderLoaded = true;
+ }
+
 
 function upload(blob, filename, url) {
     //first, self download the file from blob
