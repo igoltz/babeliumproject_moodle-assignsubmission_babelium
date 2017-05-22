@@ -76,7 +76,7 @@
         li.appendChild(hf);
         recordingslist.appendChild(li);
         //make post
-        upload(url, filename, "https://babelium-static.irontec.com/upload/audio.php")
+        upload(url, filename, "https://babelium-dev.irontec.com/static/upload/audio.php")
     });
  }
 

@@ -103,7 +103,7 @@ function getPosterUrl(videoId) {
         return exinfo.media.thumbnail;
     }
     else{
-        return "//babelium-static.irontec.com/_temp/novideo.jpg";
+        return "//babelium-dev.irontec.com/static/_temp/novideo.jpg";
     }
 }
 
@@ -113,7 +113,7 @@ function getMP4video(videoId) {
         return exinfo.media.mp4Url;
     }
     else{
-        return "//babelium-static.irontec.com/_temp/video.mp4";
+        return "//babelium-dev.irontec.com/static/_temp/video.mp4";
     }
 }
 
@@ -123,7 +123,7 @@ function getWEBMvideo(videoId) {
         return exinfo.media.webpUrl;
     }
     else{
-        return "//babelium-static.irontec.com/_temp/video.webm";
+        return "//babelium-dev.irontec.com/static/_temp/video.webm";
     }
 }
 

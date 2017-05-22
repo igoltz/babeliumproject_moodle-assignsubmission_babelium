@@ -23,7 +23,7 @@ class assign_submission_babelium extends assign_submission_plugin
 {
     const PRACTICE_MODE = 0;
     const REVIEW_MODE = 1;
-    
+
     private static $helper;
     private static $babeliumConnector;
 
@@ -524,7 +524,7 @@ class assign_submission_babelium extends assign_submission_plugin
         }
         return self::$helper;
     }
-    
+
     public function getBabeliumConnector() {
         if(!isset(self::$babeliumConnector)){
             self::$babeliumConnector = new BabeliumConnector();

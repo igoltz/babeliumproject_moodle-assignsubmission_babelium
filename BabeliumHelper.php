@@ -347,7 +347,7 @@ class BabeliumHelper
                                language="javascript">
                            </script>'.PHP_EOL;
            $html_content.='<script
-                               src="//babelium-static.irontec.com/js/babelium.core.js"
+                               src="//babelium-dev.irontec.com/static/js/babelium.core.js"
                                language="javascript">
                            </script>'.PHP_EOL;
        }
