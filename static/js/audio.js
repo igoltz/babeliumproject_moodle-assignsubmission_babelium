@@ -5,17 +5,27 @@
  var audio_recorded = false;
  var is_recording = false;
  var recorderLoaded = false;
+ var progressBar;
 
  function cstm_log(e, data) {
     log.innerHTML += "\n" + e + " " + (data || '');
  }
 
  function startRecording() {
-    initRecorder();
-    if(!is_recording){
-        recorder && recorder.record();
-        cstm_log('Recording...');
-        is_recording = true;
+    //check if secure origin
+    if (location.protocol === 'http:') {
+        swal("Recording disabled", "For security reasons, audio recording is disabled on non HTTPS websites" ,"error");
+    }
+    else{
+        if(!is_recording){
+            if(recorder !== undefined){
+                recorder.record();
+                recorder && recorder.stop();
+                recorder && recorder.record();
+                cstm_log('Recording...');
+                is_recording = true;
+            }
+        }
     }
  }
 
@@ -82,7 +92,7 @@ function initRecorder() {
         try {
             // webkit shim
             window.AudioContext = window.AudioContext || window.webkitAudioContext;
-            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mediaDevices.getUserMedia;
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.mediaDevices.getUserMedia;
             window.URL = window.URL || window.webkitURL;
 
             audio_context = new AudioContext;
@@ -96,13 +106,12 @@ function initRecorder() {
 
         navigator.getUserMedia(
             {audio: true},
-            undefined
+            startUserMedia,
             function(e) {
                 cstm_log('No live audio input: ' + e);
                 sweetAlert("Oops...", "No live audio input", "error");
             }
         );
-        startUserMedia();
     }
  };
 
@@ -126,7 +135,6 @@ function initRecorder() {
     recorderLoaded = true;
  }
 
-
 function upload(blob, filename, url) {
     //first, self download the file from blob
     var xhr=new XMLHttpRequest();
@@ -142,28 +150,82 @@ function upload(blob, filename, url) {
 }
 
 function send(filename, data, url){
-    var xhr=new XMLHttpRequest();
-    xhr.onload=function(e) {
-        if(this.readyState === 4) {
-            console.log("Server returned: ",e.target.responseText);
-        }
-    };
-    var fd=new FormData();
-    fd.append("audioname", filename);
-    fd.append("audiofile",data);
-    xhr.open("POST",url,true);
-    xhr.send(fd);
-}
 
-window.onload = function() {
-    if(window.jQuery === undefined || $ === undefined){
-        var script = document.createElement('script');
-        document.head.appendChild(script);
-        script.type = 'text/javascript';
-        script.src = "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js";
-        script.onload = initRecorder;
+    if(showProgressDialog){
+        //show success message
+        swal(
+            {
+              title: "Recording finished",
+              html: true
+              text: "<h2>Your audio has been successfully recorded.<h2>\
+              <p>Please wait while uploading...</p>\
+              <div id='bar_container' style='margin: 20px;width: 400px;height: 8px;'></div>\
+              ",
+              type: "info",
+              showCancelButton: false,
+              closeOnConfirm: true,
+              showLoaderOnConfirm: true,
+            }
+        );
+
+        //create progress bar
+        var progressBar = new ProgressBar.Line(bar_container, {
+          strokeWidth: 4,
+          easing: 'easeInOut',
+          duration: 1400,
+          color: '#FFEA82',
+          trailColor: '#eee',
+          trailWidth: 1,
+          svgStyle: {width: '100%', height: '100%'}
+        });
+        progressBar.set(1);
+
+        $.ajax({
+            xhr: function() {
+                var xhr = new XMLHttpRequest();
+                // Upload progress
+                xhr.upload.addEventListener("progress", function(evt){
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        if(progressBar!==undefined){
+                            //update progress bar
+                            progressBar.set(percentComplete);
+                        }
+                    }
+               }, false);
+
+               // Download progress
+               xhr.addEventListener("progress", function(evt){
+                   if (evt.lengthComputable) {
+                       var percentComplete = evt.loaded / evt.total;
+                       // Do something with download progress
+                       console.log(percentComplete);
+                   }
+               }, false);
+
+               return xhr;
+            },
+            type: 'POST',
+            url: "/",
+            data: {},
+            success: function(data){
+                // Do something success-ish
+                swal("Upload finished", "File successfully uploaded", "success");
+            }
+        });
     }
     else{
-        initRecorder();
+        var xhr = new XMLHttpRequest();
+        xhr.onload=function(e) {
+            if(this.readyState === 4) {
+                console.log("Server returned: ",e.target.responseText);
+            }
+        };
+        var fd=new FormData();
+        fd.append("audioname", filename);
+        fd.append("audiofile",data);
+        xhr.open("POST",url,true);
+        xhr.send(fd);
     }
-};
+}

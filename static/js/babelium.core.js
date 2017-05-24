@@ -19,6 +19,8 @@ window.onload = function() {
 };
 
 function start(){
+    //init recorder
+    initRecorder();
     //set listeners
     document.getElementById('submission_video').addEventListener('ended', onVideoEnded, false);
     //load subtitles
