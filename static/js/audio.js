@@ -16,6 +16,7 @@
     //check if secure origin
     if (location.protocol === 'http:') {
         swal("Recording disabled", "For security reasons, audio recording is disabled on non HTTPS websites" ,"error");
+        autoStopVideo();
     }
     else{
         if(!is_recording){
