@@ -198,7 +198,7 @@ function send(filename, data, url){
               text: "<h2>Your audio has been successfully recorded.</h2>\
               <p>Please wait while uploading...</p>\
               <div id='bar_container' style='margin: 20px;width: 400px;height: 8px;'>\
-                  <progress id='progress_bar' value="0" max="100">\
+                  <progress id='progress_bar' value='0' max='100'>\
                     <span>0</span>% uploaded\
                   </progress>\
               </div>\
