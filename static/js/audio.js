@@ -72,7 +72,8 @@ function initRecorder() {
         //check if secure origin
         if (location.protocol === 'http:') {
             // page is in-secure
-            document.body.innerHTML = '<div class="alert alert-danger">\
+            document.body.innerHTML = '\
+            <div class="alert alert-danger">\
             <strong>RECORDING DISABLED!</strong>\
             For security reasons, audio recording is disabled on non HTTPS locations\
             </div>'

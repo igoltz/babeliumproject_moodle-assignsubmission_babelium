@@ -19,8 +19,12 @@ window.onload = function() {
 };
 
 function start(){
+    //set listeners
+    document.getElementById('submission_video').addEventListener('ended', onVideoEnded, false);
+    //load subtitles
     var subtitleId = exsubs[0].subtitleId;
     loadSubtitles(subtitleId);
+    //load video
     loadVideo(exinfo.id, subtitleId);
     loadExerciseDescription(exinfo.description);
 }
@@ -41,6 +45,7 @@ function loadVideo(videoId, subtitleId) {
         <source src='"+getMP4video(videoId)+"' type='video/mp4'>\
         <source src='"+getWEBMvideo(videoId)+"' type='video/webm'>\
         <track kind='captions' label='"+getSubtitlesLangCaption(subtitleId)+"' src='"+getSubtitlesURL(subtitleId)+"' srclang='"+getSubtitlesLang(subtitleId)+"' default>\
+        video not supported\
     </video>";
     //append video element to div
     $('.videocontent').html(videoStr);
@@ -139,6 +144,11 @@ function onVideoPlay(){
         startRecording();
         setStatus("Recording...");
     }
+}
+
+function onVideoEnded() {
+    autoStopVideo();
+    stopRecording();
 }
 
 function autoStopVideo() {

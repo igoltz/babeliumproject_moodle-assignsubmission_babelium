@@ -156,7 +156,7 @@ class BabeliumHelper
     }
 
     public function hasExerciseData(){
-            return $this->exercise_data;
+            return isset($this->exercise_data);
     }
 
     public function getFormData($plugin, $mform){
