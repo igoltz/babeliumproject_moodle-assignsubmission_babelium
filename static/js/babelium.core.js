@@ -197,7 +197,11 @@ function send(filename, data, url){
               html: true,
               text: "<h2>Your audio has been successfully recorded.</h2>\
               <p>Please wait while uploading...</p>\
-              <div id='bar_container' style='margin: 20px;width: 400px;height: 8px;'></div>\
+              <div id='bar_container' style='margin: 20px;width: 400px;height: 8px;'>\
+                  <progress id='progress_bar' value="0" max="100">\
+                    <span>0</span>% uploaded\
+                  </progress>\
+              </div>\
               ",
               type: "info",
               showCancelButton: false,
@@ -205,18 +209,6 @@ function send(filename, data, url){
               showLoaderOnConfirm: true
             }
         );
-
-        //create progress bar
-        var progressBar = new ProgressBar.Line(bar_container, {
-          strokeWidth: 4,
-          easing: 'easeInOut',
-          duration: 1400,
-          color: '#FFEA82',
-          trailColor: '#eee',
-          trailWidth: 1,
-          svgStyle: {width: '100%', height: '100%'}
-        });
-        progressBar.set(1);
 
         $.ajax({
             xhr: function() {
@@ -226,10 +218,7 @@ function send(filename, data, url){
                     if (evt.lengthComputable) {
                         var percentComplete = evt.loaded / evt.total;
                         console.log(percentComplete);
-                        if(progressBar!==undefined){
-                            //update progress bar
-                            progressBar.set(percentComplete);
-                        }
+                        updateProgressBar(percentComplete);
                     }
                }, false);
 

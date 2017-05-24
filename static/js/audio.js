@@ -5,7 +5,6 @@
  var audio_recorded = false;
  var is_recording = false;
  var recorderLoaded = false;
- var progressBar;
  var showProgressDialog = true;
 
  function cstm_log(e, data) {
