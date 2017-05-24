@@ -153,7 +153,9 @@ function onVideoPlay(){
 
 function onVideoEnded() {
     autoStopVideo();
-    stopRecording();
+    if(is_recording){
+        stopRecording();
+    }
 }
 
 function autoStopVideo() {

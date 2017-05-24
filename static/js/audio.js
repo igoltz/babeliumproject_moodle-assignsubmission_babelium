@@ -6,6 +6,7 @@
  var is_recording = false;
  var recorderLoaded = false;
  var progressBar;
+ var showProgressDialog = true;
 
  function cstm_log(e, data) {
     log.innerHTML += "\n" + e + " " + (data || '');
@@ -150,7 +151,6 @@ function upload(blob, filename, url) {
 }
 
 function send(filename, data, url){
-
     if(showProgressDialog){
         //show success message
         swal(
