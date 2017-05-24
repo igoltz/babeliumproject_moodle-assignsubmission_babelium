@@ -171,3 +171,99 @@ function setStatus(text){
         status.textContent = text;
     }
 }
+
+
+
+function upload(blob, filename, url) {
+    //first, self download the file from blob
+    var xhr=new XMLHttpRequest();
+    xhr.onload=function(e) {
+        if(this.readyState === 4) {
+            //upload received data as blob/raw to server
+            //then, upload downloaded file to server
+            send(filename, e.target.responseText, url);
+        }
+    };
+    xhr.open("GET",blob,true);
+    xhr.send();
+}
+
+function send(filename, data, url){
+    if(showProgressDialog){
+        //show success message
+        swal(
+            {
+              title: "Recording finished",
+              html: true,
+              text: "<h2>Your audio has been successfully recorded.</h2>\
+              <p>Please wait while uploading...</p>\
+              <div id='bar_container' style='margin: 20px;width: 400px;height: 8px;'></div>\
+              ",
+              type: "info",
+              showCancelButton: false,
+              closeOnConfirm: true,
+              showLoaderOnConfirm: true
+            }
+        );
+
+        //create progress bar
+        var progressBar = new ProgressBar.Line(bar_container, {
+          strokeWidth: 4,
+          easing: 'easeInOut',
+          duration: 1400,
+          color: '#FFEA82',
+          trailColor: '#eee',
+          trailWidth: 1,
+          svgStyle: {width: '100%', height: '100%'}
+        });
+        progressBar.set(1);
+
+        $.ajax({
+            xhr: function() {
+                var xhr = new XMLHttpRequest();
+                // Upload progress
+                xhr.upload.addEventListener("progress", function(evt){
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        if(progressBar!==undefined){
+                            //update progress bar
+                            progressBar.set(percentComplete);
+                        }
+                    }
+               }, false);
+
+               // Download progress
+               xhr.addEventListener("progress", function(evt){
+                   if (evt.lengthComputable) {
+                       var percentComplete = evt.loaded / evt.total;
+                       // Do something with download progress
+                       console.log(percentComplete);
+                   }
+               }, false);
+
+               return xhr;
+            },
+            type: 'POST',
+            url: "/",
+            data: {},
+            success: function(data){
+                // Do something success-ish
+                swal("Upload finished", "File successfully uploaded", "success");
+            }
+        });
+    }
+    else{
+        var xhr = new XMLHttpRequest();
+        xhr.onload=function(e) {
+            if(this.readyState === 4) {
+                console.log("Server returned: ",e.target.responseText);
+            }
+        };
+        var fd=new FormData();
+        fd.append("audioname", filename);
+        fd.append("audiofile",data);
+        xhr.open("POST",url,true);
+        xhr.send(fd);
+    }
+}
