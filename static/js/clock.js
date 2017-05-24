@@ -17,7 +17,7 @@ function format(x) {
     if (x < 10) x = "0" + x;
     return x;
 }
-
+/*
 var c;
 
 $("#startRecord").click(function() {
@@ -37,3 +37,4 @@ function setTheTime() {
     var curTime = formathour + ":" + formatmin + ":" + formatsec // Current time formatted
     $("#clock").prop('value', curTime);
 }
+*/

@@ -156,7 +156,7 @@ function send(filename, data, url){
         swal(
             {
               title: "Recording finished",
-              html: true
+              html: true,
               text: "<h2>Your audio has been successfully recorded.<h2>\
               <p>Please wait while uploading...</p>\
               <div id='bar_container' style='margin: 20px;width: 400px;height: 8px;'></div>\
@@ -164,7 +164,7 @@ function send(filename, data, url){
               type: "info",
               showCancelButton: false,
               closeOnConfirm: true,
-              showLoaderOnConfirm: true,
+              showLoaderOnConfirm: true
             }
         );
 
