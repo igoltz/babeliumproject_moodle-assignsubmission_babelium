@@ -21,14 +21,17 @@ window.onload = function() {
 function start(){
     //init recorder
     initRecorder();
-    //set listeners
-    document.getElementById('submission_video').addEventListener('ended', onVideoEnded, false);
     //load subtitles
     var subtitleId = exsubs[0].subtitleId;
     loadSubtitles(subtitleId);
     //load video
     loadVideo(exinfo.id, subtitleId);
     loadExerciseDescription(exinfo.description);
+    //set listeners
+    var video = document.getElementById('submission_video');
+    if(video!==undefined){
+        video.addEventListener('ended', onVideoEnded, false);
+    }
 }
 
 function loadSubtitles(id){
