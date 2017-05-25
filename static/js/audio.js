@@ -6,7 +6,7 @@
  var is_recording = false;
  var recorderLoaded = false;
  var showProgressDialog = true;
- var lastRecordedAudio;
+ var lastRecordedAudio = [];
 
  function cstm_log(e, data) {
     log.innerHTML += "\n" + e + " " + (data || '');

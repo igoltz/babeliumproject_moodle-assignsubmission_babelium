@@ -349,10 +349,21 @@ class BabeliumHelper
                            src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/babelium.moodle.js"
                            language="javascript">
                        </script>'.PHP_EOL;
+
+       $html_content.='<script
+                           src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/audio.js"
+                           language="javascript">
+                       </script>'.PHP_EOL;
+
        $html_content.='<script
                            src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.core.js"
                            language="javascript">
                        </script>'.PHP_EOL;
+
+        $html_content.='<script async defer
+                        src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/dist/progressbar/progressbar.min.js"
+                        language="javascript">
+                        </script>'.PHP_EOL;
 
        $html_content .= '<script language="javascript" type="text/javascript">
                                var domain = "'.$domain.'";
@@ -453,7 +464,7 @@ class BabeliumHelper
        // If it exist, check if it's a directory
        return ($path !== false AND is_dir($path)) ? $path : false;
    }
-   
+
    public function redirectAudioToBabelium($audio_stream, $idexercise, $idstudent, $idsubtitle, $rolename){
        //TODO make authorized post request with given params
    }

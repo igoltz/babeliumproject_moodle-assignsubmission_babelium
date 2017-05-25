@@ -8,7 +8,7 @@ var debug_enabled = true;
 
 var audioPostUrl = "https://babelium-dev.irontec.com/mod/assign/submission/babelium/post.php"
 if(debug_enabled){
-audioPostUrl = "http://192.167.1.3/mod/assign/submission/babelium/post.php"
+    audioPostUrl = "http://192.167.1.3/mod/assign/submission/babelium/post.php"
 }
 
 window.onload = function() {
@@ -54,10 +54,10 @@ function overwriteFormControl() {
 
 function loadSubtitles(id){
     debug("babelium.core.js::loadSubtitles()");
-    var onSuccess = function(response){
+    var onSuccess = function(response, ajaxOptions, thrownError){
         console.log("Success: "+response);
     };
-    var onError = function(response){
+    var onError = function(response, ajaxOptions, thrownError){
         console.log("Error: "+response);
     };
     rpc("GET", getSubtitlesURL(id), onSuccess, onError);
@@ -98,11 +98,6 @@ function rpc(method, url, onSuccess, onError){
     jQuery.ajax(
         {
             url: url,
-            /*headers:
-            {
-                'access-key': key,
-                'secret': secret
-            },*/
             success: function(xhr, ajaxOptions, thrownError){
                 if(onSuccess !== undefined){
                     onSuccess(xhr.responseText);
@@ -257,17 +252,17 @@ function onSubmissionDoneListener() {
     debug("babelium.core.js::onSubmissionDoneListener()");
 
     //1 make ajax call to moodle middleware
-    var onSuccess = function(response){
+    var onSuccess = function(data, textStatus, xhr){
         //2 audio post was ok. send data to moodle using its form
         var formid = 'mform1';
         var sumbissionForm = document.getElementById(formid);
         if(sumbissionForm !== undefined){
-            //sumbissionForm.submit();
+            sumbissionForm.submit();
         }
     };
-    var onError = function(response){
+    var onError = function(data, textStatus, xhr){
         //1 show error popup with server returned message
-        swal("Error", response, "error");
+        swal("Error", data, "error");
     };
     alert("demo");
     //1
@@ -275,14 +270,14 @@ function onSubmissionDoneListener() {
 }
 
 function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
-    debug("babelium.core.js::send()");
+    debug("babelium.core.js::sendAudioDataToMiddleWare()");
     if(showProgressDialog){
         //show success message
         swal(
             {
               title: "Recording finished",
               html: true,
-              text: "<h2>Your audio has been successfully recorded.</h2>\
+              text: "<h3>Your audio has been successfully recorded.</h3>\
               <p>Please wait while uploading...</p>\
               <div id='bar_container' style='margin: 20px;width: 400px;height: 8px;'>\
                   <progress id='progress_bar' value='0' max='100'>\
@@ -293,59 +288,78 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
               type: "info",
               showCancelButton: false,
               closeOnConfirm: true,
-              showLoaderOnConfirm: true
+              showLoaderOnConfirm: true,
+              showConfirmButton: false
             }
         );
 
         //define additional middleware data
         var fd = new FormData();
-        fd.append("audiostream","a");
-        fd.append("audiolen",   "a");
-        fd.append("audioname",   "a");
+        fd.append("audiostream", lastRecordedAudio);
+        fd.append("audiolen",   lastRecordedAudio.length);
+        fd.append("audioname",  new Date().toISOString() +  extension);
         fd.append("idexercise", "a");
         fd.append("idstudent",  "a");
         fd.append("idsubtitle", "a");
         fd.append("rolename",   "a");
 
-        $.ajax({
-            xhr: function() {
-                var xhr = new XMLHttpRequest();
-                // Upload progress
-                xhr.upload.addEventListener("progress", function(evt){
-                    if (evt.lengthComputable) {
-                        var percentComplete = evt.loaded / evt.total;
-                        console.log(percentComplete);
-                        updateProgressBar(percentComplete);
+        var method01 = false;
+        if(method01){
+            var request = new XMLHttpRequest();
+            request.open("POST", audioPostUrl);
+            request.send(fd);
+        }
+        else{
+            $.ajax({
+                xhr: function() {
+                    var xhr = new XMLHttpRequest();
+                    // Upload progress
+                    xhr.upload.addEventListener("progress", function(evt){
+                        if (evt.lengthComputable) {
+                            var percentComplete = (evt.loaded / evt.total) * 100;
+                            console.log(percentComplete);
+                            updateUploadDialogProgressBar(percentComplete);
+                        }
+                   }, false);
+
+                   // Download progress
+                   xhr.addEventListener("progress", function(evt){
+                       if (evt.lengthComputable) {
+                           var percentComplete = evt.loaded / evt.total;
+                           // Do something with download progress
+                           console.log(percentComplete);
+                       }
+                   }, false);
+
+                   return xhr;
+                },
+                type: 'POST',
+                url: audioPostUrl,
+                data: fd,
+                processData: false,  // tell jQuery not to process the data
+                contentType: false,   // tell jQuery not to set contentType
+                success: function(data, textStatus, xhr){
+                    //show success dialog. and execute callback when click on button
+                    swal({
+                      title: "Upload finished",
+                      text: "File successfully uploaded",
+                      type: "success",
+                      showCancelButton: false
+                    },
+                    function(){
+                        if( onSuccess !== undefined ){
+                            onSuccess(data, textStatus, xhr);
+                        }
+                    });
+                },
+                error: function(data, textStatus, xhr){
+                    //execute error callback
+                    if( onError !== undefined ){
+                        onError(data, textStatus, xhr);
                     }
-               }, false);
-
-               // Download progress
-               xhr.addEventListener("progress", function(evt){
-                   if (evt.lengthComputable) {
-                       var percentComplete = evt.loaded / evt.total;
-                       // Do something with download progress
-                       console.log(percentComplete);
-                   }
-               }, false);
-
-               return xhr;
-            },
-            type: 'POST',
-            url: audioPostUrl,
-            data: {},
-            success: function(data){
-                // Do something success-ish
-                //swal("Upload finished", "File successfully uploaded", "success");
-                if( onSuccess !== undefined ){
-                    //onSuccess();
                 }
-            },
-            error: function(){
-                if( onError !== undefined ){
-                    onError();
-                }
-            }
-        });
+            });
+        }
     }
     else{
         var xhr = new XMLHttpRequest();
