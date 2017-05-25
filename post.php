@@ -1,5 +1,6 @@
 <?php
 
+require_once '../../../../config.php';
 require_once './BabeliumHelper.php';
 
 if ( $_SERVER['REQUEST_METHOD'] == 'POST' ){
@@ -21,5 +22,5 @@ function processPostRequest(){
     if($response == 'success'){
         $response = $helper->redirectAudioToBabelium($audio_stream, $idexercise, $idstudent, $idsubtitle, $rolename);
     }
-    return $response;
+    echo $response;
 }
