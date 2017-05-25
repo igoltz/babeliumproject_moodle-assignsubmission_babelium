@@ -6,6 +6,7 @@
  var is_recording = false;
  var recorderLoaded = false;
  var showProgressDialog = true;
+ var lastRecordedAudio;
 
  function cstm_log(e, data) {
     log.innerHTML += "\n" + e + " " + (data || '');
@@ -48,28 +49,6 @@
         sweetAlert("Babelium recorder", "You have to start a record first", "error");
     }
     setStatus("Audio recording controls");
- }
-
- function createDownloadLink() {
-    recorder && recorder.exportWAV(function(blob) {
-        var url = URL.createObjectURL(blob);
-        console.log(url);
-        var li = document.createElement('li');
-        var au = document.createElement('audio');
-        var hf = document.createElement('a');
-
-        au.controls = true;
-        au.src = url;
-        hf.href = url;
-        var filename = new Date().toISOString() +  extension;
-        hf.download = filename;
-        hf.innerHTML = hf.download;
-        li.appendChild(au);
-        li.appendChild(hf);
-        recordingslist.appendChild(li);
-        //make post
-        upload(url, filename, "https://babelium-dev.irontec.com/static/upload/audio.php")
-    });
  }
 
 function initRecorder() {

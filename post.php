@@ -1,5 +1,7 @@
 <?php
 
+require_once './BabeliumHelper.php';
+
 if ( $_SERVER['REQUEST_METHOD'] == 'POST' ){
     processPostRequest();
 }
