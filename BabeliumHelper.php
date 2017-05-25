@@ -345,26 +345,14 @@ class BabeliumHelper
        $domain = get_config(self::ASSIGNSUBMISSION_BABELIUM,'serverdomain');
        $lang = current_language();
 
-       if(getenv("APPLICATION_ENV") !== 'development'){
-           $html_content.='<script
-                               src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/babelium.moodle.js"
-                               language="javascript">
-                           </script>'.PHP_EOL;
-           $html_content.='<script
-                               src="//babelium-dev.irontec.com/static/js/babelium.core.js"
-                               language="javascript">
-                           </script>'.PHP_EOL;
-       }
-       else{
-           $html_content.='<script
-                               src="http://192.168.1.13/mod/assign/submission/babelium/script/babelium.moodle.js"
-                               language="javascript">
-                           </script>'.PHP_EOL;
-           $html_content.='<script
-                               src="http://192.168.1.13/mod/assign/submission/babelium/static/js/babelium.core.js"
-                               language="javascript">
-                           </script>'.PHP_EOL;
-       }
+       $html_content.='<script
+                           src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/babelium.moodle.js"
+                           language="javascript">
+                       </script>'.PHP_EOL;
+       $html_content.='<script
+                           src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.core.js"
+                           language="javascript">
+                       </script>'.PHP_EOL;
 
        $html_content .= '<script language="javascript" type="text/javascript">
                                var domain = "'.$domain.'";
@@ -418,4 +406,55 @@ class BabeliumHelper
         }
         return $result;
     }
+
+    public function saveAudioDataResponse($audio_stream, $audio_len, $upload_name){
+        global $CFG;
+        //check destination file
+        $dataDir = $CFG->dataroot."/audiofiles";
+        if(!$this->folder_exist($dataDir)){
+            mkdir($dataDir);
+            chmod($dataDir, 0777);
+        }
+        //check length first
+        if(count($audio_stream) !== $audio_len){
+            return "An error was detected while saving the audio file.";
+        }
+        else{
+            //save the audio in temp dir.
+            $type = "audio/x-wav";
+            $filename = "$dataDir/$upload_name";
+            $saved = 0;
+
+            $fp = fopen($filename, 'a+');
+            $result = fwrite($fp, $audio_stream) ;
+            if($result === FALSE){
+                echo "An error was detected while writing the file";
+                exit;
+            }
+            $saved = $result ? 1 : 0;
+            if($saved){
+                return "success";
+            }
+            else{
+                return "failed";
+            }
+        }
+    }
+
+    /**
+    * Checks if a folder exist and return canonicalized absolute pathname (sort version)
+    * @param string $folder the path being checked.
+    * @return mixed returns the canonicalized absolute pathname on success otherwise FALSE is returned
+    */
+   private function folder_exist($folder){
+       // Get canonicalized absolute pathname
+       $path = realpath($folder);
+
+       // If it exist, check if it's a directory
+       return ($path !== false AND is_dir($path)) ? $path : false;
+   }
+   
+   public function redirectAudioToBabelium($audio_stream, $idexercise, $idstudent, $idsubtitle, $rolename){
+       //TODO make authorized post request with given params
+   }
 }
