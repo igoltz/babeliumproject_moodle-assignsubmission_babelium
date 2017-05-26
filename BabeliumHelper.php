@@ -411,6 +411,9 @@ class BabeliumHelper
                 if (isset($response_data)){
                     $babeliumcontent = $this->babeliumsubmission_html_output(self::REVIEW_MODE, $response_data['info'], $response_data['subtitles'], null);
                 }
+                else{
+                    $babeliumcontent = $this->babeliumsubmission_html_output_error($submission);
+                }
                 $result .= $babeliumcontent;
                 $result .= '</div>';
             }
@@ -468,4 +471,17 @@ class BabeliumHelper
    public function redirectAudioToBabelium($audio_stream, $idexercise, $idstudent, $idsubtitle, $rolename){
        //TODO make authorized post request with given params
    }
+
+    public function babeliumsubmission_html_output_error($submission) {
+        $html_content = '';
+        $html_content.='<h2>Could no load</h2>';
+        $html_content.='<p>An error happen while loading the exercise. Please contact your teacher or system administrator</p>';
+        //capture var dump
+        ob_start();
+        var_dump($submission);
+        $result = ob_get_clean();
+        $html_content.="<pre>".$result."</pre>";
+        return $html_content;
+    }
+
 }
