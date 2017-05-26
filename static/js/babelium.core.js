@@ -50,6 +50,19 @@ function overwriteFormControl() {
     if(submission !== undefined){
         submission.addEventListener("click", onSubmissionDoneListener);
     }
+
+    //cancel button
+    var buttonId = 'id_cancel';
+    var submission = document.getElementById(buttonId);
+    if(submission !== undefined){
+        submission.addEventListener("click", onSubmissionCancelledListener);
+    }
+}
+
+function onSubmissionCancelledListener() {
+    var url = window.location.href;
+    url = url.replace("editsubmission", "view");
+    window.location.href = url;
 }
 
 function loadSubtitles(id){
