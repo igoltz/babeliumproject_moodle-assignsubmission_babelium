@@ -31,6 +31,7 @@ require_once($CFG->dirroot . '/mod/assign/submission/babelium/babeliumservice.ph
 class BabeliumConnector {
 
     const DEVELOPMENT_ENVIRONMENT = 'development';
+
     private static $environment;
     private static $config;
     private static $babeliumService;
@@ -61,20 +62,20 @@ class BabeliumConnector {
            $g = $this->getBabeliumRemoteService();
            $data = null;
            if($responseid){
-                   $data = $g->getResponseInformation($responseid);
-                    if(!$data){
-                        return null;
-                    }
-                   $subtitleId = isset($data['subtitleId']) ? $data['subtitleId'] : 0;
-                   $mediaId= isset($data['mediaId']) ? $data['mediaId']: 0;
+                $data = $g->getResponseInformation($responseid);
+                 if(!$data){
+                     return null;
+                 }
+                $subtitleId = isset($data['subtitleId']) ? $data['subtitleId'] : 0;
+                $mediaId= isset($data['mediaId']) ? $data['mediaId']: 0;
            } else {
-                   $data = $g->getExerciseInformation($exerciseid);
-                   if(!$data){
-                        return null;
-                    }
-                   $media = $data['media'];
-                   $subtitleId = isset($media['subtitleId']) ? $media['subtitleId'] : 0;
-                   $mediaId= isset($media['id']) ? $media['id']: 0;
+                $data = $g->getExerciseInformation($exerciseid);
+                if(!$data){
+                     return null;
+                 }
+                $media = $data['media'];
+                $subtitleId = isset($media['subtitleId']) ? $media['subtitleId'] : 0;
+                $mediaId= isset($media['id']) ? $media['id']: 0;
            }
            $captions = $g->getCaptions($subtitleId,$mediaId);
            if(!$captions){
@@ -114,7 +115,6 @@ class BabeliumConnector {
       return $this->getResponseInfo($data, $captions, $exerciseRoles, $recinfo);
     }
   }
-
    /**
     * Saves the data of a new response recorded using the plugin
     * @param int $exerciseId
@@ -130,8 +130,10 @@ class BabeliumConnector {
     * @return mixed $responseData
     * 		Array with information about the newly saved response, or false on error
     */
-   function babeliumsubmission_save_response_data($exerciseId, $subtitleId, $recordedRole, $responseName){
-           $parameters = array(
+   public function saveStudentExerciseOnBabelium($exerciseId, $subtitleId, $recordedRole, $responseName){
+       /**
+        * OLD WAY:
+        * $parameters = array(
                                    "exerciseId" => $exerciseId,
                                    "subtitleId" => $subtitleId,
                                    "characterName" => $recordedRole,
@@ -140,6 +142,15 @@ class BabeliumConnector {
            return $responsedata = $this
                    ->getBabeliumRemoteService()
                    ->newServiceCall('admSaveResponse', $parameters);
+        */
+       $parameters = array(
+                                   "exerciseId" => $exerciseId,
+                                   "subtitleId" => $subtitleId,
+                                   "characterName" => $recordedRole,
+                                   "mediaUrl" => $responseName
+                                   );
+       $g = $this->getBabeliumRemoteService();
+       return $g->saveStudentExerciseOnBabelium($parameters);
    }
 
     public function getBabeliumRemoteService(){

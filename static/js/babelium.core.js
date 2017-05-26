@@ -257,7 +257,9 @@ function onSubmissionDoneListener() {
         var formid = 'mform1';
         var sumbissionForm = document.getElementById(formid);
         if(sumbissionForm !== undefined){
-            sumbissionForm.submit();
+            sumbissionForm.elements["recordedRole"].value = getRecordedRole();
+            sumbissionForm.elements["responsehash"].value = getResponseHash();
+            //sumbissionForm.submit();
         }
     };
     var onError = function(data, textStatus, xhr){
@@ -267,6 +269,14 @@ function onSubmissionDoneListener() {
     alert("demo");
     //1
     sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError);
+}
+
+function getRecordedRole() {
+    return $bjq('#id_roleCombo option:selected').text();
+}
+
+function getResponseHash() {
+    return exinfo.media.mp4Url;
 }
 
 function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
@@ -295,13 +305,18 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
 
         //define additional middleware data
         var fd = new FormData();
+        var b = exinfo.media.mp4Url;
+        var baseUrl = b.substring(0, b.lastIndexOf('/')+1 );
+        var timestamp = new Date().getTime();
+        var newMediaUrl = baseUrl + "resp-"+timestamp+".flv";
         fd.append("audiostream", lastRecordedAudio);
         fd.append("audiolen",   lastRecordedAudio.length);
-        fd.append("audioname",  new Date().toISOString() +  extension);
-        fd.append("idexercise", "a");
-        fd.append("idstudent",  "a");
-        fd.append("idsubtitle", "a");
-        fd.append("rolename",   "a");
+        fd.append("audioname",  timestamp);
+        fd.append("idexercise", exinfo.id);
+        fd.append("idmedia",  exinfo.media.id);
+        fd.append("idsubtitle", exinfo.media.subtitleId);
+        fd.append("mediaUrl",   newMediaUrl);
+        fd.append("rolename",   getRecordedRole());
 
         var method01 = false;
         if(method01){

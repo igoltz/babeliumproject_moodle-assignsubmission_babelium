@@ -23,6 +23,7 @@ class assign_submission_babelium extends assign_submission_plugin
 {
     const PRACTICE_MODE = 0;
     const REVIEW_MODE = 1;
+    const NO_RESPONSE_ID_VALID = -1;
 
     private static $helper;
     private static $babeliumConnector;
@@ -187,7 +188,7 @@ class assign_submission_babelium extends assign_submission_plugin
         $PAGE->requires->string_for_js('babeliumStopRecording', 'assignsubmission_babelium');*/
         $PAGE->requires->jquery();
 
-        list($data, $exinfo, $exroles, $exlangs, $exsubs, $recinfo) = $formdata;
+            list($data, $exinfo, $exroles, $exlangs, $exsubs, $recinfo) = $formdata;
 
         $roleMenu = array();
         if ($exroles && count($exroles) > 0) {
@@ -265,7 +266,6 @@ class assign_submission_babelium extends assign_submission_plugin
         global $USER, $DB;
 
         // File storage options should go here if needed
-
         $babeliumsubmission = $this->get_babelium_submission($submission->id);
 
         // Check that the responsehash is set before submitting anything
@@ -313,13 +313,22 @@ class assign_submission_babelium extends assign_submission_plugin
             'groupid' => $groupid,
             'groupname' => $groupname
         );
-
+        $responseReady = false;
+        $connector = $this->getBabeliumConnector();
         if ($babeliumsubmission) {
             if ($babeliumsubmission->responsehash != $data->responsehash) {
-                $responsedata = $this->getBabeliumConnector()->babeliumsubmission_save_response_data($this->get_config('exerciseid'), $data->subtitleId, $data->recordedRole, $data->responsehash);
-                if (!$responsedata)
+                $responsedata = $connector->saveStudentExerciseOnBabelium(
+                        $this->get_config('exerciseid'),
+                        $data->subtitleId,
+                        $data->recordedRole,
+                        $data->responsehash
+                );
+                if (!$responsedata && $responseReady){
                     throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
-                $babeliumsubmission->responseid = $responsedata['responseId'];
+                }
+                else{
+                    $babeliumsubmission->responseid = $responsedata['responseId'];
+                }
             } else {
                 $babeliumsubmission->responseid = $data->responseid;
             }
@@ -334,20 +343,26 @@ class assign_submission_babelium extends assign_submission_plugin
             $babeliumsubmission               = new stdClass();
             $babeliumsubmission->responsehash = $data->responsehash;
 
-            $responsedata = $this->getBabeliumConnector()->babeliumsubmission_save_response_data($this->get_config('exerciseid'), $data->subtitleId, $data->recordedRole, $data->responsehash);
-            if (!$responsedata)
+            $responsedata = $connector->saveStudentExerciseOnBabelium(
+                    $this->get_config('exerciseid'),
+                    $data->subtitleId,
+                    $data->recordedRole,
+                    $data->responsehash
+            );
+            if (!$responsedata && $responseReady){
                 throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
-            $babeliumsubmission->responseid = $responsedata['responseId'];
-
-
-            $babeliumsubmission->submission = $submission->id;
-            $babeliumsubmission->assignment = $this->assignment->get_instance()->id;
-            $babeliumsubmission->id         = $DB->insert_record('assignsubmission_babelium', $babeliumsubmission);
-            $params['objectid']             = $babeliumsubmission->id;
-            $event                          = \assignsubmission_babelium\event\submission_created::create($params);
-            $event->set_assign($this->assignment);
-            $event->trigger();
-            return $babeliumsubmission->id > 0;
+            }
+            else{
+                $babeliumsubmission->responseid = $responsedata['responseId'];
+                $babeliumsubmission->submission = $submission->id;
+                $babeliumsubmission->assignment = $this->assignment->get_instance()->id;
+                $babeliumsubmission->id         = $DB->insert_record('assignsubmission_babelium', $babeliumsubmission);
+                $params['objectid']             = $babeliumsubmission->id;
+                $event                          = \assignsubmission_babelium\event\submission_created::create($params);
+                $event->set_assign($this->assignment);
+                $event->trigger();
+                return $babeliumsubmission->id > 0;
+            }
         }
     }
 

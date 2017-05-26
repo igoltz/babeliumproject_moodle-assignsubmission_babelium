@@ -251,7 +251,7 @@ class babeliumservice{
             return $result;
     }
 
-    public function make_request($headers, $request_url){
+    public function make_request($headers, $request_url, $post_params = null){
         //Prepare the cURL request
         $ch = curl_init($request_url);
         if (!$ch) {
@@ -261,19 +261,26 @@ class babeliumservice{
 
         $referer = "";
         $origin="";
+        
+       $curl_data = array(
+            CURLOPT_URL => $request_url,
+            CURLOPT_HTTPHEADER  => $headers,
+            CURLOPT_REFERER => $referer,
+            //CURLOPT_VERBOSE => 1,
+            //CURLOPT_HEADER => 1,
+            CURLOPT_RETURNTRANSFER  =>true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false
+        );
+       
+       if(isset($post_params)){
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_params);
+       }
 
         curl_setopt_array(
                 $ch,
-                array(
-                    CURLOPT_URL => $request_url,
-                    CURLOPT_HTTPHEADER  => $headers, //array('X-User: admin', 'X-Authorization: 123456'),
-                    CURLOPT_REFERER => $referer,
-                    //CURLOPT_VERBOSE => 1,
-                    //CURLOPT_HEADER => 1,
-                    CURLOPT_RETURNTRANSFER  =>true,
-                    CURLOPT_SSL_VERIFYPEER => false,
-                    CURLOPT_SSL_VERIFYHOST => false
-                )
+                $curl_data
         );
         $result = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -323,10 +330,17 @@ class babeliumservice{
         return $this->makeApiV3Request($request_url, $headers);
     }
     
-    private function makeApiV3Request($request_url, $headers){
+    
+    public function saveStudentExerciseOnBabelium($params) {
+        $headers = $this->build_headers();
+        $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/response";
+        return $this->makeApiV3Request($request_url, $headers, $params);
+    }
+    
+    private function makeApiV3Request($request_url, $headers, $params = null){
         //Check if proxy (if used) should be bypassed for this url
         $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($request_url) : false;
-        $result = $this->make_request($headers, $request_url);
+        $result = $this->make_request($headers, $request_url, $params);
         //Parses the response output to separate the headers from the body of the response
         //$this->parseCurlOutput($result);
         return $this->decodeJsonResponse($result);
