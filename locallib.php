@@ -155,9 +155,15 @@ class assign_submission_babelium extends assign_submission_plugin
 
         }
 
-        $exercise_data = !empty($data->responsehash) ? $this->getBabeliumConnector()->babeliumsubmission_get_exercise_data(0, $data->responseid) : $this->getBabeliumConnector()->babeliumsubmission_get_exercise_data($exerciseid);
+        $exercise_data = null;
+        if(!empty($data->responsehash)){
+            $exercise_data = $this->getBabeliumConnector()->babeliumsubmission_get_exercise_data(0, $data->responseid);
+        }
+        else{
+            $exercise_data = $this->getBabeliumConnector()->babeliumsubmission_get_exercise_data($exerciseid);
+        }
         if (!$exercise_data)
-            throw new dml_exception("Error while retrieving Babelium external data");
+            throw new dml_exception("Error while retrieving Babelium external data. No data returned");
 
         //error_log(print_r($exercise_data,true),3,"/tmp/error.log");
 
@@ -228,11 +234,12 @@ class assign_submission_babelium extends assign_submission_plugin
         //error_log(print_r($recinfo,true),3,"/tmp/error.log");
 
         //Returns a string with all the html and script tags needed to init the babelium widget
-        $html_content = $this->getBabeliumHelper()->babeliumsubmission_html_output(self::PRACTICE_MODE, $exinfo, $exsubs, $recinfo);
+        $html_content = $this->getBabeliumHelper()->babeliumsubmission_html_exercise_todo_view_output(self::PRACTICE_MODE, $exinfo, $exsubs, $recinfo);
 
         $mform->addElement('html', $html_content);
         $mform->addElement('select', 'roleCombo', get_string('babeliumChooseRole', 'assignsubmission_babelium'), $roleMenu);
 
+        $mform->addRule( 'roleCombo', 'You must select enter a valid babelium exercise', 'required' );
         //TODO Currently, we only allow one language for the subtitles so this element is not needed for now
         //$mform->addElement('select', 'localeCombo', get_string('babeliumChooseSubLang', 'assignment_babelium'), $localeMenu);
 
@@ -425,7 +432,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function view(stdClass $submission)
     {
-        return $this->getBabeliumHelper()->displayVideoResponse($this, $submission);
+        return $this->getBabeliumHelper()->displaySubmittedExercise($this, $submission);
     }
 
     /**

@@ -324,11 +324,73 @@ class BabeliumHelper
     * @return String $html_content
     *	An html snippet that loads the babelium player and its related scripts
     */
-   function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
+   function babeliumsubmission_html_exercise_done_view_output($info, $subs, $rmedia){
         Logging::logBabelium("Rendering HTML5 data with babelium information...");
        global $SESSION, $CFG, $BCFG;
 
-       $content_path = $this->getSumbissionHTMLPath();
+       $content_path = $this->getSumbissionViewHTMLPath();
+
+       $exinfo = '""';
+       $exsubs = '""';
+       $rsinfo = '""';
+       $rssubs = '""';
+       $recinfo = '""';
+
+        $rsinfo = json_encode($info);
+        $rssubs = json_encode($subs);
+
+        if($rmedia){
+            $recinfo = json_encode($rmedia);
+        }
+
+       $html_content = '';
+       if(isset($info['title'])){
+               $html_content.='<h2 id="babelium-exercise-title" class="centered">'.$info['title'].'</h2>';
+       }
+       $html_content.= file_get_contents($content_path, FILE_USE_INCLUDE_PATH);
+        //load jquery just in case
+       $html_content.='<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>'.PHP_EOL;
+
+       $domain = get_config(self::ASSIGNSUBMISSION_BABELIUM,'serverdomain');
+       $lang = current_language();
+       
+       $html_content .= '<script language="javascript" type="text/javascript">
+                               var domain = "'.$domain.'";
+                               var lang = "'.$lang.'";
+                               var exinfo = '.$exinfo.';
+                               var exsubs = '.$exsubs.';
+                               var rsinfo = '.$rsinfo.';
+                               var rssubs = '.$rssubs.';
+                               var recinfo = '.$recinfo.';
+                               init(exinfo, exsubs, rsinfo, rssubs, recinfo);
+                         </script>'.PHP_EOL;
+       
+        $html_content.='<script
+                     src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
+                     language="javascript">
+                 </script>'.PHP_EOL;
+
+       Logging::logBabelium("Injecting ". strlen($html_content)." data bytes into babelium submission");
+       return $html_content;
+   }
+   
+   /**
+    * Returns html code for displaying the babelium widget with the provided information
+    *
+    * @param int $mode
+    *	States whether we should return the widget in play ($mode = 0) or review ($mode = 1) status
+    * @param array $info
+    *	Information about the exercise/response the widget is going to display
+    * @param array $subs
+    *	The subtitles & roles this exercise/response is going to use
+    * @return String $html_content
+    *	An html snippet that loads the babelium player and its related scripts
+    */
+   function babeliumsubmission_html_exercise_todo_view_output($mode, $info, $subs, $rmedia){
+        Logging::logBabelium("Rendering HTML5 data with babelium information...");
+       global $SESSION, $CFG, $BCFG;
+
+       $content_path = $this->getSumbissionUploadHTMLPath();
 
        $exinfo = '""';
        $exsubs = '""';
@@ -369,9 +431,15 @@ class BabeliumHelper
                            src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/audio.js"
                            language="javascript">
                        </script>'.PHP_EOL;
-
+       
        $html_content.='<script
                            src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.core.js"
+                           language="javascript">
+                       </script>'.PHP_EOL;
+
+
+       $html_content.='<script
+                           src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
                            language="javascript">
                        </script>'.PHP_EOL;
 
@@ -394,13 +462,25 @@ class BabeliumHelper
        return $html_content;
    }
 
-    public function getSumbissionHTMLPath() {
-        Logging::logBabelium("Loading submission template from local file");
+    public function getSumbissionUploadHTMLPath() {
+        Logging::logBabelium("Loading submission upload template from local file");
          if($this->isDevelopment()){
              $content_path = self::$rootPath.'/mod/assign/submission/babelium/iframe/upload.body.html';
          }
          else{
              $content_path = '/var/www/babelium-moodle/moodle32/iframe/upload.body.html';
+         }
+         Logging::logBabelium("Injecting template data from file: ".$content_path);
+         return $content_path;
+     }
+     
+     public function getSumbissionViewHTMLPath() {
+        Logging::logBabelium("Loading submission view template from local file");
+         if($this->isDevelopment()){
+             $content_path = self::$rootPath.'/mod/assign/submission/babelium/iframe/view.body.html';
+         }
+         else{
+             $content_path = '/var/www/babelium-moodle/moodle32/iframe/view.body.html';
          }
          Logging::logBabelium("Injecting template data from file: ".$content_path);
          return $content_path;
@@ -422,7 +502,7 @@ class BabeliumHelper
         return false;
     }
 
-    public function displayVideoResponse($plugin, $submission){
+    public function displaySubmittedExercise($plugin, $submission){
         Logging::logBabelium("Displaying HTML5 video response");
         $result = "";
         if(isset($submission)){
@@ -433,7 +513,7 @@ class BabeliumHelper
                 $responseid = $babeliumsubmission->responseid;
                 $response_data = $plugin->getBabeliumConnector()->babeliumsubmission_get_response_data($responseid);
                 if (isset($response_data)){
-                    $babeliumcontent = $this->babeliumsubmission_html_output(self::REVIEW_MODE, $response_data['info'], $response_data['subtitles'], null);
+                    $babeliumcontent = $this->babeliumsubmission_html_exercise_done_view_output($response_data['info'], $response_data['subtitles'], null);
                 }
                 else{
                     $babeliumcontent = $this->babeliumsubmission_html_output_error($submission);
@@ -529,13 +609,16 @@ class BabeliumHelper
     public function babeliumsubmission_html_output_error($submission) {
         Logging::logBabelium("Generating error HTML for failed submission preview");
         $html_content = '';
-        $html_content.='<h2>Could no load</h2>';
-        $html_content.='<p>An error happen while loading the exercise. Please contact your teacher or system administrator</p>';
-        //capture var dump
-        ob_start();
-        var_dump($submission);
-        $result = ob_get_clean();
-        $html_content.="<pre>".$result."</pre>";
+        $html_content.='<h2>Could not load an exercise preview</h2>';
+        $html_content.='<p>An error happen while loading the exercise preview. Please contact your teacher or system administrator</p>';
+        $showDetails = false;
+        if($showDetails){
+            //capture var dump
+            ob_start();
+            var_dump($submission);
+            $result = ob_get_clean();
+            $html_content.="<pre>".$result."</pre>";
+        }
         return $html_content;
     }
 }
