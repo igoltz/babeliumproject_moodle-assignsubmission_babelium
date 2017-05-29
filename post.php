@@ -5,10 +5,10 @@ require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
 require_once './BabeliumHelper.php';
 
 if ( $_SERVER['REQUEST_METHOD'] == 'POST' ){
-    processPostRequest();
+    processStudentAudioPostRequest();
 }
 
-function processPostRequest(){
+function processStudentAudioPostRequest(){
     Logging::logBabelium("Processing POST request");
     $audio_stream = $_POST["audiostream"];
     $audio_len =    $_POST["audiolen"];
@@ -40,6 +40,7 @@ function processPostRequest(){
             $response = $helper->deleteTempAudioFile($upload_name);
         }
     }
+    
     Logging::logBabelium("Processing POST request DONE");
     echo $response;
 }

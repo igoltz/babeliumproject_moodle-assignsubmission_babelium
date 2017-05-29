@@ -134,7 +134,7 @@ class BabeliumConnector {
     * @return mixed $responseData
     * 		Array with information about the newly saved response, or false on error
     */
-   public function saveStudentExerciseOnBabelium($exerciseId, $subtitleId, $recordedRole, $responseName){
+   public function saveStudentExerciseOnBabelium($idstudent, $idexercise, $idsubtitle, $rolename, $responsehash, $audio_stream){
        /**
         * OLD WAY:
         * $parameters = array(
@@ -147,29 +147,18 @@ class BabeliumConnector {
                    ->getBabeliumRemoteService()
                    ->newServiceCall('admSaveResponse', $parameters);
         */
-       Logging::logBabelium("Saving student submission on Babelium");
-       $parameters = array(
-                                   "exerciseId" => $exerciseId,
-                                   "subtitleId" => $subtitleId,
-                                   "characterName" => $recordedRole,
-                                   "mediaUrl" => $responseName
-                                   );
-       $g = $this->getBabeliumRemoteService();
-       return $g->saveStudentExerciseOnBabelium($parameters);
-   }
-   
-    public function saveStudentAudioOnBabelium($idstudent, $idexercise, $idsubtitle, $rolename, $audio_stream) {
-        Logging::logBabelium("Saving audio stream on Babelium");
+       Logging::logBabelium("Saving student submission & audio on Babelium");
         $parameters = array(
-            "studentid" => $idstudent,
-            "exerciseid" => $idexercise,
-            "subtitleid" => $idsubtitle,
-            "role" => $rolename,
+            "studentId" => $idstudent,
+            "exerciseId" => $idexercise,
+            "subtitleId" => $idsubtitle,
+            "characterName" => $rolename,
+            "responsehash" => $responsehash,
             "audio" => $audio_stream
         );
        $g = $this->getBabeliumRemoteService();
-       return $g->saveStudentAudioOnBabelium($parameters);
-    }
+       return $g->saveStudentExerciseOnBabelium($parameters);
+   }
     
     public function getExerciseRoles($captions){
         Logging::logBabelium("Getting exercise roles");

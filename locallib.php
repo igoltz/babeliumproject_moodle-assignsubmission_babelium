@@ -134,11 +134,9 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function get_form_elements($submission, MoodleQuickForm $mform, stdClass $data)
     {
-
         if (($exerciseid = $this->get_config('exerciseid')) <= 0) {
             return false;
         }
-
         $submissionid = $submission ? $submission->id : 0;
 
         if (!isset($data->responseid)) {
@@ -265,6 +263,7 @@ class assign_submission_babelium extends assign_submission_plugin
     public function save(stdClass $submission, stdClass $data)
     {
         Logging::logBabelium("Saving user response for submission...");
+        return; //temp
         global $USER, $DB;
 
         // File storage options should go here if needed

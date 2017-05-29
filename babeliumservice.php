@@ -348,7 +348,7 @@ class babeliumservice{
     
     public function saveStudentAudioOnBabelium($params) {
         $headers = $this->build_headers();
-        $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/audio";
+        $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/response";
         return $this->makeApiV3Request($request_url, $headers, $params);
     }
     

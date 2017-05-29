@@ -516,17 +516,11 @@ class BabeliumHelper
        $connector = new BabeliumConnector();
        //save student response on babelium
        $responsedata =  $connector->saveStudentExerciseOnBabelium(
-            $idexercise,
-            $idsubtitle,
-            $rolename,
-            $responsehash
-        );
-       //save student audio on babelium
-       $audioresponsedata =  $connector->saveStudentAudioOnBabelium(
             $idstudent,
             $idexercise,
             $idsubtitle,
             $rolename,
+            $responsehash,
             $audio_stream
         );
        return $audioresponsedata;
