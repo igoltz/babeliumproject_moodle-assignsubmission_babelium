@@ -272,15 +272,15 @@ function onSubmissionDoneListener() {
         if(sumbissionForm !== undefined){
             sumbissionForm.elements["recordedRole"].value = getRecordedRole();
             sumbissionForm.elements["responsehash"].value = getResponseHash();
-            //sumbissionForm.submit();
+            if(!debug_enabled){
+                sumbissionForm.submit();
+            }
         }
     };
     var onError = function(data, textStatus, xhr){
         //1 show error popup with server returned message
         swal("Error", data, "error");
     };
-    alert("demo");
-    //1
     sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError);
 }
 
@@ -322,14 +322,18 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
         var baseUrl = b.substring(0, b.lastIndexOf('/')+1 );
         var timestamp = new Date().getTime();
         var newMediaUrl = baseUrl + "resp-"+timestamp+".flv";
+
         fd.append("audiostream", lastRecordedAudio);
         fd.append("audiolen",   lastRecordedAudio.length);
         fd.append("audioname",  timestamp);
+
         fd.append("idexercise", exinfo.id);
         fd.append("idmedia",  exinfo.media.id);
         fd.append("idsubtitle", exinfo.media.subtitleId);
         fd.append("mediaUrl",   newMediaUrl);
+
         fd.append("rolename",   getRecordedRole());
+        fd.append("responsehash",   getResponseHash());
 
         var method01 = false;
         if(method01){

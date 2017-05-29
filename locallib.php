@@ -16,6 +16,7 @@ defined('MOODLE_INTERNAL') || die();
 define('ASSIGNSUBMISSION_BABELIUM_FILEAREA', 'submissions_babelium');
 
 /** Include babelium helper classes **/
+require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/BabeliumConnector.php');
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/BabeliumHelper.php');
 
@@ -263,6 +264,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function save(stdClass $submission, stdClass $data)
     {
+        Logging::logBabelium("Saving user response for submission...");
         global $USER, $DB;
 
         // File storage options should go here if needed
@@ -284,6 +286,7 @@ class assign_submission_babelium extends assign_submission_plugin
                 'pathnamehashes' => array()
             )
         );
+        
         if (!empty($submission->userid) && ($submission->userid != $USER->id)) {
             $params['relateduserid'] = $submission->userid;
         }
@@ -394,6 +397,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function view_summary(stdClass $submission, &$showviewlink)
     {
+        Logging::logBabelium("Showing HTML5 summary view of submission");
         $babeliumsubmission = $this->get_babelium_submission($submission->id);
         // always show the view link
         $showviewlink       = true;
@@ -494,6 +498,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function delete_instance()
     {
+        Logging::logBabelium("Deleting instance...");
         return $this->getBabeliumHelper()->deleteInstance($this);
     }
 
@@ -503,6 +508,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function is_empty(stdClass $submission)
     {
+        Logging::logBabelium("Checking for empty submission...");
         return $this->getBabeliumHelper()->isEmptySubmission($this, $submission);
     }
 
@@ -512,6 +518,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function get_file_areas()
     {
+        Logging::logBabelium("Getting file areas...");
         return array(
             ASSIGNSUBMISSION_BABELIUM_FILEAREA => $this->get_name()
         );
@@ -525,11 +532,13 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function copy_submission(stdClass $sourcesubmission, stdClass $destsubmission)
     {
+        Logging::logBabelium("Copying submission...");
         return $this->getBabeliumHelper()->copy_submission($sourcesubmission, $destsubmission);
     }
 
     public function check_file_code($submissioncode)
     {
+        Logging::logBabelium("Checking file code...");
         return $this->getBabeliumHelper()->check_file_code($submissioncode);
     }
 

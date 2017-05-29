@@ -21,6 +21,9 @@
  * @copyright 2013 Babelium Project {@link http://babeliumproject.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
+
+Logging::logBabelium("Loading plugin settings and configuration parameters...");
 
 // Note this is on by default
 $settings->add(
@@ -96,3 +99,5 @@ $settings->add(
     ''
   )
 );
+
+Logging::logBabelium("Settings reading DONE!");

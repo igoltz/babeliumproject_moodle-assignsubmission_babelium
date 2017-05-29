@@ -21,6 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
+
 class babeliumservice{
 
     private $_curlHeaders = array();
@@ -33,12 +35,14 @@ class babeliumservice{
     private $logFilePath;
 
     function __construct() {
+        Logging::logBabelium("Building babeliumservice...");
         self::$settings = $this->get_babelium_settings();
         global $CFG;
         $this->logFilePath = $CFG->dataroot."/babelium.log";
     }
-
-            /**
+    
+    //@deprecated
+    /**
      * Parses the output of cURL. The headers found in this output are stored in the $_curlHeaders class property.
      * The response object, which should be a JSON object, is stored in the $_curlResponse class property.
      * @param string $output
@@ -60,6 +64,7 @@ class babeliumservice{
             $this->parseResponseHeaders();
     }
 
+    //@deprecated
     /**
      * Searches for a HTTP status code in the response headers. If no headers are returned
      * or the status code is different to 200 it throws an error
@@ -79,27 +84,8 @@ class babeliumservice{
                     }
             }
     }
-
-    /**
-     * Get all the configuration parameters needed to communicate with the external Babelium server
-     * @return stdClass - An array of properties (keys) and their values (values)
-     */
-    private function get_babelium_settings(){
-        if(!isset(self::$settings)){
-                $bcfg = new stdClass();
-                $bcfg->babelium_babeliumWebDomain = get_config('assignsubmission_babelium','serverdomain');
-                //$bcfg->babelium_babeliumWebPort = get_config('assignsubmission_babelium','serverport');//removed
-                //$bcfg->babelium_babeliumApiDomain = get_config('assignsubmission_babelium','apidomain');
-                //$bcfg->babelium_babeliumApiEndPoint = get_config('assignsubmission_babelium','apiendpoint');
-                $bcfg->babelium_new_api_endpoint = get_config('assignsubmission_babelium','newapiendpoint');
-                $bcfg->babelium_babeliumApiAccessKey = get_config('assignsubmission_babelium','accesskey');
-                $bcfg->babelium_babeliumApiSecretAccessKey = get_config('assignsubmission_babelium','secretaccesskey');
-                self::$settings = $bcfg;
-        }
-        return self::$settings;
-    }
-
-
+    
+    //@deprecated
     /**
      * Makes API requests using cURL and a signed header
      * @param String $method
@@ -251,6 +237,26 @@ class babeliumservice{
             return $result;
     }
 
+    /**
+     * Get all the configuration parameters needed to communicate with the external Babelium server
+     * @return stdClass - An array of properties (keys) and their values (values)
+     */
+    private function get_babelium_settings(){
+        if(!isset(self::$settings)){
+                Logging::logBabelium("Reading babelium plugin user configuration...");
+                $bcfg = new stdClass();
+                $bcfg->babelium_babeliumWebDomain = get_config('assignsubmission_babelium','serverdomain');
+                //$bcfg->babelium_babeliumWebPort = get_config('assignsubmission_babelium','serverport');//removed
+                //$bcfg->babelium_babeliumApiDomain = get_config('assignsubmission_babelium','apidomain');
+                //$bcfg->babelium_babeliumApiEndPoint = get_config('assignsubmission_babelium','apiendpoint');
+                $bcfg->babelium_new_api_endpoint = get_config('assignsubmission_babelium','newapiendpoint');
+                $bcfg->babelium_babeliumApiAccessKey = get_config('assignsubmission_babelium','accesskey');
+                $bcfg->babelium_babeliumApiSecretAccessKey = get_config('assignsubmission_babelium','secretaccesskey');
+                self::$settings = $bcfg;
+        }
+        return self::$settings;
+    }
+
     public function make_request($headers, $request_url, $post_params = null){
         //Prepare the cURL request
         $ch = curl_init($request_url);
@@ -290,16 +296,19 @@ class babeliumservice{
     }
 
     public function get_query_string($method){
+        Logging::logBabelium("Getting query string...");
         $commProtocol = 'http://';
         $web_domain = self::$settings->babelium_babeliumWebDomain;
         $api_domain = $web_domain;
         $api_endpoint = self::$settings->babelium_new_api_endpoint;
         $api_url = $commProtocol . $api_domain . $api_endpoint;
         $query_string = $api_url . '/' . $method;
+        Logging::logBabelium("Query string is: ".$query_string);
         return $query_string;
     }
 
     public function build_headers(){
+        Logging::logBabelium("Building request headers...");
         return array(
             'Access-Key:'.self::$settings->babelium_babeliumApiAccessKey,
             'Secret-Access:'.self::$settings->babelium_babeliumApiSecretAccessKey
@@ -337,7 +346,14 @@ class babeliumservice{
         return $this->makeApiV3Request($request_url, $headers, $params);
     }
     
+    public function saveStudentAudioOnBabelium($params) {
+        $headers = $this->build_headers();
+        $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/audio";
+        return $this->makeApiV3Request($request_url, $headers, $params);
+    }
+    
     private function makeApiV3Request($request_url, $headers, $params = null){
+        Logging::logBabelium("Requesting ".$request_url);
         //Check if proxy (if used) should be bypassed for this url
         $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($request_url) : false;
         $result = $this->make_request($headers, $request_url, $params);
@@ -372,7 +388,7 @@ class babeliumservice{
     private function display_error($errorCode){
         if(!$errorCode)
             return;
-
+        Logging::logBabelium("Error detected with code ".$errorCode);
         //We are in moodle 2.x
         if(class_exists("moodle_exception")){
                 throw new moodle_exception($errorCode,'assignsubmission_babelium');
@@ -389,6 +405,7 @@ class babeliumservice{
     }
 
     public function decodeJsonResponse($result) {
+        Logging::logBabelium("Decoding JSON answer: ".$result);
         $result = json_decode($result,true);
         if (count($result)>0) {
             return $result;

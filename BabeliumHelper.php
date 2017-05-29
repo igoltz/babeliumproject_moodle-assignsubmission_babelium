@@ -1,5 +1,7 @@
 <?php
 
+require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
+
 /**
 * BabeliumHelper class that contains BabeliumPlugin Business Logic
 * @author sanguita
@@ -132,6 +134,7 @@ class BabeliumHelper
     }
 
     public function populateWithBabeliumData($plugin, $submission){
+        Logging::logBabelium("Populating with babelium data");
         if(isset($submission)){
             $babeliumsubmission = $plugin->get_babelium_submission($submission->id);
             if ($babeliumsubmission) {
@@ -143,6 +146,7 @@ class BabeliumHelper
     }
 
     public function getExerciseData($data){
+        Logging::logBabelium("Getting exercise data...");
         //original code
         //$exercise_data = !empty($data->responsehash) ? babeliumsubmission_get_exercise_data(0, $data->responseid) : babeliumsubmission_get_exercise_data($exerciseid);
         if( !empty($data->responsehash) ){
@@ -160,6 +164,7 @@ class BabeliumHelper
     }
 
     public function getFormData($plugin, $mform){
+        Logging::logBabelium("Getting moodle form data...");
         $plugin->get_babelium_form_elements($mform,
             array(
                 $this->data,
@@ -191,16 +196,21 @@ class BabeliumHelper
     * @param stdClass $submission
     */
     public function isEmptySubmission($plugin, $submission){
+        Logging::logBabelium("Checking for EMPTY submission...");
         $hasValidData = isset($submission);
         if($hasValidData){
             $babeliumsubmission = $plugin->get_babelium_submission($submission->id);
-            return empty($babeliumsubmission->responsehash);
+            $empty = empty($babeliumsubmission->responsehash);
+            Logging::logBabelium("Submission was empty? : ".$empty);
+            return $empty;
         }
+        Logging::logBabelium("Submission was empty");
         return true;
     }
 
     public function deleteInstance($plugin){
         global $DB;
+        Logging::logBabelium("Deleting instance...");
         // will throw exception on failure
         $DB->delete_records(
             self::ASSIGNSUBMISSION_BABELIUM,
@@ -208,14 +218,19 @@ class BabeliumHelper
                 self::KEY_ASSIGNMENT => $plugin->assignment->get_instance()->id
             )
         );
+        Logging::logBabelium("Instance deleted DONE!");
     }
 
     public function get_plugin_name() {
-        return get_string(self::KEY_CONFIG_BABELIUM_NAME, self::ASSIGNSUBMISSION_BABELIUM);
+        Logging::logBabelium("Getting plugin name...");
+        $name = get_string(self::KEY_CONFIG_BABELIUM_NAME, self::ASSIGNSUBMISSION_BABELIUM);
+        Logging::logBabelium("Plugin name is: ".$name);
+        return $name;
     }
 
     public function getBabeliumSubmission($submissionid) {
         global $DB;
+        Logging::logBabelium("Getting babelium sumbission with ID ".$submissionid);
         $hasValidData = isset($submissionid);
         if($hasValidData){
             return $DB->get_record(
@@ -310,7 +325,7 @@ class BabeliumHelper
     *	An html snippet that loads the babelium player and its related scripts
     */
    function babeliumsubmission_html_output($mode, $info, $subs, $rmedia){
-
+        Logging::logBabelium("Rendering HTML5 data with babelium information...");
        global $SESSION, $CFG, $BCFG;
 
        $content_path = $this->getSumbissionHTMLPath();
@@ -375,31 +390,40 @@ class BabeliumHelper
                                var recinfo = '.$recinfo.';
                                init(exinfo, exsubs, rsinfo, rssubs, recinfo);
                          </script>'.PHP_EOL;
+       Logging::logBabelium("Injecting ". strlen($html_content)." data bytes into babelium submission");
        return $html_content;
    }
 
     public function getSumbissionHTMLPath() {
+        Logging::logBabelium("Loading submission template from local file");
          if($this->isDevelopment()){
              $content_path = self::$rootPath.'/mod/assign/submission/babelium/iframe/upload.body.html';
          }
          else{
              $content_path = '/var/www/babelium-moodle/moodle32/iframe/upload.body.html';
          }
+         Logging::logBabelium("Injecting template data from file: ".$content_path);
          return $content_path;
      }
 
     public function isDevelopment() {
-        return self::$environment == self::DEVELOPMENT_ENVIRONMENT;
+        $env = self::$environment == self::DEVELOPMENT_ENVIRONMENT;
+        Logging::logBabelium("Is development environment? : ".$env);
+        return $env;
     }
 
     public function canUpgrade($type, $version) {
+        Logging::logBabelium("Is elegible for upgrading?");
         if(isset($type) && isset($version)){
-            return ($type == self::SUBMISSION_TYPE && $version >= self::MIN_MOODLE_VERSION);
+            $valid = ($type == self::SUBMISSION_TYPE && $version >= self::MIN_MOODLE_VERSION);
+            Logging::logBabelium("Valid to be upgraded: ".$valid);
         }
+        Logging::logBabelium("No valid to be upgraded");
         return false;
     }
 
     public function displayVideoResponse($plugin, $submission){
+        Logging::logBabelium("Displaying HTML5 video response");
         $result = "";
         if(isset($submission)){
             $babeliumsubmission = $this->getBabeliumSubmission($submission->id);
@@ -418,38 +442,57 @@ class BabeliumHelper
                 $result .= '</div>';
             }
         }
+        Logging::logBabelium("Injecting ". strlen($result)." data bytes into babelium video display");
         return $result;
+    }
+    
+    public function deleteTempAudioFile($upload_name) {
+        Logging::logBabelium("Deleting audio file: ".$upload_name);
+        $dataDir = $CFG->dataroot."/audiofiles";
+        if($this->folder_exist($dataDir)){
+            $filename = $dataDir."/".$upload_name;
+            unlink($filename);
+            Logging::logBabelium("audio file ".$filename." was deleted");
+            return "success";
+        }
     }
 
     public function saveAudioDataResponse($audio_stream, $audio_len, $upload_name){
+        Logging::logBabelium("Saving audio stream on Moodle server");
         global $CFG;
         //check destination file
         $dataDir = $CFG->dataroot."/audiofiles";
         if(!$this->folder_exist($dataDir)){
+            Logging::logBabelium("Creating directory 'audiofiles'...");
             mkdir($dataDir);
             chmod($dataDir, 0777);
         }
         //check length first
-        if(count($audio_stream) !== $audio_len){
+        $len = count($audio_stream);
+        if($len !== $audio_len){
+            Logging::logBabelium("ERROR: invalid audio length was detected. Declared length was ".$audio_len." and detected length is ".$len);
             return "An error was detected while saving the audio file.";
         }
         else{
             //save the audio in temp dir.
             $type = "audio/x-wav";
-            $filename = "$dataDir/$upload_name";
+            $filename = $dataDir."/".$upload_name;
             $saved = 0;
 
             $fp = fopen($filename, 'a+');
             $result = fwrite($fp, $audio_stream) ;
             if($result === FALSE){
+                Logging::logBabelium("fwrite() returned false so an error happen when writing file on disk, please check permissions");
                 echo "An error was detected while writing the file";
                 exit;
             }
             $saved = $result ? 1 : 0;
             if($saved){
+                Logging::logBabelium("File was successfully saved!");
                 return "success";
             }
             else{
+                Logging::logBabelium("Saving file on disk failed!");
                 return "failed";
             }
         }
@@ -468,11 +511,29 @@ class BabeliumHelper
        return ($path !== false AND is_dir($path)) ? $path : false;
    }
 
-   public function redirectAudioToBabelium($audio_stream, $idexercise, $idstudent, $idsubtitle, $rolename){
-       //TODO make authorized post request with given params
+   public function redirectAudioToBabelium($audio_stream, $idexercise, $idstudent, $idsubtitle, $rolename, $responsehash){
+       Logging::logBabelium("Redirecting user audio stream to babelium server");
+       $connector = new BabeliumConnector();
+       //save student response on babelium
+       $responsedata =  $connector->saveStudentExerciseOnBabelium(
+            $idexercise,
+            $idsubtitle,
+            $rolename,
+            $responsehash
+        );
+       //save student audio on babelium
+       $audioresponsedata =  $connector->saveStudentAudioOnBabelium(
+            $idstudent,
+            $idexercise,
+            $idsubtitle,
+            $rolename,
+            $audio_stream
+        );
+       return $audioresponsedata;
    }
 
     public function babeliumsubmission_html_output_error($submission) {
+        Logging::logBabelium("Generating error HTML for failed submission preview");
         $html_content = '';
         $html_content.='<h2>Could no load</h2>';
         $html_content.='<p>An error happen while loading the exercise. Please contact your teacher or system administrator</p>';
@@ -483,5 +544,4 @@ class BabeliumHelper
         $html_content.="<pre>".$result."</pre>";
         return $html_content;
     }
-
 }

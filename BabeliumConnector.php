@@ -22,6 +22,7 @@
 */
 
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/babeliumservice.php');
+require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
 
 /**
  * Description of BabeliumConnector. A simple Class to connect to Babelium RPC
@@ -48,6 +49,7 @@ class BabeliumConnector {
     * 		An array of exercise data if successful or false on error/when empty query results
     */
    function babeliumsubmission_get_available_exercise_list(){
+       Logging::logBabelium("Getting available exercise list");
         return $this->getBabeliumRemoteService()->getExerciseList();
    }
 
@@ -59,6 +61,7 @@ class BabeliumConnector {
     * 		An associative array with the info, the roles, the languages and the subtitle lines of the exercise, or false on error/when empty query results
     */
    function babeliumsubmission_get_exercise_data($exerciseid,$responseid=0){
+       Logging::logBabelium("Getting exercise data");
            $g = $this->getBabeliumRemoteService();
            $data = null;
            if($responseid){
@@ -98,6 +101,7 @@ class BabeliumConnector {
     * 		An associative array with the info, the roles, the languages and the subtitle lines of the response, or false on error/when empty query results
     */
   function babeliumsubmission_get_response_data($responseid){
+      Logging::logBabelium("Getting response data");
     $g = $this->getBabeliumRemoteService();
     $data = $g->getResponseInformation($responseid);
     $captions = null;
@@ -143,6 +147,7 @@ class BabeliumConnector {
                    ->getBabeliumRemoteService()
                    ->newServiceCall('admSaveResponse', $parameters);
         */
+       Logging::logBabelium("Saving student submission on Babelium");
        $parameters = array(
                                    "exerciseId" => $exerciseId,
                                    "subtitleId" => $subtitleId,
@@ -152,15 +157,22 @@ class BabeliumConnector {
        $g = $this->getBabeliumRemoteService();
        return $g->saveStudentExerciseOnBabelium($parameters);
    }
-
-    public function getBabeliumRemoteService(){
-        if(!isset(self::$babeliumService)){
-            self::$babeliumService = new babeliumservice();
-        }
-        return self::$babeliumService;
+   
+    public function saveStudentAudioOnBabelium($idstudent, $idexercise, $idsubtitle, $rolename, $audio_stream) {
+        Logging::logBabelium("Saving audio stream on Babelium");
+        $parameters = array(
+            "studentid" => $idstudent,
+            "exerciseid" => $idexercise,
+            "subtitleid" => $idsubtitle,
+            "role" => $rolename,
+            "audio" => $audio_stream
+        );
+       $g = $this->getBabeliumRemoteService();
+       return $g->saveStudentAudioOnBabelium($parameters);
     }
-
+    
     public function getExerciseRoles($captions){
+        Logging::logBabelium("Getting exercise roles");
         $exerciseRoles = array();
         if(isset($captions)){
           foreach($captions as $subline){
@@ -180,7 +192,7 @@ class BabeliumConnector {
     }
 
     public function getResponseInfo($data, $captions, $exerciseRoles, $recinfo) {
-
+        Logging::logBabelium("Getting response info");
       $validData = isset($data)
       && isset($captions)
       && isset($captions[0])
@@ -206,5 +218,11 @@ class BabeliumConnector {
         return;
       }
     }
-
+    
+    public function getBabeliumRemoteService(){
+        if(!isset(self::$babeliumService)){
+            self::$babeliumService = new babeliumservice();
+        }
+        return self::$babeliumService;
+    }
 }
