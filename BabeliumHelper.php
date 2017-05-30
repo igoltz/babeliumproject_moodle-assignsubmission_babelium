@@ -621,4 +621,35 @@ class BabeliumHelper
         }
         return $html_content;
     }
+
+    public function viewSummary($submission, $showviewlink) {
+        $babeliumsubmission = $this->getBabeliumSubmission($submission->id);
+        // always show the view link
+        $showviewlink = true;
+        $output = '';
+        if ($babeliumsubmission) {
+            $output   = '<div class="no-overflow">';
+            $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
+
+            $recordedMediaUrl  = $babeliumsubmission->responsehash;
+            $recordedMediaCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, '/') + 1, -4);
+
+            $thumbnailpath = $protocol 
+                    . get_config('assignsubmission_babelium', 'serverdomain')
+                    . '/resources/images/thumbs/' 
+                    . $recordedMediaCode 
+                    . '/default.jpg';
+            
+            $thumbnail     = '<img src="' 
+                    . $thumbnailpath 
+                    . '" alt="' 
+                    . get_string('babelium', 'assignsubmission_babelium') 
+                    . '" border="0" height="45" width="60"/>';
+            
+            $output .= $thumbnail;
+            $output .= '</div>';
+        }
+        return $output;
+    }
+
 }

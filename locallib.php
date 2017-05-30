@@ -35,6 +35,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function get_name()
     {
+        Logging::logBabelium("Getting plugin name");
         return $this->getBabeliumHelper()->get_plugin_name();
     }
 
@@ -46,6 +47,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function get_babelium_submission($submissionid)
     {
+        Logging::logBabelium("Getting submission from DB...");
         return $this->getBabeliumHelper()->getBabeliumSubmission($submissionid);
     }
 
@@ -56,61 +58,23 @@ class assign_submission_babelium extends assign_submission_plugin
      * @param MoodleQuickForm $mform The form to add elements to
      * @return void
      */
-    public function get_settings(MoodleQuickForm $mform)
-    {
+    public function get_settings(MoodleQuickForm $mform){
+        Logging::logBabelium("Loading new submission babelium form...");
         global $CFG, $COURSE;
-
         $defaultexerciseid = $this->getBabeliumHelper()->getDefaultExerciseId($this);
-
-        $exercises      = array();
-        $exercisesMenu  = array();
-        $classattribute = array(
-            'class' => 'error'
-        );
-
         try {
-            //$exercises = babeliumsubmission_get_available_exercise_list();
-            $exercises = $this->getBabeliumConnector()->babeliumsubmission_get_available_exercise_list();
-
-            if ($exercises && count($exercises) > 0) {
-                foreach ($exercises as $exercise) {
-                    $exercisesMenu[$exercise['id']] = $exercise['title'];
-                }
-            }
-            if (count($exercisesMenu) > 0) {
-
-                $mform->addElement('select', 'assignsubmission_babelium_exerciseid', get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'), $exercisesMenu);
-
-                $mform->addHelpButton('assignsubmission_babelium_exerciseid', 'babeliumAvailableRecordableExercises', 'assignsubmission_babelium');
-
-                $mform->setDefault('assignsubmission_babelium_exerciseid', $defaultexerciseid);
-
-                //Moodle 2.5 uses a checkbox to enable different submission plugins whereas prior versions use a select
-                //control. This is a dirty hack to check the version and apply a different conditional rule to each version.
-                if ($CFG->version < 2013051400) {
-                    $mform->disabledIf('assignsubmission_babelium_exerciseid', 'assignsubmission_babelium_enabled', 'eq', 0);
-                } else {
-                    $mform->disabledIf('assignsubmission_babelium_exerciseid', 'assignsubmission_babelium_enabled', 'notchecked');
-                }
-                $mform->addElement('hidden', 'noexerciseavailable', 0);
+            $this->getBabeliumConnector()->babeliumsubmission_get_available_exercise_list();
+            if ($this->getBabeliumConnector()->areValidExercises()) {
+                $version = $CFG->version < 2013051400;
+                $this->getBabeliumConnector()->build_settings_form($mform, $defaultexerciseid, $version);
             } else {
-                $msg = html_writer::tag('span', get_string('babeliumNoExerciseAvailable', 'assignsubmission_babelium'), $classattribute);
-                $mform->addElement('static', 'noexercisemessage', get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'), $msg);
-                $mform->addElement('hidden', 'noexerciseavailable', 1);
+                $this->getBabeliumConnector()->build_settings_form_empty($mform);
             }
         }
         catch (Exception $e) {
-            //html_writer::span() shortcut function is not available in Moodle versions prior to 2.5
-            //$msg = html_writer::span($e->getMessage(), 'error');
-            $msg = html_writer::tag('span', $e->getMessage(), $classattribute);
-            $mform->addElement('static', 'assignsubmission_babelium_servererror', get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'), $msg);
-
-            //This is a dirty hack, but it should avoid enabling Babelium submissions when server auth
-            //goes wrong for some reason.
-            $mform->addElement('hidden', 'noexerciseavailable', 1);
+            $this->getBabeliumConnector()->build_settings_form_error($mform, $e);
         }
-        $mform->setType('noexerciseavailable', PARAM_INT);
-        $mform->disabledIf('assignsubmission_babelium_enabled', 'noexerciseavailable', 'eq', 1);
+        $this->getBabeliumConnector()->build_settings_footer($mform);
     }
 
     /**
@@ -121,6 +85,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function save_settings(stdClass $data)
     {
+        Logging::logBabelium("Saving settings for babelium submission plugin...");
         return $this->getBabeliumHelper()->saveSubmissionConfiguration($this, $data);
     }
 
@@ -134,6 +99,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function get_form_elements($submission, MoodleQuickForm $mform, stdClass $data)
     {
+        Logging::logBabelium("Getting form elements, submission form");
         if (($exerciseid = $this->get_config('exerciseid')) <= 0) {
             return false;
         }
@@ -386,7 +352,14 @@ class assign_submission_babelium extends assign_submission_plugin
         $result = array();
         $fs     = get_file_storage();
 
-        $files = $fs->get_area_files($this->assignment->get_context()->id, 'assignsubmission_babelium', ASSIGNSUBMISSION_BABELIUM_FILEAREA, $submission->id, "timemodified", false);
+        $files = $fs->get_area_files(
+                    $this->assignment->get_context()->id,
+                    'assignsubmission_babelium',
+                    ASSIGNSUBMISSION_BABELIUM_FILEAREA,
+                    $submission->id,
+                    "timemodified",
+                    false
+                );
 
         foreach ($files as $file) {
             $result[$file->get_filename()] = $file;
@@ -404,24 +377,7 @@ class assign_submission_babelium extends assign_submission_plugin
     public function view_summary(stdClass $submission, &$showviewlink)
     {
         Logging::logBabelium("Showing HTML5 summary view of submission");
-        $babeliumsubmission = $this->get_babelium_submission($submission->id);
-        // always show the view link
-        $showviewlink       = true;
-
-        if ($babeliumsubmission) {
-            $output   = '<div class="no-overflow">';
-            $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
-
-            $recordedMediaUrl  = $babeliumsubmission->responsehash;
-            $recordedMediaCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, '/') + 1, -4);
-
-            $thumbnailpath = $protocol . get_config('assignsubmission_babelium', 'serverdomain') . '/resources/images/thumbs/' . $recordedMediaCode . '/default.jpg';
-            $thumbnail     = '<img src="' . $thumbnailpath . '" alt="' . get_string('babelium', 'assignsubmission_babelium') . '" border="0" height="45" width="60"/>';
-            $output .= $thumbnail;
-            $output .= '</div>';
-            return $output;
-        }
-        return '';
+        return $this->getBabeliumHelper()->viewSummary($submission, $showviewlink);
     }
 
     /**
@@ -432,6 +388,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function view(stdClass $submission)
     {
+        Logging::logBabelium("Displaying view...");
         return $this->getBabeliumHelper()->displaySubmittedExercise($this, $submission);
     }
 
@@ -460,6 +417,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function upgrade_settings(context $oldcontext, stdClass $oldassignment, &$log)
     {
+        Logging::logBabelium("Upgrading settings..");
         return $this->getBabeliumHelper()->upgradeSettings($oldcontext, $oldassignment, $log);
     }
 
@@ -475,6 +433,7 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function upgrade(context $oldcontext, stdClass $oldassignment, stdClass $oldsubmission, stdClass $submission, &$log)
     {
+        Logging::logBabelium("Upgrading submission...");
         return $this->getBabeliumHelper()->upgradeSubmission(
                 $this,
                 $oldcontext,

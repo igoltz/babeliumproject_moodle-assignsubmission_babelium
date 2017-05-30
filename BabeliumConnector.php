@@ -32,10 +32,17 @@ require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
 class BabeliumConnector {
 
     const DEVELOPMENT_ENVIRONMENT = 'development';
+    const MINIMUM_EXERCISE_COUNT = 0;
 
     private static $environment;
     private static $config;
     private static $babeliumService;
+    
+    private $exercises      = array();
+    private $exercisesMenu  = array();
+    private $classattribute = array(
+        'class' => 'error'
+    );
 
     function __construct() {
         global $SESSION, $CFG, $BCFG;
@@ -50,7 +57,112 @@ class BabeliumConnector {
     */
    function babeliumsubmission_get_available_exercise_list(){
        Logging::logBabelium("Getting available exercise list");
-        return $this->getBabeliumRemoteService()->getExerciseList();
+       $this->exercises = $this->getBabeliumRemoteService()->getExerciseList();
+       return $this->getExercisesMenu();
+   }
+   
+   function getExercisesMenu(){
+       $this->exercisesMenu = array();
+       if ($this->exercises && count($this->exercises) > 0) {
+            foreach ($this->exercises as $exercise) {
+                $this->exercisesMenu[$exercise['id']] = $exercise['title'];
+            }
+        }
+        return $this->exercisesMenu;
+   }
+
+    function build_settings_form_empty($mform){
+        $msg = html_writer::tag(
+            'span',
+            get_string('babeliumNoExerciseAvailable', 'assignsubmission_babelium'),
+            $this->classattribute
+        );
+        $mform->addElement(
+            'static',
+            'noexercisemessage',
+            get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'),
+            $msg
+        );
+        $mform->addElement(
+            'hidden',
+            'noexerciseavailable',
+            1
+        );
+    }
+    
+    function build_settings_form_footer($mform){
+        $mform->setType(
+            'noexerciseavailable',
+            PARAM_INT
+        );
+        $mform->disabledIf(
+            'assignsubmission_babelium_enabled',
+            'noexerciseavailable',
+            'eq',
+            1
+        );
+    }
+    
+    function build_settings_form_error($mform, $exception){
+        //html_writer::span() shortcut function is not available in Moodle versions prior to 2.5
+        //$msg = html_writer::span($e->getMessage(), 'error');
+        $msg = html_writer::tag('span', $exception->getMessage(), $this->classattribute);
+        $mform->addElement(
+            'static',
+            'assignsubmission_babelium_servererror',
+            get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'),
+            $msg
+        );
+
+        //This is a dirty hack, but it should avoid enabling Babelium submissions when server auth
+        //goes wrong for some reason.
+        $mform->addElement(
+            'hidden',
+            'noexerciseavailable',
+            1
+        );
+    }
+   
+   function build_settings_form($mform, $defaultexerciseid, $version){
+       $mform->addElement(
+            'select',
+            'assignsubmission_babelium_exerciseid',
+            get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'),
+            $this->exercisesMenu
+        );
+
+        $mform->addHelpButton(
+            'assignsubmission_babelium_exerciseid',
+            'babeliumAvailableRecordableExercises',
+            'assignsubmission_babelium'
+        );
+
+        $mform->setDefault(
+            'assignsubmission_babelium_exerciseid',
+            $defaultexerciseid
+        );
+        //Moodle 2.5 uses a checkbox to enable different submission plugins whereas prior versions use a select
+        //control. This is a dirty hack to check the version and apply a different conditional rule to each version.
+        if ($version) {
+            $mform->disabledIf(
+                'assignsubmission_babelium_exerciseid',
+                'assignsubmission_babelium_enabled',
+                'eq',
+                0
+            );
+        } 
+        else {
+            $mform->disabledIf(
+                'assignsubmission_babelium_exerciseid',
+                'assignsubmission_babelium_enabled',
+                'notchecked'
+            );
+        }
+        $mform->addElement(
+            'hidden',
+            'noexerciseavailable',
+            0
+        );
    }
 
    /**
@@ -214,4 +326,9 @@ class BabeliumConnector {
         }
         return self::$babeliumService;
     }
+
+    public function areValidExercises() {
+        return count($this->exercisesMenu) > self::MINIMUM_EXERCISE_COUNT;
+    }
+
 }
