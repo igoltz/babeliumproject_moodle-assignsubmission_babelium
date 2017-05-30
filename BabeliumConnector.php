@@ -93,14 +93,6 @@ class BabeliumConnector {
     }
     
     function build_settings_form_footer($mform){
-        //detect if error
-        //disable babelium checkbox if no exercises available found
-        $value = $this->areValidExercises() ? 1 : 0;
-        $mform->addElement(
-            'hidden',
-            'noexerciseavailable',
-            $value
-        );
         //apply if error
         $mform->setType(
             'noexerciseavailable',
@@ -169,6 +161,15 @@ class BabeliumConnector {
                 'notchecked'
             );
         }
+        
+        //detect if error
+        //disable babelium checkbox if no exercises available found
+        $value = $this->areValidExercises() ? 1 : 0;
+        $mform->addElement(
+            'hidden',
+            'noexerciseavailable',
+            $value
+        );
    }
 
    /**
