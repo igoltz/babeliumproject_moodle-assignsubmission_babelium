@@ -74,7 +74,7 @@ class assign_submission_babelium extends assign_submission_plugin
         catch (Exception $e) {
             $this->getBabeliumConnector()->build_settings_form_error($mform, $e);
         }
-        $this->getBabeliumConnector()->build_settings_footer($mform);
+        $this->getBabeliumConnector()->build_settings_form_footer($mform);
     }
 
     /**

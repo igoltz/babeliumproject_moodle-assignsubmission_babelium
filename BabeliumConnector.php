@@ -65,7 +65,9 @@ class BabeliumConnector {
        $this->exercisesMenu = array();
        if ($this->exercises && count($this->exercises) > 0) {
             foreach ($this->exercises as $exercise) {
-                $this->exercisesMenu[$exercise['id']] = $exercise['title'];
+                if(isset($exercise) && isset($exercise['id']) && isset($exercise['title'])){
+                    $this->exercisesMenu[$exercise['id']] = $exercise['title'];
+                }
             }
         }
         return $this->exercisesMenu;
@@ -91,6 +93,15 @@ class BabeliumConnector {
     }
     
     function build_settings_form_footer($mform){
+        //detect if error
+        //disable babelium checkbox if no exercises available found
+        $value = $this->areValidExercises() ? 1 : 0;
+        $mform->addElement(
+            'hidden',
+            'noexerciseavailable',
+            $value
+        );
+        //apply if error
         $mform->setType(
             'noexerciseavailable',
             PARAM_INT
@@ -158,11 +169,6 @@ class BabeliumConnector {
                 'notchecked'
             );
         }
-        $mform->addElement(
-            'hidden',
-            'noexerciseavailable',
-            0
-        );
    }
 
    /**
