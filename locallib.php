@@ -153,13 +153,9 @@ class assign_submission_babelium extends assign_submission_plugin
     public function get_babelium_form_elements(MoodleQuickForm $mform, $formdata)
     {
         global $PAGE;
-        /*$PAGE->requires->string_for_js('babeliumViewRecording', 'assignsubmission_babelium');
-        $PAGE->requires->string_for_js('babeliumViewExercise', 'assignsubmission_babelium');
-        $PAGE->requires->string_for_js('babeliumStartRecording', 'assignsubmission_babelium');
-        $PAGE->requires->string_for_js('babeliumStopRecording', 'assignsubmission_babelium');*/
         $PAGE->requires->jquery();
-
-            list($data, $exinfo, $exroles, $exlangs, $exsubs, $recinfo) = $formdata;
+        
+        list($data, $exinfo, $exroles, $exlangs, $exsubs, $recinfo) = $formdata;
 
         $roleMenu = array();
         if ($exroles && count($exroles) > 0) {
@@ -205,7 +201,6 @@ class assign_submission_babelium extends assign_submission_plugin
         $mform->addElement('html', $html_content);
         $mform->addElement('select', 'roleCombo', get_string('babeliumChooseRole', 'assignsubmission_babelium'), $roleMenu);
 
-        $mform->addRule( 'roleCombo', 'You must select enter a valid babelium exercise', 'required' );
         //TODO Currently, we only allow one language for the subtitles so this element is not needed for now
         //$mform->addElement('select', 'localeCombo', get_string('babeliumChooseSubLang', 'assignment_babelium'), $localeMenu);
 
@@ -216,14 +211,6 @@ class assign_submission_babelium extends assign_submission_plugin
         $mform->addGroup($recmethods, 'radioar', get_string('babeliumChooseRecMethod', 'assignsubmission_babelium'), array(
             ' '
         ), false);*/
-
-        //TODO check how the help dynamic popups retrieve their texts to apply the same principle to the label of these two buttons
-        /* These actions will be defined using JS
-         * $babeliumactions   = array();
-        $babeliumactions[] = $mform->createElement('button', 'startStopRecordingBtn', get_string('babeliumStartRecording', 'assignsubmission_babelium'));
-        $babeliumactions[] = $mform->createElement('button', 'viewRecordingBtn', get_string('babeliumViewRecording', 'assignsubmission_babelium'), empty($data->responsehash) ? 'style="display:none;"' : null);
-        $babeliumactions[] = $mform->createElement('button', 'viewExerciseBtn', get_string('babeliumViewExercise', 'assignsubmission_babelium'), empty($data->responsehash) ? 'style="display:none;"' : null);
-        $mform->addGroup($babeliumactions, 'babeliumActions', '', '', false);*/
     }
 
     /**

@@ -79,12 +79,13 @@ class BabeliumConnector {
             get_string('babeliumNoExerciseAvailable', 'assignsubmission_babelium'),
             $this->classattribute
         );
+        //show no exercises message
         $mform->addElement(
             'static',
             'noexercisemessage',
             get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'),
             $msg
-        );
+        );//do the trick with this value
         $mform->addElement(
             'hidden',
             'noexerciseavailable',
@@ -98,6 +99,7 @@ class BabeliumConnector {
             'noexerciseavailable',
             PARAM_INT
         );
+        //disable checkbox if noexerciseavailable == 1
         $mform->disabledIf(
             'assignsubmission_babelium_enabled',
             'noexerciseavailable',
@@ -133,6 +135,8 @@ class BabeliumConnector {
             get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'),
             $this->exercisesMenu
         );
+       $mform->addRule('assignsubmission_babelium_exerciseid', get_string('required'), 'required', null, 'server');
+       $mform->addRule('assignsubmission_babelium_exerciseid','Please select a valid babelium exercise','required');
 
         $mform->addHelpButton(
             'assignsubmission_babelium_exerciseid',
@@ -335,6 +339,7 @@ class BabeliumConnector {
     }
 
     public function areValidExercises() {
+        Logging::logBabelium("Checking for exercise validity...");
         return count($this->exercisesMenu) > self::MINIMUM_EXERCISE_COUNT;
     }
 

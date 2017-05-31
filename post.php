@@ -26,7 +26,7 @@ function processStudentAudioPostRequest(){
     $helper = new BabeliumHelper();
     //save audio first on mooodle server, temp location. just in case redirection does not work
     $response = $helper->saveAudioDataResponse($audio_stream, $audio_len, $upload_name);
-    if($response == 'success'){
+    if($response == 'success' || true){
         $response = $helper->redirectAudioToBabelium(
                 $audio_stream,
                 $idexercise,
