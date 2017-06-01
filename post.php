@@ -7,6 +7,9 @@ require_once './BabeliumHelper.php';
 if ( $_SERVER['REQUEST_METHOD'] == 'POST' ){
     processStudentAudioPostRequest();
 }
+else{
+    echo "GET request";
+}
 
 function processStudentAudioPostRequest(){
     Logging::logBabelium("Processing POST request");

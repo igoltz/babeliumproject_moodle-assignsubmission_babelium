@@ -6,11 +6,7 @@ var host = "//babelium-server-dev.irontec.com/api/v3";
 var contentServerUrl = "//babelium-server-dev.irontec.com/";
 var debug_enabled = true;
 
-var audioPostUrl = "https://babelium-dev.irontec.com/mod/assign/submission/babelium/post.php"
-if(debug_enabled){
-    audioPostUrl = "http://192.167.1.3/mod/assign/submission/babelium/post.php"
-}
-
+var audioPostUrl = "//babelium-dev.irontec.com/mod/assign/submission/babelium/post.php"
 window.onload = function() {
     debug("babelium.core.js::onload()");
     if(window.jQuery === undefined || $ === undefined){
@@ -48,18 +44,23 @@ function overwriteFormControl() {
     var buttonId = 'id_submitbutton';
     var submission = document.getElementById(buttonId);
     if(submission !== undefined){
-        submission.addEventListener("click", onSubmissionDoneListener);
+        submission.addEventListener("click", function(event){
+            onSubmissionDoneListener(event);
+        });
     }
 
     //cancel button
     var buttonId = 'id_cancel';
     var submission = document.getElementById(buttonId);
     if(submission !== undefined){
-        submission.addEventListener("click", onSubmissionCancelledListener);
+        submission.addEventListener("click", function(event){
+            onSubmissionCancelledListener(event);
+        });
     }
 }
 
-function onSubmissionCancelledListener() {
+function onSubmissionCancelledListener(event) {
+    event.preventDefault();
     var url = window.location.href;
     url = url.replace("editsubmission", "view");
     window.location.href = url;
@@ -94,6 +95,7 @@ function rpc(method, url, onSuccess, onError){
     // Request with custom header
     jQuery.ajax(
         {
+            type: method,
             url: url,
             success: function(xhr, ajaxOptions, thrownError){
                 if(onSuccess !== undefined){
@@ -195,9 +197,10 @@ function onAudioStreamReceived(audioStream) {
     }
 }
 
-function onSubmissionDoneListener() {
+function onSubmissionDoneListener(event) {
     debug("babelium.core.js::onSubmissionDoneListener()");
 
+    event.preventDefault();
     //1 make ajax call to moodle middleware
     var onSuccess = function(data, textStatus, xhr){
         //2 audio post was ok. send data to moodle using its form
@@ -206,9 +209,7 @@ function onSubmissionDoneListener() {
         if(sumbissionForm !== undefined){
             sumbissionForm.elements["recordedRole"].value = getRecordedRole();
             sumbissionForm.elements["responsehash"].value = getResponseHash();
-            if(!debug_enabled){
-                sumbissionForm.submit();
-            }
+            //sumbissionForm.submit();
         }
     };
     var onError = function(data, textStatus, xhr){
@@ -269,11 +270,22 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
         fd.append("rolename",   getRecordedRole());
         fd.append("responsehash",   getResponseHash());
 
-        var method01 = false;
-        if(method01){
+        var method01 = 3;
+        if(method01 == 1){
             var request = new XMLHttpRequest();
             request.open("POST", audioPostUrl);
             request.send(fd);
+        }
+        else if(method01 == 2){
+            debug("babelium.core.js::demo get request to moodle()");
+            var onSuccess = function(response, ajaxOptions, thrownError){
+                console.log("demo request response: "+response);
+            };
+            var onError = function(response, ajaxOptions, thrownError){
+                console.log("demo request error response: "+response);
+            };
+            rpc("POST", audioPostUrl, onSuccess, onError);
+
         }
         else{
             $.ajax({
