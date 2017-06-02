@@ -153,5 +153,6 @@ function initRecorder() {
     recorder = new Recorder(input, config);
     cstm_log('Recorder initialised.');
     recorderLoaded = true;
+    recording_permission_granted = true;
  }
 
