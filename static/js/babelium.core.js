@@ -258,6 +258,10 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
         var timestamp = new Date().getTime();
         var newMediaUrl = baseUrl + "resp-"+timestamp+".flv";
 
+        //convert last audio data to base64
+        if(lastRecordedAudio!== undefined && lastRecordedAudio.length > 0){
+            lastRecordedAudio = btoa(lastRecordedAudio);
+        }
         fd.append("audiostream", lastRecordedAudio);
         fd.append("audiolen",   lastRecordedAudio.length);
         fd.append("audioname",  timestamp);

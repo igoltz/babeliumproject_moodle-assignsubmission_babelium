@@ -7,48 +7,88 @@
  var recorderLoaded = false;
  var showProgressDialog = true;
  var lastRecordedAudio = [];
-
+ var recording_permission_granted = false;
  function cstm_log(e, data) {
     log.innerHTML += "\n" + e + " " + (data || '');
  }
 
  function startRecording() {
-    //check if secure origin
-    if (location.protocol === 'http:') {
-        swal("Recording disabled", "For security reasons, audio recording is disabled on non HTTPS websites" ,"error");
-        autoStopVideo();
-    }
-    else{
-        if(!is_recording){
-            if(recorder !== undefined){
-                recorder.record();
-                recorder && recorder.stop();
-                recorder && recorder.record();
-                cstm_log('Recording...');
-                is_recording = true;
+    if(recording_permission_granted){
+        //check if secure origin
+        if (location.protocol === 'http:') {
+            swal("Recording disabled", "For security reasons, audio recording is disabled on non HTTPS websites" ,"error");
+            autoStopVideo();
+        }
+        else{
+            if(!is_recording){
+                if(recorder !== undefined){
+                    recorder.record();
+                    recorder && recorder.stop();
+                    recorder && recorder.record();
+                    cstm_log('Recording...');
+                    is_recording = true;
+                }
             }
         }
     }
+    else{
+        swal({
+            title: "Allow microphone",
+            text: "Please, allow microphone access before recording",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Allow",
+            closeOnConfirm: true
+            },
+            function(){
+                checkPermissions('microphone');
+            }
+        );
+    }
  }
 
- function stopRecording() {
-    if(is_recording){
-        is_recording = false;
-        if(recorder!==undefined){
-            recorder && recorder.stop();
-            autoStopVideo();
-            cstm_log('Stopped recording.');
-            cstm_log('Creating audio link...');
-            // create WAV download link using audio data blob
-            createDownloadLink();
-            recorder.clear();
+ function checkPermissions(permissionName, descriptor){
+    if(!recording_permission_granted){
+        initRecorder();
+        //request required permissions
+        //mic only for now
+        navigator.permissions.query(descriptor || {
+            name: permissionName
+        })
+        .then(function(result) {
+        if (result.state == 'granted') {
+            recording_permission_granted = true;
+        } else if (result.state == 'prompt') {
+            recording_permission_granted = false;
+        } else if (result.state == 'denied') {
+            recording_permission_granted = false;
         }
+        result.onchange = function() {
+            console.log("permission changed");
+        };
+    });
+
     }
-    else{
-        //shoe error
-        sweetAlert("Babelium recorder", "You have to start a record first", "error");
-    }
-    setStatus("Audio recording controls");
+}
+
+ function stopRecording() {
+        if(is_recording){
+            is_recording = false;
+            if(recorder!==undefined){
+                recorder && recorder.stop();
+                autoStopVideo();
+                cstm_log('Stopped recording.');
+                cstm_log('Creating audio link...');
+                // create WAV download link using audio data blob
+                createDownloadLink();
+                recorder.clear();
+            }
+        }
+        else{
+            //shoe error
+            sweetAlert("Babelium recorder", "You have to start a record first", "error");
+        }
+        setStatus("Audio recording controls");
  }
 
 function initRecorder() {
@@ -114,3 +154,4 @@ function initRecorder() {
     cstm_log('Recorder initialised.');
     recorderLoaded = true;
  }
+
