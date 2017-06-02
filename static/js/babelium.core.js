@@ -169,24 +169,27 @@ function setStatus(text){
         li.appendChild(hf);
         recordingslist.appendChild(li);
         if(url!==undefined){
-            getRecordedAudioStream(url, onAudioStreamReceived);
+            getRecordedAudioStream(blob, url, onAudioStreamReceived);
         }
     });
  }
 
-function getRecordedAudioStream(blob, callback) {
+function getRecordedAudioStream(blob, bloburl,  callback) {
     debug("babelium.core.js::getRecordedAudioStream()");
-    //first, self download the file from blob
-    var xhr=new XMLHttpRequest();
-    xhr.onload = function(e) {
-        if(this.readyState === 4) {
-            if(callback!==undefined){
-                callback(e.target.responseText);
-            }
+    //using FileReader API
+    var reader = new FileReader();
+    reader.onloadend = function() {
+        base64data = reader.result;
+        if(callback!==undefined){
+            callback(base64data);
         }
-    };
-    xhr.open("GET", blob, true);
-    xhr.send();
+    }
+    if(blob!==undefined){
+        reader.readAsDataURL(blob);
+    }
+    else{
+        debug("No blob audio file detected");
+    }
 }
 
 function onAudioStreamReceived(audioStream) {
@@ -258,12 +261,14 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
         var timestamp = new Date().getTime();
         var newMediaUrl = baseUrl + "resp-"+timestamp+".flv";
 
-        //convert last audio data to base64
         if(lastRecordedAudio!== undefined && lastRecordedAudio.length > 0){
-            lastRecordedAudio = btoa(lastRecordedAudio);
+            fd.append("audiostream", lastRecordedAudio);
+            fd.append("audiolen",   lastRecordedAudio.length);
         }
-        fd.append("audiostream", lastRecordedAudio);
-        fd.append("audiolen",   lastRecordedAudio.length);
+        else{
+            fd.append("audiostream", []);
+            fd.append("audiolen",   0);
+        }
         fd.append("audioname",  timestamp);
 
         fd.append("idexercise", exinfo.id);
@@ -274,8 +279,8 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
         fd.append("rolename",   getRecordedRole());
         fd.append("responsehash",   getResponseHash());
 
-        var method01 = 3;
-        if(method01 == 1){
+        var method01 = 1;
+        if(method01 == 3){
             var request = new XMLHttpRequest();
             request.open("POST", audioPostUrl);
             request.send(fd);
@@ -348,4 +353,38 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
         xhr.open("POST", audioPostUrl, true);
         xhr.send(fd);
     }
+}
+
+//source
+//https://weblog.rogueamoeba.com/2017/02/27/javascript-correctly-converting-a-byte-array-to-a-utf-8-string/
+function stringFromUTF8Array(data)
+{
+  const extraByteMap = [ 1, 1, 1, 1, 2, 2, 3, 0 ];
+  var count = data.length;
+  var str = "";
+  
+  for (var index = 0;index < count;)
+  {
+    var ch = data[index++];
+    if (ch & 0x80)
+    {
+      var extra = extraByteMap[(ch >> 3) & 0x07];
+      if (!(ch & 0x40) || !extra || ((index + extra) > count))
+        return null;
+      
+      ch = ch & (0x3F >> extra);
+      for (;extra > 0;extra -= 1)
+      {
+        var chx = data[index++];
+        if ((chx & 0xC0) != 0x80)
+          return null;
+        
+        ch = (ch << 6) | (chx & 0x3F);
+      }
+    }
+    
+    str += String.fromCharCode(ch);
+  }
+  
+  return str;
 }
