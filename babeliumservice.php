@@ -343,23 +343,28 @@ class babeliumservice{
     public function saveStudentExerciseOnBabelium($params) {
         $headers = $this->build_headers();
         $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/response";
-        return $this->makeApiV3Request($request_url, $headers, $params);
+        return $this->makeApiV3Request($request_url, $headers, $params, false);
     }
     
     public function saveStudentAudioOnBabelium($params) {
         $headers = $this->build_headers();
         $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/response";
-        return $this->makeApiV3Request($request_url, $headers, $params);
+        return $this->makeApiV3Request($request_url, $headers, $params, false);
     }
     
-    private function makeApiV3Request($request_url, $headers, $params = null){
+    private function makeApiV3Request($request_url, $headers, $params = null, $decode = true){
         Logging::logBabelium("Requesting ".$request_url);
         //Check if proxy (if used) should be bypassed for this url
         $proxybypass = function_exists('is_proxybypass') ? is_proxybypass($request_url) : false;
         $result = $this->make_request($headers, $request_url, $params);
         //Parses the response output to separate the headers from the body of the response
         //$this->parseCurlOutput($result);
-        return $this->decodeJsonResponse($result);
+        if($decode){
+            return $this->decodeJsonResponse($result);
+        }
+        else{
+            return $result;
+        }
     }
 
     /**

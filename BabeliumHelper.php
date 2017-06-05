@@ -1,6 +1,7 @@
 <?php
 
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
+require_once($CFG->dirroot . '/mod/assign/submission/babelium/BabeliumConnector.php');
 
 /**
 * BabeliumHelper class that contains BabeliumPlugin Business Logic
@@ -596,7 +597,7 @@ class BabeliumHelper
        Logging::logBabelium("Redirecting user audio stream to babelium server");
        $connector = new BabeliumConnector();
        //save student response on babelium
-       $audioresponsedata =  $connector->saveStudentExerciseOnBabelium(
+       return $connector->saveStudentExerciseOnBabelium(
             $idstudent,
             $idexercise,
             $idsubtitle,
@@ -604,7 +605,6 @@ class BabeliumHelper
             $responsehash,
             $audio_stream
         );
-       return $audioresponsedata;
    }
 
     public function babeliumsubmission_html_output_error($submission) {
