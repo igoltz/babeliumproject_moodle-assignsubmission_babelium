@@ -136,23 +136,31 @@ function initRecorder() {
  };
 
   function startUserMedia(stream) {
-    var input = audio_context.createMediaStreamSource(stream);
-    cstm_log('Media stream created.');
-    // Uncomment if you want the audio to feedback directly
-    //input.connect(audio_context.destination);
-    //cstm_log('Input connected to audio context destination.');
+    //detecting mics
+    var mics = stream.getAudioTracks().length;
+    if(mics > 0){
+        console.log("Audio tracks detected: "+mics);
+        var input = audio_context.createMediaStreamSource(stream);
+        cstm_log('Media stream created.');
+        // Uncomment if you want the audio to feedback directly
+        //input.connect(audio_context.destination);
+        //cstm_log('Input connected to audio context destination.');
+    
+        //custom recorder settings
+        config = {
+            sampleRate : 48000, // 48kbps = 48000 sample rate in bits,
+            numChannels: 1,
+            bufferLen: 1024
+        };
+        cstm_log('Setting recorder configuration...');
 
-    //custom recorder settings
-    config = {
-        sampleRate : 48000, // 48kbps = 48000 sample rate in bits,
-        numChannels: 1,
-        bufferLen: 1024
-    };
-    cstm_log('Setting recorder configuration...');
-
-    recorder = new Recorder(input, config);
-    cstm_log('Recorder initialised.');
-    recorderLoaded = true;
-    recording_permission_granted = true;
+        recorder = new Recorder(input, config);
+        cstm_log('Recorder initialised.');
+        recorderLoaded = true;
+        recording_permission_granted = true;
+    }
+    else{
+        sweetAlert("Oops...", "No recording microphones detected", "error");
+    }
  }
 
