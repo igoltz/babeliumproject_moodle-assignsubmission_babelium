@@ -548,23 +548,24 @@ class BabeliumHelper
             chmod($dataDir, 0777);
         }
         //check length first
-        $len = count($audio_stream);
-        if($len !== $audio_len){
+        $len = strlen($audio_stream);
+        if($len != $audio_len){
             Logging::logBabelium("ERROR: invalid audio length was detected. Declared length was ".$audio_len." and detected length is ".$len);
-            return "An error was detected while saving the audio file.";
+            return "Declared audio source length does not match with received audio length";
         }
         else{
             //save the audio in temp dir.
             $type = "audio/x-wav";
             $filename = $dataDir."/".$upload_name;
             $saved = 0;
-
             $fp = fopen($filename, 'a+');
-            $result = fwrite($fp, $audio_stream) ;
+            //convert audio stream to byte array from base64
+            $decoded = base64_decode($audio_stream);
+            $result = fwrite($fp, $decoded) ;
             if($result === FALSE){
                 Logging::logBabelium("fwrite() returned false so an error happen when writing file on disk, please check permissions");
                 echo "An error was detected while writing the file";
-                exit;
+                die();
             }
             $saved = $result ? 1 : 0;
             if($saved){
@@ -579,7 +580,7 @@ class BabeliumHelper
     }
 
     /**
-    * Checks if a folder exist and return canonicalized absolute pathname (sort version)
+    * Checks if dir exist and return canonicalized absolute pathname (sort version)
     * @param string $folder the path being checked.
     * @return mixed returns the canonicalized absolute pathname on success otherwise FALSE is returned
     */
@@ -595,7 +596,7 @@ class BabeliumHelper
        Logging::logBabelium("Redirecting user audio stream to babelium server");
        $connector = new BabeliumConnector();
        //save student response on babelium
-       $responsedata =  $connector->saveStudentExerciseOnBabelium(
+       $audioresponsedata =  $connector->saveStudentExerciseOnBabelium(
             $idstudent,
             $idexercise,
             $idsubtitle,

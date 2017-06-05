@@ -13,8 +13,16 @@ else{
 
 function processStudentAudioPostRequest(){
     Logging::logBabelium("Processing POST request");
+    $header = 'data:audio/wav;base64,';
     $audio_stream = $_POST["audiostream"];
+    //clean audio stream
+    if(isset($audio_stream)){
+        Logging::logBabelium("Removing base64 stream header...");
+        $audio_stream = str_replace($header, '', $audio_stream);
+    }
     $audio_len =    $_POST["audiolen"];
+    //convert len to int
+    $audio_len = intval($audio_len) - strlen($header);
     $upload_name =  $_POST["audioname"];
     
     $idexercise =  $_POST["idexercise"];
@@ -29,7 +37,7 @@ function processStudentAudioPostRequest(){
     $helper = new BabeliumHelper();
     //save audio first on mooodle server, temp location. just in case redirection does not work
     $response = $helper->saveAudioDataResponse($audio_stream, $audio_len, $upload_name);
-    if($response == 'success' || true){
+    if($response == 'success'){
         $response = $helper->redirectAudioToBabelium(
                 $audio_stream,
                 $idexercise,
