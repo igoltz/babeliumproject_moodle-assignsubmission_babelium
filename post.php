@@ -46,9 +46,21 @@ function processStudentAudioPostRequest(){
                 $rolename,
                 $responsehash
         );
-        if($response == 'success'){
+        $valid = isset($response) && $response['id'];
+        $responseId = intval($response['id']);
+        if($valid){
             //delete temp audio from moodle server
             $response = $helper->deleteTempAudioFile($upload_name);
+            //link response to user
+            $response = $helper->saveBabeliumResponse(
+                $idexercise,
+                $idmedia,
+                $idstudent,
+                $idsubtitle,
+                $rolename,
+                $responseId,
+                $response
+            );
         }
     }
     

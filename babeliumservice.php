@@ -339,17 +339,10 @@ class babeliumservice{
         return $this->makeApiV3Request($request_url, $headers);
     }
     
-    
     public function saveStudentExerciseOnBabelium($params) {
         $headers = $this->build_headers();
         $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/response";
-        return $this->makeApiV3Request($request_url, $headers, $params, false);
-    }
-    
-    public function saveStudentAudioOnBabelium($params) {
-        $headers = $this->build_headers();
-        $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/response";
-        return $this->makeApiV3Request($request_url, $headers, $params, false);
+        return $this->makeApiV3Request($request_url, $headers, $params);
     }
     
     private function makeApiV3Request($request_url, $headers, $params = null, $decode = true){

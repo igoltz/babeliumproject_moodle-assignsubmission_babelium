@@ -513,7 +513,8 @@ class BabeliumHelper
                 $babeliumcontent = '';
                 $responseid = $babeliumsubmission->responseid;
                 $response_data = $plugin->getBabeliumConnector()->babeliumsubmission_get_response_data($responseid);
-                if (isset($response_data)){
+                $hasValidData = isset($response_data);
+                if ($hasValidData){
                     $babeliumcontent = $this->babeliumsubmission_html_exercise_done_view_output($response_data['info'], $response_data['subtitles'], null);
                 }
                 else{
@@ -651,6 +652,12 @@ class BabeliumHelper
             $output .= '</div>';
         }
         return $output;
+    }
+
+    public function saveBabeliumResponse($idexercise, $idmedia, $idstudent, $idsubtitle, $rolename, $responseId, $response) {
+        
+        $returnValue = "failed";
+        return $returnValue;
     }
 
 }
