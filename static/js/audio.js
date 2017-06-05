@@ -2,12 +2,13 @@
  var extension;
  var audio_context;
  var recorder;
- var audio_recorded = false;
  var is_recording = false;
  var recorderLoaded = false;
  var showProgressDialog = true;
  var lastRecordedAudio = [];
  var recording_permission_granted = false;
+ var audio_recorded = false;
+
  function cstm_log(e, data) {
     log.innerHTML += "\n" + e + " " + (data || '');
  }
@@ -22,6 +23,7 @@
         else{
             if(!is_recording){
                 if(recorder !== undefined){
+                    audio_recorded = false;
                     recorder.record();
                     recorder && recorder.stop();
                     recorder && recorder.record();
@@ -82,6 +84,7 @@
                 // create WAV download link using audio data blob
                 createDownloadLink();
                 recorder.clear();
+                audio_recorded = true;
             }
         }
         else{
