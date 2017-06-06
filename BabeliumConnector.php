@@ -22,6 +22,7 @@
 */
 
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/babeliumservice.php');
+require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
 
 /**
  * Description of BabeliumConnector. A simple Class to connect to Babelium RPC
@@ -31,9 +32,17 @@ require_once($CFG->dirroot . '/mod/assign/submission/babelium/babeliumservice.ph
 class BabeliumConnector {
 
     const DEVELOPMENT_ENVIRONMENT = 'development';
+    const MINIMUM_EXERCISE_COUNT = 0;
+
     private static $environment;
     private static $config;
     private static $babeliumService;
+    
+    private $exercises      = array();
+    private $exercisesMenu  = array();
+    private $classattribute = array(
+        'class' => 'error'
+    );
 
     function __construct() {
         global $SESSION, $CFG, $BCFG;
@@ -47,7 +56,127 @@ class BabeliumConnector {
     * 		An array of exercise data if successful or false on error/when empty query results
     */
    function babeliumsubmission_get_available_exercise_list(){
-        return $this->getBabeliumRemoteService()->getExerciseList();
+       Logging::logBabelium("Getting available exercise list");
+       $this->exercises = $this->getBabeliumRemoteService()->getExerciseList();
+       return $this->getExercisesMenu();
+   }
+   
+   function getExercisesMenu(){
+       $this->exercisesMenu = array();
+       if ($this->exercises && count($this->exercises) > 0) {
+            foreach ($this->exercises as $exercise) {
+                if(isset($exercise) && isset($exercise['id']) && isset($exercise['title'])){
+                    $this->exercisesMenu[$exercise['id']] = $exercise['title'];
+                }
+            }
+        }
+        return $this->exercisesMenu;
+   }
+
+    function build_settings_form_empty($mform){
+        $msg = html_writer::tag(
+            'span',
+            get_string('babeliumNoExerciseAvailable', 'assignsubmission_babelium'),
+            $this->classattribute
+        );
+        //show no exercises message
+        $mform->addElement(
+            'static',
+            'noexercisemessage',
+            get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'),
+            $msg
+        );//do the trick with this value
+        $mform->addElement(
+            'hidden',
+            'noexerciseavailable',
+            1
+        );
+    }
+    
+    function build_settings_form_footer($mform){
+        //apply if error
+        $mform->setType(
+            'noexerciseavailable',
+            PARAM_INT
+        );
+        //disable checkbox if noexerciseavailable == 1
+        $mform->disabledIf(
+            'assignsubmission_babelium_enabled',
+            'noexerciseavailable',
+            'eq',
+            1
+        );
+    }
+    
+    function build_settings_form_error($mform, $exception){
+        //html_writer::span() shortcut function is not available in Moodle versions prior to 2.5
+        //$msg = html_writer::span($e->getMessage(), 'error');
+        $msg = html_writer::tag('span', $exception->getMessage(), $this->classattribute);
+        $mform->addElement(
+            'static',
+            'assignsubmission_babelium_servererror',
+            get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'),
+            $msg
+        );
+
+        //This is a dirty hack, but it should avoid enabling Babelium submissions when server auth
+        //goes wrong for some reason.
+        $mform->addElement(
+            'hidden',
+            'noexerciseavailable',
+            1
+        );
+    }
+   
+   function build_settings_form($mform, $defaultexerciseid, $version){
+       $mform->addElement(
+            'select',
+            'assignsubmission_babelium_exerciseid',
+            get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'),
+            $this->exercisesMenu
+        );
+       //como el tipo de ejercicio no siempre va a ser de tipo babelium,
+       //no se puede forzar de momento el que este seleccionado un ejericio babelium
+       //si la entrega es de subir un fichero normal, por ejemplo.
+       //$mform->addRule('assignsubmission_babelium_exerciseid', get_string('required'), 'required', null, 'server');
+       //$mform->addRule('assignsubmission_babelium_exerciseid','Please select a valid babelium exercise','required');
+
+        $mform->addHelpButton(
+            'assignsubmission_babelium_exerciseid',
+            'babeliumAvailableRecordableExercises',
+            'assignsubmission_babelium'
+        );
+
+        $mform->setDefault(
+            'assignsubmission_babelium_exerciseid',
+            $defaultexerciseid
+        );
+        //Moodle 2.5 uses a checkbox to enable different submission plugins whereas prior versions use a select
+        //control. This is a dirty hack to check the version and apply a different conditional rule to each version.
+        if ($version) {
+            $mform->disabledIf(
+                'assignsubmission_babelium_exerciseid',
+                'assignsubmission_babelium_enabled',
+                'eq',
+                0
+            );
+        } 
+        else {
+            $mform->disabledIf(
+                'assignsubmission_babelium_exerciseid',
+                'assignsubmission_babelium_enabled',
+                'notchecked'
+            );
+        }
+        
+        //detect if error
+        //disable babelium checkbox if no exercises available found
+        $value = $this->areValidExercises() ? 0 : 1;
+        $mform->addElement(
+            'hidden',
+            'noexerciseavailable',
+            $value
+        );
    }
 
    /**
@@ -58,23 +187,24 @@ class BabeliumConnector {
     * 		An associative array with the info, the roles, the languages and the subtitle lines of the exercise, or false on error/when empty query results
     */
    function babeliumsubmission_get_exercise_data($exerciseid,$responseid=0){
+       Logging::logBabelium("Getting exercise data");
            $g = $this->getBabeliumRemoteService();
            $data = null;
            if($responseid){
-                   $data = $g->getResponseInformation($responseid);
-                    if(!$data){
-                        return null;
-                    }
-                   $subtitleId = isset($data['subtitleId']) ? $data['subtitleId'] : 0;
-                   $mediaId= isset($data['mediaId']) ? $data['mediaId']: 0;
+                $data = $g->getResponseInformation($responseid);
+                 if(!$data){
+                     return null;
+                 }
+                $subtitleId = isset($data['subtitleId']) ? $data['subtitleId'] : 0;
+                $mediaId= isset($data['mediaId']) ? $data['mediaId']: 0;
            } else {
-                   $data = $g->getExerciseInformation($exerciseid);
-                   if(!$data){
-                        return null;
-                    }
-                   $media = $data['media'];
-                   $subtitleId = isset($media['subtitleId']) ? $media['subtitleId'] : 0;
-                   $mediaId= isset($media['id']) ? $media['id']: 0;
+                $data = $g->getExerciseInformation($exerciseid);
+                if(!$data){
+                     return null;
+                 }
+                $media = $data['media'];
+                $subtitleId = isset($media['subtitleId']) ? $media['subtitleId'] : 0;
+                $mediaId= isset($media['id']) ? $media['id']: 0;
            }
            $captions = $g->getCaptions($subtitleId,$mediaId);
            if(!$captions){
@@ -97,6 +227,7 @@ class BabeliumConnector {
     * 		An associative array with the info, the roles, the languages and the subtitle lines of the response, or false on error/when empty query results
     */
   function babeliumsubmission_get_response_data($responseid){
+      Logging::logBabelium("Getting response data");
     $g = $this->getBabeliumRemoteService();
     $data = $g->getResponseInformation($responseid);
     $captions = null;
@@ -114,7 +245,6 @@ class BabeliumConnector {
       return $this->getResponseInfo($data, $captions, $exerciseRoles, $recinfo);
     }
   }
-
    /**
     * Saves the data of a new response recorded using the plugin
     * @param int $exerciseId
@@ -130,8 +260,10 @@ class BabeliumConnector {
     * @return mixed $responseData
     * 		Array with information about the newly saved response, or false on error
     */
-   function babeliumsubmission_save_response_data($exerciseId, $subtitleId, $recordedRole, $responseName){
-           $parameters = array(
+   public function saveStudentExerciseOnBabelium($idstudent, $idexercise, $idsubtitle, $rolename, $responsehash, $audio_stream){
+       /**
+        * OLD WAY:
+        * $parameters = array(
                                    "exerciseId" => $exerciseId,
                                    "subtitleId" => $subtitleId,
                                    "characterName" => $recordedRole,
@@ -140,16 +272,22 @@ class BabeliumConnector {
            return $responsedata = $this
                    ->getBabeliumRemoteService()
                    ->newServiceCall('admSaveResponse', $parameters);
+        */
+       Logging::logBabelium("Saving student submission & audio on Babelium");
+        $parameters = array(
+            "studentId" => $idstudent,
+            "exerciseId" => $idexercise,
+            "subtitleId" => $idsubtitle,
+            "characterName" => $rolename,
+            "responsehash" => $responsehash,
+            "audio" => $audio_stream
+        );
+       $g = $this->getBabeliumRemoteService();
+       return $g->saveStudentExerciseOnBabelium($parameters);
    }
-
-    public function getBabeliumRemoteService(){
-        if(!isset(self::$babeliumService)){
-            self::$babeliumService = new babeliumservice();
-        }
-        return self::$babeliumService;
-    }
-
+    
     public function getExerciseRoles($captions){
+        Logging::logBabelium("Getting exercise roles");
         $exerciseRoles = array();
         if(isset($captions)){
           foreach($captions as $subline){
@@ -169,7 +307,7 @@ class BabeliumConnector {
     }
 
     public function getResponseInfo($data, $captions, $exerciseRoles, $recinfo) {
-
+        Logging::logBabelium("Getting response info");
       $validData = isset($data)
       && isset($captions)
       && isset($captions[0])
@@ -194,6 +332,18 @@ class BabeliumConnector {
         //TODO add logging for failure
         return;
       }
+    }
+    
+    public function getBabeliumRemoteService(){
+        if(!isset(self::$babeliumService)){
+            self::$babeliumService = new babeliumservice();
+        }
+        return self::$babeliumService;
+    }
+
+    public function areValidExercises() {
+        Logging::logBabelium("Checking for exercise validity...");
+        return count($this->exercisesMenu) > self::MINIMUM_EXERCISE_COUNT;
     }
 
 }

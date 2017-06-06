@@ -24,6 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
+
+Logging::logBabelium("Reading plugin version parameters...");
+
 $plugin->version   = 2015120500;
 $plugin->release   = '2.0';
 
@@ -33,3 +37,5 @@ $plugin->requires  = 2014051200;
 $plugin->component = 'assignsubmission_babelium';
 $plugin->cron      = 0;
 $plugin->maturity  = MATURITY_STABLE;
+
+Logging::logBabelium("Plugin parameters read DONE!");
