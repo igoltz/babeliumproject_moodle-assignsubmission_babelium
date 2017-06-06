@@ -92,6 +92,7 @@ function execute_post_request($audio_stream, $audio_len, $upload_name, $idexerci
         );
         $valid = isset($response) && $response['id'];
         $responseId = intval($response['id']);
+        //var_dump($response);
         if($valid){
             //delete temp audio from moodle server
             $response = $helper->deleteTempAudioFile($upload_name);
@@ -105,6 +106,7 @@ function execute_post_request($audio_stream, $audio_len, $upload_name, $idexerci
                 $responseId,
                 $response
             );
+            echo "Save data in moodle response: ".$response.PHP_EOL;
         }
     }
     
