@@ -8,6 +8,7 @@
  var lastRecordedAudio = [];
  var recording_permission_granted = false;
  var audio_recorded = false;
+ var is_page_insecure_msg_shown = false;
 
  function cstm_log(e, data) {
     log.innerHTML += "\n" + e + " " + (data || '');
@@ -54,22 +55,26 @@
         initRecorder();
         //request required permissions
         //mic only for now
-        navigator.permissions.query(descriptor || {
-            name: permissionName
-        })
-        .then(function(result) {
-        if (result.state == 'granted') {
-            recording_permission_granted = true;
-        } else if (result.state == 'prompt') {
-            recording_permission_granted = false;
-        } else if (result.state == 'denied') {
-            recording_permission_granted = false;
+        try{
+            navigator.permissions.query(descriptor || {
+                name: permissionName
+            })
+            .then(function(result) {
+                if (result.state == 'granted') {
+                    recording_permission_granted = true;
+                } else if (result.state == 'prompt') {
+                    recording_permission_granted = false;
+                } else if (result.state == 'denied') {
+                    recording_permission_granted = false;
+                }
+                result.onchange = function() {
+                    console.log("permission changed");
+                };
+            });
         }
-        result.onchange = function() {
-            console.log("permission changed");
-        };
-    });
-
+        catch(err){
+            console.log(err);
+        }
     }
 }
 
@@ -105,12 +110,15 @@ function initRecorder() {
         //check if secure origin
         if (location.protocol === 'http:') {
             // page is in-secure
-            document.body.innerHTML = '\
-            <div class="alert alert-danger">\
-            <strong>RECORDING DISABLED!</strong>\
-            For security reasons, audio recording is disabled on non HTTPS locations\
-            </div>'
-            + document.body.innerHTML;
+            if(!is_page_insecure_msg_shown){
+                document.body.innerHTML = '\
+                <div class="alert alert-danger">\
+                <strong>RECORDING DISABLED!</strong>\
+                For security reasons, audio recording is disabled on non HTTPS locations\
+                </div>'
+                + document.body.innerHTML;
+                is_page_insecure_msg_shown = true;
+            }
         }
         try {
             // webkit shim
@@ -148,7 +156,7 @@ function initRecorder() {
         // Uncomment if you want the audio to feedback directly
         //input.connect(audio_context.destination);
         //cstm_log('Input connected to audio context destination.');
-    
+
         //custom recorder settings
         config = {
             sampleRate : 48000, // 48kbps = 48000 sample rate in bits,
