@@ -655,9 +655,7 @@ class BabeliumHelper
     }
 
     public function saveBabeliumResponse($idexercise, $idmedia, $idstudent, $idsubtitle, $rolename, $responseId, $response) {
-        
-        $returnValue = "failed";
+        $returnValue = '{"error":"save babelium response not implemented yet."}';
         return $returnValue;
     }
-
 }
