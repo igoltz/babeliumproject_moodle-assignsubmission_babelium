@@ -223,6 +223,7 @@ class assign_submission_babelium extends assign_submission_plugin
     public function save(stdClass $submission, stdClass $data)
     {
         Logging::logBabelium("Saving user response for submission...");
+        var_dump($_GET, $_POST, $submission, $data);        
         return; //temp
         global $USER, $DB;
 

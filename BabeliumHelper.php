@@ -659,6 +659,22 @@ class BabeliumHelper
 
     public function saveBabeliumResponse($idexercise, $idmedia, $idstudent, $idsubtitle, $rolename, $responseId, $response) {
         $returnValue = '{"error":"save babelium response not implemented yet."}';
-        return $returnValue;
+        //attempt to save it on babelium db
+        $babeliumsubmission               = new stdClass();
+        $babeliumsubmission->responseid   = $unixTime; //internal id based on unix time
+        $babeliumsubmission->responsehash = $responseId; //response id returned by the server
+        
+        var_dump($babeliumsubmission);die();
+
+        /*
+         * temp
+        $babeliumsubmission->submission = $submission->id;
+        $babeliumsubmission->assignment = $plugin->assignment->get_instance()->id;
+
+        if (!$DB->insert_record(self::ASSIGNSUBMISSION_BABELIUM, $babeliumsubmission)){
+            return $returnValue;
+        }
+         */
+        return "success";
     }
 }
