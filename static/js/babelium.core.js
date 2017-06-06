@@ -278,12 +278,14 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
         fd.append("audioname",  timestamp);
 
         fd.append("idexercise", exinfo.id);
-        fd.append("idmedia",  exinfo.media.id);
+        fd.append("idmedia", exinfo.media.id);
         fd.append("idsubtitle", exinfo.media.subtitleId);
-        fd.append("mediaUrl",   newMediaUrl);
+        fd.append("mediaUrl", newMediaUrl);
+        fd.append("idstudent", -1);
 
-        fd.append("rolename",   getRecordedRole());
-        fd.append("responsehash",   getResponseHash());
+
+        fd.append("rolename", getRecordedRole());
+        fd.append("responsehash", getResponseHash());
 
         var method01 = 1;
         if(method01 == 3){
