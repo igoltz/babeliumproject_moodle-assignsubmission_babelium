@@ -121,14 +121,20 @@ function onVideoPlay(){
     debug("babelium.core.js::onVideoPlay()");
     var video = document.getElementById('submission_video');
     if(video !== undefined && video !== null){
-        console.log("playing video...");
-        //start video at the beginning
-        video.currentTime = 0;
-        //play video
-        video.play();
-        console.log("recording...");
-        startRecording();
-        setStatus("Recording...");
+        if(recorderLoaded){
+            console.log("playing video...");
+            //start video at the beginning
+            video.currentTime = 0;
+            //play video
+            video.play();
+            console.log("recording...");
+            startRecording();
+            setStatus("Recording...");
+        }
+        else{
+            cstm_log("Recorded not loaded");
+            startRecording();
+        }
     }
 }
 
