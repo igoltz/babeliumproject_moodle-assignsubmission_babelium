@@ -35,6 +35,7 @@
         }
     }
     else{
+        autoStopVideo();
         swal({
             title: "Allow microphone",
             text: "Please, allow microphone access before recording",

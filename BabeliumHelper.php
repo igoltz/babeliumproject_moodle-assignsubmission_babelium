@@ -530,12 +530,15 @@ class BabeliumHelper
     
     public function deleteTempAudioFile($upload_name) {
         Logging::logBabelium("Deleting audio file: ".$upload_name);
-        $dataDir = $CFG->dataroot."/audiofiles";
+        $dataDir = self::$config->dataroot."/audiofiles";
         if($this->folder_exist($dataDir)){
             $filename = $dataDir."/".$upload_name;
             unlink($filename);
             Logging::logBabelium("audio file ".$filename." was deleted");
             return "success";
+        }
+        else{
+            return "audiofiles folder does not exists";
         }
     }
 
@@ -589,9 +592,9 @@ class BabeliumHelper
    private function folder_exist($folder){
        // Get canonicalized absolute pathname
        $path = realpath($folder);
-
        // If it exist, check if it's a directory
-       return ($path !== false AND is_dir($path)) ? $path : false;
+       $result = ($path !== false AND is_dir($path)) ? $path : false;
+       return $result;
    }
 
    public function redirectAudioToBabelium($audio_stream, $idexercise, $idstudent, $idsubtitle, $rolename, $responsehash){
