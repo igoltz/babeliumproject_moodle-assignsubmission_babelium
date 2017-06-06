@@ -135,8 +135,11 @@ class BabeliumConnector {
             get_string('babeliumAvailableRecordableExercises', 'assignsubmission_babelium'),
             $this->exercisesMenu
         );
-       $mform->addRule('assignsubmission_babelium_exerciseid', get_string('required'), 'required', null, 'server');
-       $mform->addRule('assignsubmission_babelium_exerciseid','Please select a valid babelium exercise','required');
+       //como el tipo de ejercicio no siempre va a ser de tipo babelium,
+       //no se puede forzar de momento el que este seleccionado un ejericio babelium
+       //si la entrega es de subir un fichero normal, por ejemplo.
+       //$mform->addRule('assignsubmission_babelium_exerciseid', get_string('required'), 'required', null, 'server');
+       //$mform->addRule('assignsubmission_babelium_exerciseid','Please select a valid babelium exercise','required');
 
         $mform->addHelpButton(
             'assignsubmission_babelium_exerciseid',
@@ -168,7 +171,7 @@ class BabeliumConnector {
         
         //detect if error
         //disable babelium checkbox if no exercises available found
-        $value = $this->areValidExercises() ? 1 : 0;
+        $value = $this->areValidExercises() ? 0 : 1;
         $mform->addElement(
             'hidden',
             'noexerciseavailable',

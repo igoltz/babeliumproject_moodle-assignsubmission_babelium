@@ -65,7 +65,16 @@ function processStudentAudioPostRequest(){
     
     $response = "";
     if($passed){
-        $response = execute_post_request($audio_stream, $audio_len, $upload_name, $idexercise, $idstudent, $idsubtitle, $rolename, $responsehash);
+        $response = execute_post_request(
+            $audio_stream,
+            $audio_len,
+            $upload_name,
+            $idexercise,
+            $idstudent,
+            $idsubtitle,
+            $rolename,
+            $responsehash
+        );
     }
     else{
         $response = throw_security_error();
