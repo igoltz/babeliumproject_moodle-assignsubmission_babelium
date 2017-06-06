@@ -224,7 +224,7 @@ function onSubmissionDoneListener(event) {
         if(sumbissionForm !== undefined){
             sumbissionForm.elements["recordedRole"].value = getRecordedRole();
             sumbissionForm.elements["responsehash"].value = getResponseHash();
-            //sumbissionForm.submit();
+            sumbissionForm.submit();
         }
     };
     var onError = function(data, textStatus, xhr){
