@@ -219,7 +219,7 @@ function onSubmissionDoneListener(event) {
         if(sumbissionForm !== undefined){
             sumbissionForm.elements["recordedRole"].value = getRecordedRole();
             sumbissionForm.elements["responsehash"].value = getResponseHash();
-            sumbissionForm.elements["payload"].value = "e30="; //{} as b64
+            sumbissionForm.elements["payload"].value = "ew0KCSJpZCI6IDk5OQ0KfQ=="; // {"id": 999} as base 64
             sumbissionForm.submit();
         }
     }
