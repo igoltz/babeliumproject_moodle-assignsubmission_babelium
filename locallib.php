@@ -244,10 +244,6 @@ class assign_submission_babelium extends assign_submission_plugin
             return false;
         }
         
-        echo $$responsedata;
-        die();
-        return;
-
         $params = array(
             'context' => context_module::instance($this->assignment->get_course_module()->id),
             'courseid' => $this->assignment->get_course()->id,
