@@ -241,7 +241,7 @@ class assign_submission_babelium extends assign_submission_plugin
         $responsedata = base64_decode($data->payload);
         //check if we have a response
         if(!isset($responsedata)){
-            return false;
+            throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
         }
         
         $params = array(
@@ -283,8 +283,6 @@ class assign_submission_babelium extends assign_submission_plugin
             'groupid' => $groupid,
             'groupname' => $groupname
         );
-        $responseReady = false;
-        $connector = $this->getBabeliumConnector();
         if ($babeliumsubmission) {
             if ($babeliumsubmission->responsehash != $data->responsehash) {
                 /*$responsedata = $connector->saveStudentExerciseOnBabelium(
@@ -293,12 +291,7 @@ class assign_submission_babelium extends assign_submission_plugin
                         $data->recordedRole,
                         $data->responsehash
                 );*/
-                if (!$responsedata && $responseReady){
-                    throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
-                }
-                else{
-                    $babeliumsubmission->responseid = $responsedata['responseId'];
-                }
+                $babeliumsubmission->responseid = $responsedata['id'];
             } else {
                 $babeliumsubmission->responseid = $data->responseid;
             }
@@ -323,7 +316,7 @@ class assign_submission_babelium extends assign_submission_plugin
                 throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
             }
             else{
-                $babeliumsubmission->responseid = $responsedata['responseId'];
+                $babeliumsubmission->responseid = $responsedata['id']; //$responsedata['responseId'];
                 $babeliumsubmission->submission = $submission->id;
                 $babeliumsubmission->assignment = $this->assignment->get_instance()->id;
                 $babeliumsubmission->id         = $DB->insert_record('assignsubmission_babelium', $babeliumsubmission);
