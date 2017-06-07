@@ -1,12 +1,9 @@
-//dynamically load video data and subtitle with previous check
-
-var key = "1234";
-var secret = "abcd";
 var host = "//babelium-server-dev.irontec.com/api/v3";
 var contentServerUrl = "//babelium-server-dev.irontec.com/";
+var audioPostUrl = "//babelium-dev.irontec.com/mod/assign/submission/babelium/post.php";
 var debug_enabled = true;
+var babelium_server_data = "";
 
-var audioPostUrl = "//babelium-dev.irontec.com/mod/assign/submission/babelium/post.php"
 window.onload = function() {
     debug("babelium.core.js::onload()");
     if(window.jQuery === undefined || $ === undefined){
@@ -45,7 +42,7 @@ function overwriteFormControl() {
     var submission = document.getElementById(buttonId);
     if(submission !== undefined){
         submission.addEventListener("click", function(event){
-            if(audio_recorded){
+            if(audio_recorded || debug_enabled){
                 onSubmissionDoneListener(event);
             }
             else{
@@ -214,24 +211,37 @@ function onAudioStreamReceived(audioStream) {
 
 function onSubmissionDoneListener(event) {
     debug("babelium.core.js::onSubmissionDoneListener()");
-
     event.preventDefault();
-    //1 make ajax call to moodle middleware
-    var onSuccess = function(data, textStatus, xhr){
+    if (debug_enabled) {
         //2 audio post was ok. send data to moodle using its form
         var formid = 'mform1';
         var sumbissionForm = document.getElementById(formid);
         if(sumbissionForm !== undefined){
             sumbissionForm.elements["recordedRole"].value = getRecordedRole();
             sumbissionForm.elements["responsehash"].value = getResponseHash();
+            sumbissionForm.elements["payload"].value = "e30="; //{} as b64
             sumbissionForm.submit();
         }
-    };
-    var onError = function(data, textStatus, xhr){
-        //1 show error popup with server returned message
-        swal("Error", data, "error");
-    };
-    sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError);
+    }
+    else{
+        //1 make ajax call to moodle middleware
+        var onSuccess = function(data, textStatus, xhr){
+            //2 audio post was ok. send data to moodle using its form
+            var formid = 'mform1';
+            var sumbissionForm = document.getElementById(formid);
+            if(sumbissionForm !== undefined){
+                sumbissionForm.elements["recordedRole"].value = getRecordedRole();
+                sumbissionForm.elements["responsehash"].value = getResponseHash();
+                sumbissionForm.elements["payload"].value = getResponseData();
+                sumbissionForm.submit();
+            }
+        };
+        var onError = function(data, textStatus, xhr){
+            //1 show error popup with server returned message
+            swal("Error", data, "error");
+        };
+        sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError);
+    }
 }
 
 function getRecordedRole() {
@@ -242,6 +252,9 @@ function getResponseHash() {
     return exinfo.media.mp4Url;
 }
 
+function getResponseData() {
+    return babelium_server_data;
+}
 function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
     debug("babelium.core.js::sendAudioDataToMiddleWare()");
     if(showProgressDialog){
@@ -349,6 +362,7 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
                     },
                     function(){
                         if( onSuccess !== undefined ){
+                            babelium_server_data = data;
                             onSuccess(data, textStatus, xhr);
                         }
                     });

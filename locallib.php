@@ -178,6 +178,9 @@ class assign_submission_babelium extends assign_submission_plugin
 
         $mform->addElement('hidden', 'responsehash');
         $mform->setType('responsehash', PARAM_TEXT);
+        
+        $mform->addElement('hidden', 'payload');
+        $mform->setType('payload', PARAM_TEXT);
         //$mform->addRule('responsehash','You cannot save the assignment without recording something','required');
         //$mform->addRule('responsehash', get_string('required'), 'required', null, 'server');
 
@@ -223,7 +226,6 @@ class assign_submission_babelium extends assign_submission_plugin
     public function save(stdClass $submission, stdClass $data)
     {
         Logging::logBabelium("Saving user response for submission...");
-        return; //temp
         global $USER, $DB;
 
         // File storage options should go here if needed
@@ -233,6 +235,12 @@ class assign_submission_babelium extends assign_submission_plugin
         $codenotset = $this->check_file_code($data->responsehash);
         if ($codenotset) {
             $this->set_error($codenotset);
+            return false;
+        }
+        
+        $responsedata = base64_decode($data->payload);
+        //check if we have a response
+        if(!isset($responsedata)){
             return false;
         }
 
@@ -279,12 +287,12 @@ class assign_submission_babelium extends assign_submission_plugin
         $connector = $this->getBabeliumConnector();
         if ($babeliumsubmission) {
             if ($babeliumsubmission->responsehash != $data->responsehash) {
-                $responsedata = $connector->saveStudentExerciseOnBabelium(
+                /*$responsedata = $connector->saveStudentExerciseOnBabelium(
                         $this->get_config('exerciseid'),
                         $data->subtitleId,
                         $data->recordedRole,
                         $data->responsehash
-                );
+                );*/
                 if (!$responsedata && $responseReady){
                     throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
                 }
@@ -305,12 +313,12 @@ class assign_submission_babelium extends assign_submission_plugin
             $babeliumsubmission               = new stdClass();
             $babeliumsubmission->responsehash = $data->responsehash;
 
-            $responsedata = $connector->saveStudentExerciseOnBabelium(
+            /*$responsedata = $connector->saveStudentExerciseOnBabelium(
                     $this->get_config('exerciseid'),
                     $data->subtitleId,
                     $data->recordedRole,
                     $data->responsehash
-            );
+            );*/
             if (!$responsedata && $responseReady){
                 throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
             }

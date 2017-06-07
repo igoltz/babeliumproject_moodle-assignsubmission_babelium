@@ -106,7 +106,7 @@ function execute_post_request($audio_stream, $audio_len, $upload_name, $idexerci
             //delete temp audio from moodle server
             $response = $helper->deleteTempAudioFile($upload_name);
             //link response to user
-            $response = $helper->saveBabeliumResponse(
+            /*$response = $helper->saveBabeliumResponse(
                 $idexercise,
                 $idmedia,
                 $idstudent,
@@ -116,6 +116,9 @@ function execute_post_request($audio_stream, $audio_len, $upload_name, $idexerci
                 $response
             );
             echo "Save data in moodle response: ".$response.PHP_EOL;
+             */
+            //return babelium server api response json as base64 string back to the client  
+            return base64_encode($response);
         }
     }
     
