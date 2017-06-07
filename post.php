@@ -24,32 +24,32 @@ function processStudentAudioPostRequest(){
     if(isset($audio_len)){
         $audio_len = intval($audio_len) - strlen($header);
     }
-    
+
     $upload_name =  $_POST["audioname"];
     if(isset($upload_name)){
         $upload_name = trim($upload_name);
-    }    
-    
+    }
+
     $idexercise =  $_POST["idexercise"];
     $idmedia =  $_POST["idmedia"];
     $idstudent =  $_POST["idstudent"];
     $idsubtitle =  $_POST["idsubtitle"];
-    
+
     $mediaUrl =  $_POST["mediaUrl"];
     if(isset($mediaUrl)){
         $mediaUrl = trim($mediaUrl);
     }
-    
+
     $rolename =  $_POST["rolename"];
     if(isset($rolename)){
         $rolename = trim($rolename);
     }
-    
+
     $responsehash = $_POST["responsehash"];
     if(isset($responsehash)){
         $responsehash = trim($responsehash);
     }
-    
+
     //make security checks
     //audio_len = numeric value
     //upload_name = numeric_value (current is unix timestamp)
@@ -62,7 +62,7 @@ function processStudentAudioPostRequest(){
     $passed &= is_numeric($idmedia);
     $passed &= is_numeric($idstudent);
     $passed &= is_numeric($idsubtitle);
-    
+
     $response = "";
     if($passed){
         $response = execute_post_request(
@@ -91,7 +91,7 @@ function execute_post_request($audio_stream, $audio_len, $upload_name, $idexerci
     //save audio first on mooodle server, temp location. just in case redirection does not work
     $response = $helper->saveAudioDataResponse($audio_stream, $audio_len, $upload_name);
     if($response == 'success'){
-        $response = $helper->redirectAudioToBabelium(
+        $babeliumServerResponse = $helper->redirectAudioToBabelium(
                 $audio_stream,
                 $idexercise,
                 $idstudent,
@@ -99,29 +99,16 @@ function execute_post_request($audio_stream, $audio_len, $upload_name, $idexerci
                 $rolename,
                 $responsehash
         );
-        $valid = isset($response) && $response['id'];
-        $responseId = intval($response['id']);
-        //var_dump($response);
+        $valid = isset($babeliumServerResponse) && $babeliumServerResponse['id'];
+        $responseId = intval($babeliumServerResponse['id']);
         if($valid){
             //delete temp audio from moodle server
             $response = $helper->deleteTempAudioFile($upload_name);
-            //link response to user
-            /*$response = $helper->saveBabeliumResponse(
-                $idexercise,
-                $idmedia,
-                $idstudent,
-                $idsubtitle,
-                $rolename,
-                $responseId,
-                $response
-            );
-            echo "Save data in moodle response: ".$response.PHP_EOL;
-             */
-            //return babelium server api response json as base64 string back to the client  
-            return base64_encode($response);
+            //return babelium server api response json as base64 string back to the client
+            return base64_encode($babeliumServerResponse);
         }
     }
-    
+
     Logging::logBabelium("Processing POST request DONE");
     return $response;
 }
