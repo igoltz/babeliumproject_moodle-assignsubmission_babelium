@@ -100,15 +100,15 @@ function execute_post_request($audio_stream, $audio_len, $upload_name, $idexerci
                 $responsehash
         );
         $valid = isset($babeliumServerResponse) && $babeliumServerResponse['id'];
-        $responseId = intval($babeliumServerResponse['id']);
         if($valid){
             //delete temp audio from moodle server
             $response = $helper->deleteTempAudioFile($upload_name);
-            //return babelium server api response json as base64 string back to the client
         }
+        //return babelium server api response json as base64 string back to the client
         return base64_encode(json_encode($babeliumServerResponse));
     }
-
-    Logging::logBabelium("Processing POST request DONE");
-    return $response;
+    else{
+        Logging::logBabelium("Processing POST request DONE");
+        return $response;
+    }
 }

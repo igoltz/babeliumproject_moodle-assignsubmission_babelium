@@ -238,12 +238,12 @@ class assign_submission_babelium extends assign_submission_plugin
             return false;
         }
         
-        $responsedata = base64_decode($data->payload);
-        $responsedata = json_decode($responsedata);
         //check if we have a response
-        if(!isset($responsedata)){
+        if(!isset($data->payload)){
             throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
         }
+        $responsedata = base64_decode($data->payload);
+        $responsedata = json_decode($responsedata);
         
         $params = array(
             'context' => context_module::instance($this->assignment->get_course_module()->id),
