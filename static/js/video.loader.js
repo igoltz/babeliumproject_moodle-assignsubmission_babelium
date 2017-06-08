@@ -46,9 +46,10 @@ function getPosterUrl(videoId) {
 
 function getMP4video(videoId) {
     debug("babelium.core.js::getMP4video()");
-    hasMedia = exinfo!==undefined;
+    var hasMedia = exinfo!==undefined;
     if(hasMedia){
-        if(){
+        var isExercise = !exinfo.exerciseId;
+        if(isExercise){
             //exercise
             hasMedia = exinfo.media !== undefined;
             if(hasMedia && exinfo.media.mp4Url!==undefined){
