@@ -35,13 +35,26 @@ function getSubtitlesLangCaption(subtitleId) {
 
 function getPosterUrl(videoId) {
     debug("babelium.core.js::getPosterUrl()");
-    hasMedia = exinfo!==undefined && exinfo.media !== undefined;
-    if(hasMedia && exinfo.media.thumbnail!==undefined){
-        return exinfo.media.thumbnail;
+    var hasMedia = exinfo!==undefined;
+    if(hasMedia){
+        var isExercise = !exinfo.exerciseId;
+        if(isExercise){
+            //exercise
+            hasMedia = exinfo.media !== undefined;
+            if(hasMedia && exinfo.media.thumbnail!==undefined){
+                return exinfo.media.thumbnail;
+            }
+        }
+        else{
+            //response
+            hasMedia = exinfo.thumbnail !== undefined;
+            if(hasMedia){
+                return exinfo.thumbnail;
+            }
+        }
     }
-    else{
-        return "//babelium-dev.irontec.com/static/_temp/novideo.jpg";
-    }
+    //default video url for not found
+    return "//babelium-dev.irontec.com/static/_temp/novideo.jpg";
 }
 
 function getMP4video(videoId) {
