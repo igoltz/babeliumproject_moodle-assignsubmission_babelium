@@ -1,40 +1,35 @@
+var noPosterImageUrl = "//babelium-dev.irontec.com/static/_temp/novideo.jpg";
+var posterImage = noPosterImageUrl;
+
 function loadVideo(videoId, subtitleId) {
-    debug("babelium.core.js::loadVideo()");
-    var videoStr = "\
-    <video id='submission_video' style='width:100%' poster='"+getPosterUrl(videoId)+"' controls crossorigin='anonymous'>\
-        <source src='"+getMP4video(videoId)+"' type='video/mp4'>\
-        <source src='"+getWEBMvideo(videoId)+"' type='video/webm'>\
-        <track kind='captions' label='"+getSubtitlesLangCaption(subtitleId)+"' src='"+getSubtitlesURL(subtitleId)+"' srclang='"+getSubtitlesLang(subtitleId)+"' default>\
-        video not supported\
-    </video>";
-    //append video element to div
-    $('.videocontent').html(videoStr);
+    debug("video.loader.js::loadVideo()");
+    downloadPosterImage(videoId, subtitleId);
 }
 
 
 function isHTMLdescription(description) {
-    debug("babelium.core.js::isHTMLdescription()");
+    debug("video.loader.js::isHTMLdescription()");
     return description.indexOf("><") !== -1;
 }
 
 
 function getSubtitlesURL(subtitleId){
-    debug("babelium.core.js::getSubtitlesURL()");
+    debug("video.loader.js::getSubtitlesURL()");
     return host+"/sub-titles/"+subtitleId+".vtt";
 }
 
 function getSubtitlesLang(subtitleId) {
-    debug("babelium.core.js::getSubtitlesLang()");
+    debug("video.loader.js::getSubtitlesLang()");
     return "en";
 }
 
 function getSubtitlesLangCaption(subtitleId) {
-    debug("babelium.core.js::getSubtitlesLangCaption()");
+    debug("video.loader.js::getSubtitlesLangCaption()");
     return "English captions";
 }
 
 function getPosterUrl(videoId) {
-    debug("babelium.core.js::getPosterUrl()");
+    debug("video.loader.js::getPosterUrl()");
     var hasMedia = exinfo!==undefined;
     if(hasMedia){
         var isExercise = !exinfo.exerciseId;
@@ -54,11 +49,45 @@ function getPosterUrl(videoId) {
         }
     }
     //default video url for not found
-    return "//babelium-dev.irontec.com/static/_temp/novideo.jpg";
+    return noPosterImageUrl;
+}
+
+function downloadPosterImage(videoId, subtitleId){
+    var expectedPosterUrl = getPosterUrl(videoId);
+    debug("video.loader.js::downloadPosterImage()");
+    var onSuccess = function(response, ajaxOptions, thrownError){
+        debug("Poster image is valid");
+        posterImage = expectedPosterUrl;
+        injectVideo(videoId, subtitleId);
+    };
+    var onError = function(response, ajaxOptions, thrownError){
+        debug("Poster image is not valid");
+        posterImage = noPosterImageUrl;
+        injectVideo(videoId, subtitleId);
+    };
+    rpc("GET", expectedPosterUrl, onSuccess, onError);
+}
+
+function injectVideo(videoId, subtitleId) {
+    var videoStr = "\
+    <video id='submission_video' style='width:100%' poster='"+posterImage+"' controls crossorigin='anonymous'>\
+        <source src='"+getMP4video(videoId)+"' type='video/mp4'>\
+        <source src='"+getWEBMvideo(videoId)+"' type='video/webm'>\
+        <track kind='captions' label='"+getSubtitlesLangCaption(subtitleId)+"' src='"+getSubtitlesURL(subtitleId)+"' srclang='"+getSubtitlesLang(subtitleId)+"' default>\
+        video not supported\
+    </video>";
+    //append video element to div
+    $('.videocontent').html(videoStr);
+
+    //set listeners
+    var video = document.getElementById('submission_video');
+    if(video!==undefined){
+        video.addEventListener('ended', onVideoEnded, false);
+    }
 }
 
 function getMP4video(videoId) {
-    debug("babelium.core.js::getMP4video()");
+    debug("video.loader.js::getMP4video()");
     var hasMedia = exinfo!==undefined;
     if(hasMedia){
         var isExercise = !exinfo.exerciseId;
@@ -82,7 +111,7 @@ function getMP4video(videoId) {
 }
 
 function getWEBMvideo(videoId) {
-    debug("babelium.core.js::getWEBMvideo()");
+    debug("video.loader.js::getWEBMvideo()");
     hasMedia = exinfo!==undefined && exinfo.media !== undefined;
     if(hasMedia && exinfo.media.webpUrl!==undefined){
         return exinfo.media.webpUrl;

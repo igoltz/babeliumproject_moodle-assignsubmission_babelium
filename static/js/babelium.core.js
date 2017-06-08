@@ -28,11 +28,6 @@ function start(){
     //load video
     loadVideo(exinfo.id, subtitleId);
     loadExerciseDescription(exinfo.description);
-    //set listeners
-    var video = document.getElementById('submission_video');
-    if(video!==undefined){
-        video.addEventListener('ended', onVideoEnded, false);
-    }
     overwriteFormControl();
 }
 
