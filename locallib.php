@@ -361,7 +361,33 @@ class assign_submission_babelium extends assign_submission_plugin
     public function view_summary(stdClass $submission, &$showviewlink)
     {
         Logging::logBabelium("Showing HTML5 summary view of submission");
-        return $this->getBabeliumHelper()->viewSummary($submission, $showviewlink);
+        $babeliumsubmission = $this->get_babelium_submission($submission->id);
+        // always show the view link
+        $showviewlink = true;
+        $output = '';
+        if ($babeliumsubmission) {
+            $output   = '<div class="no-overflow">';
+            $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
+
+            $recordedMediaUrl  = $babeliumsubmission->responsehash;
+            $recordedMediaCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, '/') + 1, -4);
+
+            $thumbnailpath = $protocol
+                    . get_config('assignsubmission_babelium', 'serverdomain')
+                    . '/resources/images/thumbs/'
+                    . $recordedMediaCode
+                    . '/default.jpg';
+
+            $thumbnail     = '<img src="'
+                    . $thumbnailpath
+                    . '" alt="'
+                    . get_string('babelium', 'assignsubmission_babelium')
+                    . '" border="0" height="45" width="60"/>';
+
+            $output .= $thumbnail;
+            $output .= '</div>';
+        }
+        return $output;
     }
 
     /**

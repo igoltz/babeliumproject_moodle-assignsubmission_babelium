@@ -627,6 +627,12 @@ class BabeliumHelper
         return $html_content;
     }
 
+    /**
+     *  Does not work properly. View issue #13 on git
+     * @param type $submission
+     * @param boolean $showviewlink
+     * @return string
+     */
     public function viewSummary($submission, $showviewlink) {
         $babeliumsubmission = $this->getBabeliumSubmission($submission->id);
         // always show the view link
