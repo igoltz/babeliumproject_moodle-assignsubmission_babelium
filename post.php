@@ -31,7 +31,6 @@ function processStudentAudioPostRequest(){
     }
 
     $idexercise =  $_POST["idexercise"];
-    $idmedia =  $_POST["idmedia"];
     $idstudent =  $_POST["idstudent"];
     $idsubtitle =  $_POST["idsubtitle"];
 
@@ -59,7 +58,6 @@ function processStudentAudioPostRequest(){
     $passed &= is_numeric($audio_len);
     $passed &= is_numeric($upload_name); //preg_match('\d+', $upload_name);
     $passed &= is_numeric($idexercise);
-    $passed &= is_numeric($idmedia);
     $passed &= is_numeric($idstudent);
     $passed &= is_numeric($idsubtitle);
 

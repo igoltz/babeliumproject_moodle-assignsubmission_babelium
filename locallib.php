@@ -360,7 +360,6 @@ class assign_submission_babelium extends assign_submission_plugin
      */
     public function view_summary(stdClass $submission, &$showviewlink)
     {
-        Logging::logBabelium("Showing HTML5 summary view of submission");
         $babeliumsubmission = $this->get_babelium_submission($submission->id);
         // always show the view link
         $showviewlink = true;
@@ -372,23 +371,29 @@ class assign_submission_babelium extends assign_submission_plugin
             $recordedMediaUrl  = $babeliumsubmission->responsehash;
             $index = '/media';
             $last_offset = -4;
-            $recordedMediaCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, $index) + strlen($index), $last_offset);
+            $responseCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, $index) + strlen($index), $last_offset);
+            
+            //get response data of that media code. needed to recover thumbnail image
+            $connector = new BabeliumConnector();
+            //save student response on babelium
+            $thumbnailpath = $connector->getExerciseThumbnailImage($responseCode);
 
-            $thumbnailpath = $protocol
+            if(!isset($thumbnailpath)){
+                $thumbnailpath = "https://babelium-dev.irontec.com/static/img/noimage.jpg";
+                /*
+                 $thumbnailpath = $protocol
                     . get_config('assignsubmission_babelium', 'serverdomain')
                     . '/resources/images/thumbs/'
                     . $recordedMediaCode
                     . '/default.jpg';
+                 */
+            }
 
-            //for testing purpose
-            $thumbnailpath = "https://babelium-dev.irontec.com/static/_temp/poster.jpg";
-            
-            $thumbnail     = '<img src="'
+            $thumbnail = '<img src="'
                     . $thumbnailpath
                     . '" alt="'
                     . get_string('babelium', 'assignsubmission_babelium')
-                    . ' style="border-radius: 11px;border-color: #5f5f5f;border-width: 1px;border-style: solid;"'
-                    . ' width="180" height="90"/>';
+                    . '" border="0" height="45" width="60"/>';
 
             $output .= $thumbnail;
             $output .= '</div>';

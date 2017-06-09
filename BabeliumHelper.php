@@ -354,18 +354,37 @@ class BabeliumHelper
 
        $domain = get_config(self::ASSIGNSUBMISSION_BABELIUM,'serverdomain');
        $lang = current_language();
+       
+        $html_content.='<script
+              src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.view.js"
+              language="javascript">
+          </script>'.PHP_EOL;
 
        $html_content .= '<script language="javascript" type="text/javascript">
                                var domain = "'.$domain.'";
                                var lang = "'.$lang.'";
-                               var exinfo = '.$exinfo.';
-                               var exsubs = '.$exsubs.';
+                               var exerciseinfo = '.$exinfo.';
+                               var exercisesubs = '.$exsubs.';
                                var rsinfo = '.$rsinfo.';
-                               var rssubs = '.$rssubs.';
+                               var responsesubs = '.$rssubs.';
                                var recinfo = '.$recinfo.';
-                               init(exinfo, exsubs, rsinfo, rssubs, recinfo);
+                               var exinfo = exerciseinfo || rsinfo;
+                               var exsubs = exercisesubs || responsesubs;
+                               window.onload = function() {
+                                debug("built-in::onload()");
+                                if(window.jQuery === undefined || $ === undefined){
+                                    var script = document.createElement("script");
+                                    document.head.appendChild(script);
+                                    script.type = "text/javascript";
+                                    script.src = "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js";
+                                    script.onload = initView;
+                                }
+                                else{
+                                    initView();
+                                }
+                            };
                          </script>'.PHP_EOL;
-
+        
         $html_content.='<script
                      src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
                      language="javascript">
@@ -424,23 +443,22 @@ class BabeliumHelper
        $lang = current_language();
 
        $html_content.='<script
-                           src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/babelium.moodle.js"
-                           language="javascript">
-                       </script>'.PHP_EOL;
-
-       $html_content.='<script
                            src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/audio.js"
                            language="javascript">
                        </script>'.PHP_EOL;
+       
+       $html_content.='<script
+                     src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.view.js"
+                     language="javascript">
+                 </script>'.PHP_EOL;
+       
+        $html_content.='<script
+                     src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
+                     language="javascript">
+                 </script>'.PHP_EOL;
 
        $html_content.='<script
                            src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.core.js"
-                           language="javascript">
-                       </script>'.PHP_EOL;
-
-
-       $html_content.='<script
-                           src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
                            language="javascript">
                        </script>'.PHP_EOL;
 

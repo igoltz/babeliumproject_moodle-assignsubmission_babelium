@@ -346,4 +346,13 @@ class BabeliumConnector {
         return count($this->exercisesMenu) > self::MINIMUM_EXERCISE_COUNT;
     }
 
+    public function getExerciseThumbnailImage($responseCode) {
+        $g = $this->getBabeliumRemoteService();
+        $data = $g->getResponseInformation($responseCode);
+        if(isset($data) && isset($data['thumbnail'])){
+            return $data['thumbnail'];
+        }
+        return null;
+    }
+
 }
