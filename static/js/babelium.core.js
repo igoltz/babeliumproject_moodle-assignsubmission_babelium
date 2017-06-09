@@ -3,6 +3,7 @@ var contentServerUrl = "//babelium-server-dev.irontec.com/";
 var audioPostUrl = "//babelium-dev.irontec.com/mod/assign/submission/babelium/post.php";
 var debug_enabled = location.protocol === 'http:';
 var babelium_server_data = "";
+var no_value = -1;
 
 window.onload = function() {
     debug("babelium.core.js::onload()");
@@ -244,11 +245,36 @@ function getRecordedRole() {
 }
 
 function getResponseHash() {
-    return exinfo.media.mp4Url;
+    if(exinfo.media){
+        return exinfo.media.mp4Url ? exinfo.media.mp4Url : "";
+    }
+    else{
+        return exinfo.mp4Url ? exinfo.mp4Url : "";
+    }
 }
 
 function getResponseData() {
     return babelium_server_data;
+}
+
+function getSubtitleId() {
+    if(exinfo.media){
+        return exinfo.media.subtitleId ? exinfo.media.subtitleId : no_value;
+    }
+    else{
+        return exinfo.subtitleId ? exinfo.subtitleId : no_value;
+    }
+}
+
+function getExerciseId() {
+    if(exinfo.exerciseId){
+        //response mode
+        return exinfo.exerciseId ? exinfo.exerciseId : no_value;
+    }
+    else{
+        //exercise mode
+        return exinfo.id ? exinfo.id : no_value;
+    }
 }
 function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
     debug("babelium.core.js::sendAudioDataToMiddleWare()");
@@ -276,7 +302,7 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
 
         //define additional middleware data
         var fd = new FormData();
-        var b = exinfo.media.mp4Url;
+        var b = getResponseHash();
         var baseUrl = b.substring(0, b.lastIndexOf('/')+1 );
         var timestamp = new Date().getTime();
         var newMediaUrl = baseUrl + "resp-"+timestamp+".flv";
@@ -291,9 +317,8 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError){
         }
         fd.append("audioname",  timestamp);
 
-        fd.append("idexercise", exinfo.id);
-        fd.append("idmedia", exinfo.media.id);
-        fd.append("idsubtitle", exinfo.media.subtitleId);
+        fd.append("idexercise", getExerciseId());
+        fd.append("idsubtitle", getSubtitleId());
         fd.append("mediaUrl", newMediaUrl);
         fd.append("idstudent", -1);
 
