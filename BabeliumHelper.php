@@ -354,7 +354,7 @@ class BabeliumHelper
 
        $domain = get_config(self::ASSIGNSUBMISSION_BABELIUM,'serverdomain');
        $lang = current_language();
-       
+
        $html_content .= '<script language="javascript" type="text/javascript">
                                var domain = "'.$domain.'";
                                var lang = "'.$lang.'";
@@ -365,7 +365,7 @@ class BabeliumHelper
                                var recinfo = '.$recinfo.';
                                init(exinfo, exsubs, rsinfo, rssubs, recinfo);
                          </script>'.PHP_EOL;
-       
+
         $html_content.='<script
                      src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
                      language="javascript">
@@ -374,7 +374,7 @@ class BabeliumHelper
        Logging::logBabelium("Injecting ". strlen($html_content)." data bytes into babelium submission");
        return $html_content;
    }
-   
+
    /**
     * Returns html code for displaying the babelium widget with the provided information
     *
@@ -432,7 +432,7 @@ class BabeliumHelper
                            src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/audio.js"
                            language="javascript">
                        </script>'.PHP_EOL;
-       
+
        $html_content.='<script
                            src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.core.js"
                            language="javascript">
@@ -474,7 +474,7 @@ class BabeliumHelper
          Logging::logBabelium("Injecting template data from file: ".$content_path);
          return $content_path;
      }
-     
+
      public function getSumbissionViewHTMLPath() {
         Logging::logBabelium("Loading submission view template from local file");
          if($this->isDevelopment()){
@@ -527,7 +527,7 @@ class BabeliumHelper
         Logging::logBabelium("Injecting ". strlen($result)." data bytes into babelium video display");
         return $result;
     }
-    
+
     public function deleteTempAudioFile($upload_name) {
         Logging::logBabelium("Deleting audio file: ".$upload_name);
         $dataDir = self::$config->dataroot."/audiofiles";
@@ -639,26 +639,21 @@ class BabeliumHelper
             $recordedMediaUrl  = $babeliumsubmission->responsehash;
             $recordedMediaCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, '/') + 1, -4);
 
-            $thumbnailpath = $protocol 
+            $thumbnailpath = $protocol
                     . get_config('assignsubmission_babelium', 'serverdomain')
-                    . '/resources/images/thumbs/' 
-                    . $recordedMediaCode 
+                    . '/resources/images/thumbs/'
+                    . $recordedMediaCode
                     . '/default.jpg';
-            
-            $thumbnail     = '<img src="' 
-                    . $thumbnailpath 
-                    . '" alt="' 
-                    . get_string('babelium', 'assignsubmission_babelium') 
+
+            $thumbnail     = '<img src="'
+                    . $thumbnailpath
+                    . '" alt="'
+                    . get_string('babelium', 'assignsubmission_babelium')
                     . '" border="0" height="45" width="60"/>';
-            
+
             $output .= $thumbnail;
             $output .= '</div>';
         }
         return $output;
-    }
-
-    public function saveBabeliumResponse($idexercise, $idmedia, $idstudent, $idsubtitle, $rolename, $responseId, $response) {
-        $returnValue = '{"error":"save babelium response not implemented yet."}';
-        return $returnValue;
     }
 }

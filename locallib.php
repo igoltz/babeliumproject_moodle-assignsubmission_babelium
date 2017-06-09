@@ -238,12 +238,13 @@ class assign_submission_babelium extends assign_submission_plugin
             return false;
         }
         
-        $responsedata = base64_decode($data->payload);
         //check if we have a response
-        if(!isset($responsedata)){
-            return false;
+        if(!isset($data->payload)){
+            throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
         }
-
+        $responsedata = base64_decode($data->payload);
+        $responsedata = json_decode($responsedata);
+        
         $params = array(
             'context' => context_module::instance($this->assignment->get_course_module()->id),
             'courseid' => $this->assignment->get_course()->id,
@@ -283,8 +284,6 @@ class assign_submission_babelium extends assign_submission_plugin
             'groupid' => $groupid,
             'groupname' => $groupname
         );
-        $responseReady = false;
-        $connector = $this->getBabeliumConnector();
         if ($babeliumsubmission) {
             if ($babeliumsubmission->responsehash != $data->responsehash) {
                 /*$responsedata = $connector->saveStudentExerciseOnBabelium(
@@ -293,12 +292,7 @@ class assign_submission_babelium extends assign_submission_plugin
                         $data->recordedRole,
                         $data->responsehash
                 );*/
-                if (!$responsedata && $responseReady){
-                    throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
-                }
-                else{
-                    $babeliumsubmission->responseid = $responsedata['responseId'];
-                }
+                $babeliumsubmission->responseid = $responsedata->id;
             } else {
                 $babeliumsubmission->responseid = $data->responseid;
             }
@@ -319,20 +313,15 @@ class assign_submission_babelium extends assign_submission_plugin
                     $data->recordedRole,
                     $data->responsehash
             );*/
-            if (!$responsedata && $responseReady){
-                throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
-            }
-            else{
-                $babeliumsubmission->responseid = $responsedata['responseId'];
-                $babeliumsubmission->submission = $submission->id;
-                $babeliumsubmission->assignment = $this->assignment->get_instance()->id;
-                $babeliumsubmission->id         = $DB->insert_record('assignsubmission_babelium', $babeliumsubmission);
-                $params['objectid']             = $babeliumsubmission->id;
-                $event                          = \assignsubmission_babelium\event\submission_created::create($params);
-                $event->set_assign($this->assignment);
-                $event->trigger();
-                return $babeliumsubmission->id > 0;
-            }
+            $babeliumsubmission->responseid = $responsedata->id; //$responsedata['responseId'];
+            $babeliumsubmission->submission = $submission->id;
+            $babeliumsubmission->assignment = $this->assignment->get_instance()->id;
+            $babeliumsubmission->id         = $DB->insert_record('assignsubmission_babelium', $babeliumsubmission);
+            $params['objectid']             = $babeliumsubmission->id;
+            $event                          = \assignsubmission_babelium\event\submission_created::create($params);
+            $event->set_assign($this->assignment);
+            $event->trigger();
+            return $babeliumsubmission->id > 0;
         }
     }
 

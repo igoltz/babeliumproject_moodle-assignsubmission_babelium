@@ -1,7 +1,7 @@
 var host = "//babelium-server-dev.irontec.com/api/v3";
 var contentServerUrl = "//babelium-server-dev.irontec.com/";
 var audioPostUrl = "//babelium-dev.irontec.com/mod/assign/submission/babelium/post.php";
-var debug_enabled = true;
+var debug_enabled = location.protocol === 'http:';
 var babelium_server_data = "";
 
 window.onload = function() {
@@ -28,11 +28,6 @@ function start(){
     //load video
     loadVideo(exinfo.id, subtitleId);
     loadExerciseDescription(exinfo.description);
-    //set listeners
-    var video = document.getElementById('submission_video');
-    if(video!==undefined){
-        video.addEventListener('ended', onVideoEnded, false);
-    }
     overwriteFormControl();
 }
 
@@ -219,7 +214,7 @@ function onSubmissionDoneListener(event) {
         if(sumbissionForm !== undefined){
             sumbissionForm.elements["recordedRole"].value = getRecordedRole();
             sumbissionForm.elements["responsehash"].value = getResponseHash();
-            sumbissionForm.elements["payload"].value = "e30="; //{} as b64
+            sumbissionForm.elements["payload"].value = "ew0KCSJpZCI6IDk5OQ0KfQ=="; // {"id": 999} as base 64
             sumbissionForm.submit();
         }
     }
