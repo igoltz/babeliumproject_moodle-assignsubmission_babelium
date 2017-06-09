@@ -643,7 +643,9 @@ class BabeliumHelper
             $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
 
             $recordedMediaUrl  = $babeliumsubmission->responsehash;
-            $recordedMediaCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, '/') + 1, -4);
+            $index = '/media';
+            $last_offset = -4;
+            $recordedMediaCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, $index) + strlen($index), $last_offset);
 
             $thumbnailpath = $protocol
                     . get_config('assignsubmission_babelium', 'serverdomain')

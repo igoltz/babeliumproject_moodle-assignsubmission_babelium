@@ -370,7 +370,9 @@ class assign_submission_babelium extends assign_submission_plugin
             $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
 
             $recordedMediaUrl  = $babeliumsubmission->responsehash;
-            $recordedMediaCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, '/') + 1, -4);
+            $index = '/media';
+            $last_offset = -4;
+            $recordedMediaCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, $index) + strlen($index), $last_offset);
 
             $thumbnailpath = $protocol
                     . get_config('assignsubmission_babelium', 'serverdomain')
@@ -378,11 +380,15 @@ class assign_submission_babelium extends assign_submission_plugin
                     . $recordedMediaCode
                     . '/default.jpg';
 
+            //for testing purpose
+            $thumbnailpath = "https://babelium-dev.irontec.com/static/_temp/poster.jpg";
+            
             $thumbnail     = '<img src="'
                     . $thumbnailpath
                     . '" alt="'
                     . get_string('babelium', 'assignsubmission_babelium')
-                    . '" border="0" height="45" width="60"/>';
+                    . ' style="border-radius: 11px;border-color: #5f5f5f;border-width: 1px;border-style: solid;"'
+                    . ' width="180" height="90"/>';
 
             $output .= $thumbnail;
             $output .= '</div>';
