@@ -369,10 +369,16 @@ class assign_submission_babelium extends assign_submission_plugin
             $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
 
             $recordedMediaUrl  = $babeliumsubmission->responsehash;
-            $index = '/media';
+            $index = '/media/';
             $last_offset = -4;
             $responseCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, $index) + strlen($index), $last_offset);
             
+            if(!is_numeric($responseCode)){
+                //"https://babelium-server-dev.irontec.com/api/v3/video-response/999.mp4"
+                $index = '/video-response/';
+                $last_offset = -4;
+                $responseCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, $index) + strlen($index), $last_offset);
+            }
             //get response data of that media code. needed to recover thumbnail image
             $connector = new BabeliumConnector();
             //save student response on babelium
