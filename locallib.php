@@ -393,7 +393,7 @@ class assign_submission_babelium extends assign_submission_plugin
                     . $thumbnailpath
                     . '" alt="'
                     . get_string('babelium', 'assignsubmission_babelium')
-                    . '" border="0" height="45" width="60"/>';
+                    . '" border="0" height="120" width="90"/>';
 
             $output .= $thumbnail;
             $output .= '</div>';
