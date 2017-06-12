@@ -712,16 +712,16 @@ class BabeliumHelper
 
     public function generateStatusAlert($html_content, $info) {
         //add video status if needed
-       if(isset($info['isProcessed']) && $info['isProcessed']=='false'){
+       if(isset($info['isProcessed']) && ($info['isProcessed']=='false' || $info['isProcessed']==0)){
            //conversion not started
             $html_content.='<div class="alert alert-info alert-block fade in" role="alert">
                                 <button type="button" class="close" data-dismiss="alert">×</button>
                                 Submitted video is added to processing queue, please wait...
                             </div>';
        }
-       else if(isset($info['isProcessed']) && $info['isProcessed']=='true'){
+       else if(isset($info['isProcessed']) && ($info['isProcessed']=='true' || $info['isProcessed']==1)){
            //conversion started
-           if(isset($info['isConverted']) && $info['isConverted']=='false'){
+           if(isset($info['isConverted']) && ( $info['isConverted']=='false' ||  $info['isConverted']==0) ){
                //conversion started but not finished
                $html_content.='<div class="alert alert-info alert-block fade in" role="alert">
                                     <button type="button" class="close" data-dismiss="alert">×</button>
