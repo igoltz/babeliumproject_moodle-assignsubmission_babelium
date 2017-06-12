@@ -384,6 +384,11 @@ class BabeliumHelper
               src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.view.js"
               language="javascript">
           </script>'.PHP_EOL;
+        
+        $html_content.='<script
+             src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
+             language="javascript">
+         </script>'.PHP_EOL;
 
        $html_content .= '<script language="javascript" type="text/javascript">
                                var domain = "'.$domain.'";
@@ -395,26 +400,10 @@ class BabeliumHelper
                                var recinfo = '.$recinfo.';
                                var exinfo = exerciseinfo || rsinfo;
                                var exsubs = exercisesubs || responsesubs;
-                               window.onload = function() {
-                                debug("built-in::onload()");
-                                if(window.jQuery === undefined || $ === undefined){
-                                    var script = document.createElement("script");
-                                    document.head.appendChild(script);
-                                    script.type = "text/javascript";
-                                    script.src = "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js";
-                                    script.onload = initView;
-                                }
-                                else{
-                                    initView();
-                                }
-                            };
+                               debug("built-in::onload()");
+                               initView();
                          </script>'.PHP_EOL;
        
-        $html_content.='<script
-                     src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
-                     language="javascript">
-                 </script>'.PHP_EOL;
-
        Logging::logBabelium("Injecting ". strlen($html_content)." data bytes into babelium submission");
        return $html_content;
    }
