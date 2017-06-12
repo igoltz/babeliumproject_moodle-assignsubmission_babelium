@@ -369,6 +369,7 @@ class BabeliumHelper
         }
 
        $html_content = '';
+       $html_content = $this->generateStatusAlert($html_content, $info);
        if(isset($info['title'])){
                $html_content.='<h2 id="babelium-exercise-title" class="centered">'.$info['title'].'</h2>';
        }
@@ -711,14 +712,29 @@ class BabeliumHelper
 
     public function generateStatusAlert($html_content, $info) {
         //add video status if needed
-       if(isset($info['processing']) && $info['processing']=='true'){
-            $html_content.='<p class="alert" style="color: white;background-color: #a10000;">Submitted video is being processing, please wait...</p>';
+       if(isset($info['isProcessed']) && $info['isProcessed']=='false'){
+           //conversion not started
+            $html_content.='<div class="alert alert-danger alert-block fade in" role="alert">
+                                <button type="button" class="close" data-dismiss="alert">×</button>
+                                Submitted video is added to processing queue, please wait...
+                            </div>';
        }
-       else if(isset($info['converted']) && $info['converted']=='true'){
-            $html_content.='<p class="alert" style="color: white;background-color: #007ba1;">Submitted video is your activity result.</p>';
-       }
-       else{
-            $html_content.='<p class="alert" style="color: white;background-color: #007ba1;">Submitted video is your activity result.</p>';
+       else if(isset($info['isProcessed']) && $info['isProcessed']=='true'){
+           //conversion started
+           if(isset($info['isConverted']) && $info['isConverted']=='false'){
+               //conversion started but not finished
+               $html_content.='<div class="alert alert-danger alert-block fade in" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert">×</button>
+                                    Submitted video is being processing, please wait...
+                                </div>';
+           }
+           else{
+               //conversion finished
+               $html_content.='<div class="alert alert-info alert-block fade in" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert">×</button>
+                                    Exercise preview is ready.
+                               </div>';
+           }
        }
        return $html_content;
     }
