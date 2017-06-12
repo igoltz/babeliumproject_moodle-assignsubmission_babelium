@@ -409,11 +409,6 @@ class BabeliumHelper
                                 }
                             };
                          </script>'.PHP_EOL;
-
-       $html_content.='<script
-                     src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/dist/sweetalert/sweetalert.min.js"
-                     language="javascript">
-                 </script>'.PHP_EOL;
        
         $html_content.='<script
                      src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
