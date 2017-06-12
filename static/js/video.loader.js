@@ -87,10 +87,24 @@ function injectVideo(videoId, subtitleId) {
 
 function onVideoEnded() {
     debug("babelium.core.js::onVideoEnded()");
-    autoStopVideo();
-    if (is_recording) {
-        stopRecording();
+    try{
+        autoStopVideo();
+        if(isGraderView()){
+            debug("No need to stop recording on grader view");
+        }
+        else{
+            if (is_recording) {
+                stopRecording();
+            }
+        }
     }
+    catch(err){
+        debug("Error on video ended event: "+err.message);
+    }
+}
+
+function isGraderView() {
+    return window.location.href.indexOf("&action=grader&") != -1;
 }
 
 function autoStopVideo() {
@@ -98,6 +112,7 @@ function autoStopVideo() {
     var video = document.getElementById('submission_video');
     if (video !== undefined && video !== null) {
         video.pause();
+        video.currentTime = 0;
     }
 }
 
