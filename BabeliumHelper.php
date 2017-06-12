@@ -1,12 +1,36 @@
 <?php
 
+/**
+ * Babelium Project open source collaborative second language oral practice - http://www.babeliumproject.com
+ *
+ * Copyright (c) 2013 GHyM and by respective authors (see below).
+ *
+ * This file is part of Babelium Project.
+ *
+ * Babelium Project is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Babelium Project is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/BabeliumConnector.php');
 
 /**
-* BabeliumHelper class that contains BabeliumPlugin Business Logic
-* @author sanguita
-*/
+ * BabeliumHelper class that contains BabeliumPlugin Business Logic
+ *
+ * @package   assignsubmission_babelium
+ * @copyright Original from 2012 Babelium Project {@link http://babeliumproject.com} modified by Elurnet Informatika Zerbitzuak S.L  {@link http://elurnet.net/es} and Irontec S.L {@link https://www.irontec.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class BabeliumHelper
 {
     const DEVELOPMENT_ENVIRONMENT = 'development';
@@ -345,6 +369,7 @@ class BabeliumHelper
         }
 
        $html_content = '';
+       $html_content = $this->generateStatusAlert($html_content, $info);
        if(isset($info['title'])){
                $html_content.='<h2 id="babelium-exercise-title" class="centered">'.$info['title'].'</h2>';
        }
@@ -355,15 +380,34 @@ class BabeliumHelper
        $domain = get_config(self::ASSIGNSUBMISSION_BABELIUM,'serverdomain');
        $lang = current_language();
 
+        $html_content.='<script
+              src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.view.js"
+              language="javascript">
+          </script>'.PHP_EOL;
+
        $html_content .= '<script language="javascript" type="text/javascript">
                                var domain = "'.$domain.'";
                                var lang = "'.$lang.'";
-                               var exinfo = '.$exinfo.';
-                               var exsubs = '.$exsubs.';
+                               var exerciseinfo = '.$exinfo.';
+                               var exercisesubs = '.$exsubs.';
                                var rsinfo = '.$rsinfo.';
-                               var rssubs = '.$rssubs.';
+                               var responsesubs = '.$rssubs.';
                                var recinfo = '.$recinfo.';
-                               init(exinfo, exsubs, rsinfo, rssubs, recinfo);
+                               var exinfo = exerciseinfo || rsinfo;
+                               var exsubs = exercisesubs || responsesubs;
+                               window.onload = function() {
+                                debug("built-in::onload()");
+                                if(window.jQuery === undefined || $ === undefined){
+                                    var script = document.createElement("script");
+                                    document.head.appendChild(script);
+                                    script.type = "text/javascript";
+                                    script.src = "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js";
+                                    script.onload = initView;
+                                }
+                                else{
+                                    initView();
+                                }
+                            };
                          </script>'.PHP_EOL;
 
         $html_content.='<script
@@ -413,6 +457,8 @@ class BabeliumHelper
         }
 
        $html_content = '';
+       $html_content = $this->generateStatusAlert($html_content, $info);
+
        if(isset($info['title'])){
                $html_content.='<h2 id="babelium-exercise-title" class="centered">'.$info['title'].'</h2>';
        }
@@ -424,23 +470,22 @@ class BabeliumHelper
        $lang = current_language();
 
        $html_content.='<script
-                           src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/script/babelium.moodle.js"
-                           language="javascript">
-                       </script>'.PHP_EOL;
-
-       $html_content.='<script
                            src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/audio.js"
                            language="javascript">
                        </script>'.PHP_EOL;
 
        $html_content.='<script
-                           src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.core.js"
-                           language="javascript">
-                       </script>'.PHP_EOL;
+                     src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.view.js"
+                     language="javascript">
+                 </script>'.PHP_EOL;
 
+        $html_content.='<script
+                     src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
+                     language="javascript">
+                 </script>'.PHP_EOL;
 
        $html_content.='<script
-                           src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
+                           src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.core.js"
                            language="javascript">
                        </script>'.PHP_EOL;
 
@@ -627,6 +672,12 @@ class BabeliumHelper
         return $html_content;
     }
 
+    /**
+     *  Does not work properly. View issue #13 on git
+     * @param type $submission
+     * @param boolean $showviewlink
+     * @return string
+     */
     public function viewSummary($submission, $showviewlink) {
         $babeliumsubmission = $this->getBabeliumSubmission($submission->id);
         // always show the view link
@@ -637,7 +688,9 @@ class BabeliumHelper
             $protocol = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
 
             $recordedMediaUrl  = $babeliumsubmission->responsehash;
-            $recordedMediaCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, '/') + 1, -4);
+            $index = '/media';
+            $last_offset = -4;
+            $recordedMediaCode = substr($recordedMediaUrl, strpos($recordedMediaUrl, $index) + strlen($index), $last_offset);
 
             $thumbnailpath = $protocol
                     . get_config('assignsubmission_babelium', 'serverdomain')
@@ -656,4 +709,34 @@ class BabeliumHelper
         }
         return $output;
     }
+
+    public function generateStatusAlert($html_content, $info) {
+        //add video status if needed
+       if( isset($info['isProcessed']) && $info['isProcessed']==0 ){
+           //conversion not started
+            $html_content.='<div class="alert alert-info alert-block fade in" role="alert">
+                                <button type="button" class="close" data-dismiss="alert">×</button>
+                                Submitted video is added to processing queue, please wait...
+                            </div>';
+       }
+       else if( isset($info['isProcessed']) && $info['isProcessed']==1 ){
+           //conversion started
+           if( isset($info['isConverted']) && $info['isConverted']==0 ){
+               //conversion started but not finished
+               $html_content.='<div class="alert alert-info alert-block fade in" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert">×</button>
+                                    Submitted video is being processing, please wait...
+                                </div>';
+           }
+           else{
+               //conversion finished
+               $html_content.='<div class="alert alert-info alert-block fade in" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert">×</button>
+                                    Exercise preview is ready.
+                               </div>';
+           }
+       }
+       return $html_content;
+    }
+
 }

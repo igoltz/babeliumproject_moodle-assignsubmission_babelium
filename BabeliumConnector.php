@@ -1,33 +1,39 @@
 <?php
 
 /**
-* Babelium Project open source collaborative second language oral practice - http://www.babeliumproject.com
-*
-* Copyright (c) 2012 GHyM and by respective authors (see below).
-*
-* This file is part of Babelium Project.
-*
-* Babelium Project is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* Babelium Project is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Babelium Project open source collaborative second language oral practice - http://www.babeliumproject.com
+ *
+ * Copyright (c) 2013 GHyM and by respective authors (see below).
+ *
+ * This file is part of Babelium Project.
+ *
+ * Babelium Project is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Babelium Project is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * babelium plugin connection class for interating with babelium service
+ *
+ * @package   assignsubmission_babelium
+ * @copyright Original from 2012 Babelium Project {@link http://babeliumproject.com} modified by Elurnet Informatika Zerbitzuak S.L  {@link http://elurnet.net/es} and Irontec S.L {@link https://www.irontec.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/babeliumservice.php');
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
 
 /**
  * Description of BabeliumConnector. A simple Class to connect to Babelium RPC
- *
- * @author sanguita
  */
 class BabeliumConnector {
 
@@ -37,7 +43,7 @@ class BabeliumConnector {
     private static $environment;
     private static $config;
     private static $babeliumService;
-    
+
     private $exercises      = array();
     private $exercisesMenu  = array();
     private $classattribute = array(
@@ -60,7 +66,7 @@ class BabeliumConnector {
        $this->exercises = $this->getBabeliumRemoteService()->getExerciseList();
        return $this->getExercisesMenu();
    }
-   
+
    function getExercisesMenu(){
        $this->exercisesMenu = array();
        if ($this->exercises && count($this->exercises) > 0) {
@@ -92,7 +98,7 @@ class BabeliumConnector {
             1
         );
     }
-    
+
     function build_settings_form_footer($mform){
         //apply if error
         $mform->setType(
@@ -107,7 +113,7 @@ class BabeliumConnector {
             1
         );
     }
-    
+
     function build_settings_form_error($mform, $exception){
         //html_writer::span() shortcut function is not available in Moodle versions prior to 2.5
         //$msg = html_writer::span($e->getMessage(), 'error');
@@ -127,7 +133,7 @@ class BabeliumConnector {
             1
         );
     }
-   
+
    function build_settings_form($mform, $defaultexerciseid, $version){
        $mform->addElement(
             'select',
@@ -160,7 +166,7 @@ class BabeliumConnector {
                 'eq',
                 0
             );
-        } 
+        }
         else {
             $mform->disabledIf(
                 'assignsubmission_babelium_exerciseid',
@@ -168,7 +174,7 @@ class BabeliumConnector {
                 'notchecked'
             );
         }
-        
+
         //detect if error
         //disable babelium checkbox if no exercises available found
         $value = $this->areValidExercises() ? 0 : 1;
@@ -285,7 +291,7 @@ class BabeliumConnector {
        $g = $this->getBabeliumRemoteService();
        return $g->saveStudentExerciseOnBabelium($parameters);
    }
-    
+
     public function getExerciseRoles($captions){
         Logging::logBabelium("Getting exercise roles");
         $exerciseRoles = array();
@@ -333,7 +339,7 @@ class BabeliumConnector {
         return;
       }
     }
-    
+
     public function getBabeliumRemoteService(){
         if(!isset(self::$babeliumService)){
             self::$babeliumService = new babeliumservice();
@@ -344,6 +350,15 @@ class BabeliumConnector {
     public function areValidExercises() {
         Logging::logBabelium("Checking for exercise validity...");
         return count($this->exercisesMenu) > self::MINIMUM_EXERCISE_COUNT;
+    }
+
+    public function getExerciseThumbnailImage($responseCode) {
+        $g = $this->getBabeliumRemoteService();
+        $data = $g->getResponseInformation($responseCode);
+        if(isset($data) && isset($data['thumbnail'])){
+            return $data['thumbnail'];
+        }
+        return null;
     }
 
 }

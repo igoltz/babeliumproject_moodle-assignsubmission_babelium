@@ -21,6 +21,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * This file defines the communication channel between moodle and babelium server
+ *
+ * @package   assignsubmission_babelium
+ * @copyright Original from 2012 Babelium Project {@link http://babeliumproject.com} modified by Elurnet Informatika Zerbitzuak S.L  {@link http://elurnet.net/es} and Irontec S.L {@link https://www.irontec.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
 
 class babeliumservice{
@@ -40,7 +48,7 @@ class babeliumservice{
         global $CFG;
         $this->logFilePath = $CFG->dataroot."/babelium.log";
     }
-    
+
     //@deprecated
     /**
      * Parses the output of cURL. The headers found in this output are stored in the $_curlHeaders class property.
@@ -84,7 +92,7 @@ class babeliumservice{
                     }
             }
     }
-    
+
     //@deprecated
     /**
      * Makes API requests using cURL and a signed header
@@ -267,7 +275,7 @@ class babeliumservice{
 
         $referer = "";
         $origin="";
-        
+
        $curl_data = array(
             CURLOPT_URL => $request_url,
             CURLOPT_HTTPHEADER  => $headers,
@@ -278,7 +286,7 @@ class babeliumservice{
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false
         );
-       
+
        if(isset($post_params)){
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $post_params);
@@ -320,31 +328,31 @@ class babeliumservice{
         $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/exercises";
         return $this->makeApiV3Request($request_url, $headers);
     }
-    
+
     public function getExerciseInformation($exerciseId) {
         $headers = $this->build_headers();
         $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/exercises/".$exerciseId;
         return $this->makeApiV3Request($request_url, $headers);
     }
-    
+
     public function getResponseInformation($responseId) {
         $headers = $this->build_headers();
         $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/response/".$responseId;
         return $this->makeApiV3Request($request_url, $headers);
     }
-    
+
     public function getCaptions($subtitleId, $mediaId) {
         $headers = $this->build_headers();
         $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/sub-titles/".$subtitleId;
         return $this->makeApiV3Request($request_url, $headers);
     }
-    
+
     public function saveStudentExerciseOnBabelium($params) {
         $headers = $this->build_headers();
         $request_url = self::$settings->babelium_babeliumWebDomain.self::$settings->babelium_new_api_endpoint."/response";
         return $this->makeApiV3Request($request_url, $headers, $params);
     }
-    
+
     private function makeApiV3Request($request_url, $headers, $params = null, $decode = true){
         Logging::logBabelium("Requesting ".$request_url);
         //Check if proxy (if used) should be bypassed for this url

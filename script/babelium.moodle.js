@@ -1,32 +1,6 @@
-//Global scope objects
-var bpExercises = null;
-var exerciseInfo = null;
-var exerciseSubs = null;
-var recordInfo = null;
-var responseInfo = null;
-var respponseSubs = null;
-
-var $bjq = jQuery.noConflict();
-
-//Enable debugging messages
-var debug = !1;
-
 function logMessage(message) {
     //IE9 and prior versions don't work well with console. Make sure it is available
     if (debug && window.console) console.log(message);
-}
-
-function init(exInfo, exSubs, rInfo, rSubs, recInfo) {
-    if (exInfo && exSubs) {
-        exerciseInfo = exInfo;
-        exerciseSubs = exSubs;
-        recordInfo = recInfo;
-    }
-    if (rInfo && rSubs) {
-        responseInfo = rInfo;
-        responseSubs = rSubs;
-        recordInfo = recInfo;
-    }
 }
 
 //This function is top-level until finding a way to route ExternalInterface.call() to object encapsulation
