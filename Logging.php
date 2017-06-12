@@ -1,31 +1,44 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Babelium Project open source collaborative second language oral practice - http://www.babeliumproject.com
+ *
+ * Copyright (c) 2013 GHyM and by respective authors (see below).
+ *
+ * This file is part of Babelium Project.
+ *
+ * Babelium Project is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Babelium Project is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** 
- * Logging class:
- * - contains lfile, lwrite and lclose public methods
- * - lfile sets path and name of log file
- * - lwrite writes message to the log file (and implicitly opens log file)
- * - lclose closes log file
- * - first call of lwrite method will open log file implicitly
- * - message is written with the following format: [d/M/Y:H:i:s] (script name) message
+/**
+ * This file is a simple logger that saves timestamped log info on disk .log files
+ *
+ * @package   assignsubmission_babelium
+ * @copyright Original from 2012 Babelium Project {@link http://babeliumproject.com} modified by Elurnet Informatika Zerbitzuak S.L  {@link http://elurnet.net/es} and Irontec S.L {@link https://www.irontec.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class Logging {
-    
-    private static $logger; 
-    
+
+    private static $logger;
+
     // declare log file and file pointer as private properties
     private $log_file, $fp;
-    
+
     function __construct($log_file) {
         $this->log_file = $log_file;
     }
-    
+
     // set log file (path and name)
     public function lfile($path) {
         $this->log_file = $path;
@@ -65,7 +78,7 @@ class Logging {
         // (if the file does not exist, try to create it)
         $this->fp = fopen($lfile, 'a') or exit("Can't open $lfile!");
     }
-    
+
     public static function getBabeliumLogger() {
         if(!isset(self::$logger)){
             self::$logger = new Logging("/tmp/babelium.plugin.log");
@@ -76,7 +89,7 @@ class Logging {
     public static function logBabelium($msg) {
         Logging::getBabeliumLogger()->lwrite($msg);
     }
-    
+
     private function getClientIp(){
         $ip = "";
         if (!empty($_SERVER['HTTP_CLIENT_IP'])) {

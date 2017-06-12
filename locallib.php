@@ -1,5 +1,28 @@
 <?php
 
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * This file defines the admin settings for this plugin
+ *
+ * @package   assignsubmission_babelium
+ * @copyright Original from 2012 Babelium Project {@link http://babeliumproject.com} modified by Elurnet Informatika Zerbitzuak S.L  {@link http://elurnet.net/es} and Irontec S.L {@link https://www.irontec.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 /**
  * This file contains the definition for the library class for babelium submission plugin
  *
@@ -154,7 +177,7 @@ class assign_submission_babelium extends assign_submission_plugin
     {
         global $PAGE;
         $PAGE->requires->jquery();
-        
+
         list($data, $exinfo, $exroles, $exlangs, $exsubs, $recinfo) = $formdata;
 
         $roleMenu = array();
@@ -178,7 +201,7 @@ class assign_submission_babelium extends assign_submission_plugin
 
         $mform->addElement('hidden', 'responsehash');
         $mform->setType('responsehash', PARAM_TEXT);
-        
+
         $mform->addElement('hidden', 'payload');
         $mform->setType('payload', PARAM_TEXT);
         //$mform->addRule('responsehash','You cannot save the assignment without recording something','required');
@@ -237,14 +260,14 @@ class assign_submission_babelium extends assign_submission_plugin
             $this->set_error($codenotset);
             return false;
         }
-        
+
         //check if we have a response
         if(!isset($data->payload)){
             throw new moodle_exception('babeliumErrorSavingResponse', 'assignsubmission_babelium');
         }
         $responsedata = base64_decode($data->payload);
         $responsedata = json_decode($responsedata);
-        
+
         $params = array(
             'context' => context_module::instance($this->assignment->get_course_module()->id),
             'courseid' => $this->assignment->get_course()->id,
@@ -254,7 +277,7 @@ class assign_submission_babelium extends assign_submission_plugin
                 'pathnamehashes' => array()
             )
         );
-        
+
         if (!empty($submission->userid) && ($submission->userid != $USER->id)) {
             $params['relateduserid'] = $submission->userid;
         }

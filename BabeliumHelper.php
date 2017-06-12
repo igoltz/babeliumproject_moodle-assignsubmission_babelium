@@ -1,12 +1,36 @@
 <?php
 
+/**
+ * Babelium Project open source collaborative second language oral practice - http://www.babeliumproject.com
+ *
+ * Copyright (c) 2013 GHyM and by respective authors (see below).
+ *
+ * This file is part of Babelium Project.
+ *
+ * Babelium Project is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Babelium Project is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/BabeliumConnector.php');
 
 /**
-* BabeliumHelper class that contains BabeliumPlugin Business Logic
-* @author sanguita
-*/
+ * BabeliumHelper class that contains BabeliumPlugin Business Logic
+ *
+ * @package   assignsubmission_babelium
+ * @copyright Original from 2012 Babelium Project {@link http://babeliumproject.com} modified by Elurnet Informatika Zerbitzuak S.L  {@link http://elurnet.net/es} and Irontec S.L {@link https://www.irontec.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class BabeliumHelper
 {
     const DEVELOPMENT_ENVIRONMENT = 'development';
@@ -354,7 +378,7 @@ class BabeliumHelper
 
        $domain = get_config(self::ASSIGNSUBMISSION_BABELIUM,'serverdomain');
        $lang = current_language();
-       
+
         $html_content.='<script
               src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.view.js"
               language="javascript">
@@ -384,7 +408,7 @@ class BabeliumHelper
                                 }
                             };
                          </script>'.PHP_EOL;
-        
+
         $html_content.='<script
                      src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
                      language="javascript">
@@ -432,6 +456,8 @@ class BabeliumHelper
         }
 
        $html_content = '';
+       $html_content = $this->generateStatusAlert($html_content, $info);
+
        if(isset($info['title'])){
                $html_content.='<h2 id="babelium-exercise-title" class="centered">'.$info['title'].'</h2>';
        }
@@ -446,12 +472,12 @@ class BabeliumHelper
                            src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/audio.js"
                            language="javascript">
                        </script>'.PHP_EOL;
-       
+
        $html_content.='<script
                      src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.view.js"
                      language="javascript">
                  </script>'.PHP_EOL;
-       
+
         $html_content.='<script
                      src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
                      language="javascript">
@@ -682,4 +708,19 @@ class BabeliumHelper
         }
         return $output;
     }
+
+    public function generateStatusAlert($html_content, $info) {
+        //add video status if needed
+       if(isset($info['processing']) && $info['processing']=='true'){
+            $html_content.='<p class="alert" style="color: white;background-color: #a10000;">Submitted video is being processing, please wait...</p>';
+       }
+       else if(isset($info['converted']) && $info['converted']=='true'){
+            $html_content.='<p class="alert" style="color: white;background-color: #007ba1;">Submitted video is your activity result.</p>';
+       }
+       else{
+            $html_content.='<p class="alert" style="color: white;background-color: #007ba1;">Submitted video is your activity result.</p>';
+       }
+       return $html_content;
+    }
+
 }

@@ -18,7 +18,7 @@
  * This file contains the version information for the babelium submission plugin
  *
  * @package    assignsubmission_babelium
- * @copyright  2013 Babelium Project {@link http://babeliumproject.com}
+ * @copyright Original from 2012 Babelium Project {@link http://babeliumproject.com} modified by Elurnet Informatika Zerbitzuak S.L  {@link http://elurnet.net/es} and Irontec S.L {@link https://www.irontec.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
