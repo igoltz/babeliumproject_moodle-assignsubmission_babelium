@@ -8,6 +8,12 @@ var babelium_server_data = "";
 var no_value = -1;
 
 function initView() {
+
+    if($ == undefined && jQuery!==undefined){
+        debug("Reseeting $ value as jQuery");
+        $ = jQuery;
+    }
+
     //load subtitles
     var subtitleId = exsubs[0].subtitleId;
     loadSubtitles(subtitleId);

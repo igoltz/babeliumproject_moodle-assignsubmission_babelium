@@ -23,8 +23,8 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
+global $CFG;
+require_once($CFG->dirroot.'/mod/assign/submission/babelium/Logging.php');
 
 Logging::logBabelium("Reading plugin version parameters...");
 
