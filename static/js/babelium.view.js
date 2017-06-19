@@ -9,7 +9,7 @@ var no_value = -1;
 
 function initView() {
 
-    if($ == undefined && jQuery!==undefined){
+    if($ === undefined && jQuery!==undefined){
         debug("Reseeting $ value as jQuery");
         $ = jQuery;
     }

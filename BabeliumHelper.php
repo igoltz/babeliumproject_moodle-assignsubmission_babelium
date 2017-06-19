@@ -379,6 +379,11 @@ class BabeliumHelper
 
        $domain = get_config(self::ASSIGNSUBMISSION_BABELIUM,'serverdomain');
        $lang = current_language();
+       
+       $html_content.='<script
+              src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/i18n.js"
+              language="javascript">
+          </script>'.PHP_EOL;
 
         $html_content.='<script
               src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.view.js"
@@ -457,6 +462,11 @@ class BabeliumHelper
 
        $domain = get_config(self::ASSIGNSUBMISSION_BABELIUM,'serverdomain');
        $lang = current_language();
+       
+       $html_content.='<script
+              src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/i18n.js"
+              language="javascript">
+          </script>'.PHP_EOL;
 
        $html_content.='<script
                            src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/audio.js"

@@ -18,7 +18,11 @@
      if (recording_permission_granted) {
          //check if secure origin
          if (location.protocol === 'http:') {
-             swal("Recording disabled", "For security reasons, audio recording is disabled on non HTTPS websites", "error");
+            swal(
+                getString("swal_msg_http_title"),
+                getString("swal_msg_http_body"),
+                "error"
+            );
              autoStopVideo();
          } else {
              if (!is_recording) {
@@ -27,7 +31,7 @@
                      recorder.record();
                      recorder && recorder.stop();
                      recorder && recorder.record();
-                     cstm_log('Recording...');
+                     cstm_log(getString('recording_log'));
                      is_recording = true;
                  }
              }
@@ -35,11 +39,12 @@
      } else {
          autoStopVideo();
          swal({
-                 title: "Allow microphone",
-                 text: "Please, allow microphone access before recording",
+                 title: getString("swal_msg_allow_micro_title"),
+                 text: getString("swal_msg_allow_micro_body"),
                  type: "warning",
                  showCancelButton: true,
-                 confirmButtonText: "Allow",
+                 confirmButtonText: getString("swal_msg_allow_btn"),
+                 cancelButtonText: getString("swal_msg_cancel_btn"),
                  closeOnConfirm: true
              },
              function() {
@@ -59,11 +64,11 @@
                      name: permissionName
                  })
                  .then(function(result) {
-                     if (result.state == 'granted') {
+                     if (result.state === 'granted') {
                          recording_permission_granted = true;
-                     } else if (result.state == 'prompt') {
+                     } else if (result.state === 'prompt') {
                          recording_permission_granted = false;
-                     } else if (result.state == 'denied') {
+                     } else if (result.state === 'denied') {
                          recording_permission_granted = false;
                      }
                      result.onchange = function() {
@@ -82,8 +87,8 @@
          if (recorder !== undefined) {
              recorder && recorder.stop();
              autoStopVideo();
-             cstm_log('Stopped recording.');
-             cstm_log('Creating audio link...');
+             cstm_log(getString('recording_stopped_log'));
+             cstm_log(getString('recording_link_log'));
              // create WAV download link using audio data blob
              createDownloadLink();
              recorder.clear();
@@ -91,7 +96,7 @@
          }
      } else {
          //shoe error
-         sweetAlert("Babelium recorder", "You have to start a record first", "error");
+         sweetAlert(getString('swal_record_first_title'), getString("swal_record_first_body"), "error");
      }
      setStatus("Audio recording controls");
  }

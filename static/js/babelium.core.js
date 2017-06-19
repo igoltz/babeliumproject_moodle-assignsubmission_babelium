@@ -244,11 +244,11 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError) {
         fd.append("responsehash", getResponseHash());
 
         var method01 = 1;
-        if (method01 == 3) {
+        if (method01 === 3) {
             var request = new XMLHttpRequest();
             request.open("POST", audioPostUrl);
             request.send(fd);
-        } else if (method01 == 2) {
+        } else if (method01 === 2) {
             debug("babelium.core.js::demo get request to moodle()");
             var onSuccess = function(response, ajaxOptions, thrownError) {
                 console.log("demo request response: " + response);
