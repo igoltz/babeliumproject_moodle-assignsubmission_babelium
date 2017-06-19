@@ -201,14 +201,15 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError) {
     if (showProgressDialog) {
         //show success message
         swal({
-            title: "Recording finished",
+            title: getString("swal_audio_recorded_title"),
             html: true,
-            text: "<h3>Your audio has been successfully recorded.</h3>\
-              <p>Please wait while uploading...</p>\
+            text: "<h3>"+getString("swal_audio_recorded_h3")+"</h3>\
+              <p>"+getString("swal_audio_recorded_p")+"</p>\
               <div id='bar_container' style='margin: 20px;width: 400px;height: 8px;'>\
                   <progress id='progress_bar' value='0' max='100'>\
-                    <span>0</span>% uploaded\
-                  </progress>\
+                    <span>0</span>% "
+                    +getString("dialog_uploaded_ratio")+
+                  "</progress>\
               </div>\
               ",
             type: "info",
@@ -290,8 +291,8 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError) {
                 success: function(data, textStatus, xhr) {
                     //show success dialog. and execute callback when click on button
                     swal({
-                            title: "Upload finished",
-                            text: "File successfully uploaded",
+                            title: getString("swal_file_uploaded_title"),
+                            text: getString("swal_file_uploaded_body"),
                             type: "success",
                             showCancelButton: false
                         },
