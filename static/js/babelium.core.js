@@ -13,10 +13,73 @@ window.onload = function() {
 
 function start() {
     debug("babelium.core.js::start()");
+    showLoading(true);
     //init recorder
     initRecorder();
     initView();
     overwriteFormControl();
+    //translate text to user lang
+    translate();
+    show();
+}
+
+function showLoading(value){
+    var babelium_loading_row = document.getElementsByClassName("babelium_loading_row")[0];
+    if(babelium_loading_row){
+        //make sure it is shown
+        if(value === true){
+            babelium_loading_row.style.display = 'block';
+        }
+        else{
+            babelium_loading_row.style.display = 'none';
+        }
+    }
+}
+
+function translate(){
+    setStatus(getString('submission_recording_controls'));
+    setButtonsText();
+    setTitle();
+    setlogs();
+}
+
+function setButtonsText(){
+    var record = document.getElementsByClassName("startRecord")[0];
+    if(record){
+        record.innerHTML = getString("record");
+    }
+    var stop = document.getElementsByClassName("stopRecord")[0];
+    if(stop){
+        stop.innerHTML = getString("stop");
+    }
+}
+
+function setTitle(){
+    var title = document.getElementsByClassName("exercise-desc-title")[0];
+    if(title){
+        title.innerHTML = getString("exercise_title");
+    }
+}
+
+function setlogs(){
+    var recording_list_title = document.getElementsByClassName("recording_list_title")[0];
+    if(recording_list_title){
+        recording_list_title.innerHTML = getString("recording_list_title");
+    }
+    var recording_log_title = document.getElementsByClassName("recording_log_title")[0];  
+    if(recording_log_title){
+        recording_log_title.innerHTML = getString("recording_log_title");
+    }
+}
+
+function show(){
+    //hide loader
+    showLoading(false);
+    //show container
+    var container = document.getElementsByClassName("babelium-container")[0];
+    if(container){
+        container.style.display = 'block';
+    }
 }
 
 function overwriteFormControl() {

@@ -15,35 +15,42 @@
 <![endif]-->
 
 <div class="container">
- <div class="row">
-    <div class='col-md-12'>
-          <div class="centered">
-          <h3>Exercise description</h3>
-          <p class="justified exdescription"></p>
-           <div class="videocontent"></div>
-          </div>
-       </div>
+    
+    <div class="row babelium_loading_row" style="text-align: center;padding: 50px;">
+        <img 
+            src="https://babelium-dev.irontec.com/static/img/loading.svg" 
+            alt="loading logo for babelium exercise"
+            height="100px"
+            width="auto" />
     </div>
-    <div class="col-md-12">
-        <div class="centered">
-            <h2 id="status_text">Audio recording controls</h2>
-            <h3 class="clock">00:00:00</h3>
+    <div class="row babelium-container" style="display:none">
+       <div class='col-md-12'>
+             <div class="centered">
+               <h3 class="exercise-desc-title">Exercise description</h3>
+               <p class="justified exdescription"></p>
+                <div class="videocontent"></div>
+             </div>
+       </div>
+   
+        <div class="col-md-12">
+            <div class="centered">
+                <h2 id="status_text">Audio recording controls</h2>
+                <h3 class="clock">00:00:00</h3>
+            </div>
+
+            <div class="button-container">
+                <a class='button -green center startRecord' onclick='onVideoPlay();'>Record</a>
+                <a class='button -salmon center stopRecord' onclick="stopRecording(this);">Stop</a>
+            </div>
+
+            <h2 class="recording_list_title">Recordings list</h2>
+            <ul id="recordingslist"></ul>
+
+            <h2 class="recording_log_title">Recording log</h2>
+            <pre id="log"></pre>
         </div>
-
-        <div class="button-container">
-            <!--button class='button -dark center' onclick="playRecording(this);">Play</button>-->
-            <a class='button -green center startRecord' onclick='onVideoPlay();'>Record</a>
-            <a class='button -salmon center stopRecord' onclick="stopRecording(this);">Stop</a>
-        </div>
-
-        <h2>Recordings list</h2>
-        <ul id="recordingslist"></ul>
-
-        <h2>Recording log</h2>
-        <pre id="log"></pre>
     </div>
  </div>
-</div>
 
 <!-- sweet alert-->
 <script src="//babelium-dev.irontec.com/static/dist/sweetalert/sweetalert.min.js"></script>

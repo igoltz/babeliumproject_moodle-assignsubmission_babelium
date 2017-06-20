@@ -36,7 +36,12 @@ var en = {
     "swal_no_record_submission_title" : "Warning",
     "swal_no_record_submission_body" : "Please, record an audio before submitting the exercise",
     "available" : "available.",
-    "not_present" : "not present!"
+    "not_present" : "not present!",
+    "record" : "Record",
+    "stop" : "Stop",
+    "exercise_title" : "Exercise description",
+    "recording_list_title" : "Recordings list",
+    "recording_log_title" : "Recording log"
 };
 
 var es = {
@@ -72,7 +77,12 @@ var es = {
     "swal_no_record_submission_title" : "Atención",
     "swal_no_record_submission_body" : "Debe grabar el audio antes de finalizar la entrega.",
     "available" : "disponible.",
-    "not_present" : "no disponible!"
+    "not_present" : "no disponible!",
+    "record" : "Grabar",
+    "stop" : "Parar",
+    "exercise_title" : "Descripción del ejercicio",
+    "recording_list_title" : "Listado de grabaciones",
+    "recording_log_title" : "Log de grabaciones"
 };
 
 var de = {
@@ -108,7 +118,12 @@ var de = {
     "swal_no_record_submission_title" : "Warning",
     "swal_no_record_submission_body" : "Please, record an audio before submitting the exercise.",
     "available" : "available.",
-    "not_present" : "not present!"
+    "not_present" : "not present!",
+    "record" : "Record",
+    "stop" : "Stop",
+    "exercise_title" : "Exercise description",
+    "recording_list_title" : "Recordings list",
+    "recording_log_title" : "Recording log"
 };
 
 var eu = {
@@ -144,7 +159,12 @@ var eu = {
     "swal_no_record_submission_title" : "Kontuz",
     "swal_no_record_submission_body" : "Ariketa bidali baino lehen, audio grabatzea derrigorrezkoa da.",
     "available" : "erabilgarri.",
-    "not_present" : "ez erabilgarria"
+    "not_present" : "ez erabilgarria",
+    "record" : "Grabatu",
+    "stop" : "Gelditu",
+    "exercise_title" : "Ariketaren azalpena",
+    "recording_list_title" : "Grabazio zerrenda",
+    "recording_log_title" : "Grabazio historikoa"
 
 };
 
