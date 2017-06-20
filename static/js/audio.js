@@ -18,7 +18,11 @@
      if (recording_permission_granted) {
          //check if secure origin
          if (location.protocol === 'http:') {
-             swal("Recording disabled", "For security reasons, audio recording is disabled on non HTTPS websites", "error");
+            swal(
+                getString("swal_msg_http_title"),
+                getString("swal_msg_http_body"),
+                "error"
+            );
              autoStopVideo();
          } else {
              if (!is_recording) {
@@ -27,7 +31,9 @@
                      recorder.record();
                      recorder && recorder.stop();
                      recorder && recorder.record();
-                     cstm_log('Recording...');
+                     cstm_log(
+                        getString('recording_log')
+                     );
                      is_recording = true;
                  }
              }
@@ -35,11 +41,12 @@
      } else {
          autoStopVideo();
          swal({
-                 title: "Allow microphone",
-                 text: "Please, allow microphone access before recording",
+                 title: getString("swal_msg_allow_micro_title"),
+                 text: getString("swal_msg_allow_micro_body"),
                  type: "warning",
                  showCancelButton: true,
-                 confirmButtonText: "Allow",
+                 confirmButtonText: getString("swal_msg_allow_btn"),
+                 cancelButtonText: getString("swal_msg_cancel_btn"),
                  closeOnConfirm: true
              },
              function() {
@@ -59,11 +66,11 @@
                      name: permissionName
                  })
                  .then(function(result) {
-                     if (result.state == 'granted') {
+                     if (result.state === 'granted') {
                          recording_permission_granted = true;
-                     } else if (result.state == 'prompt') {
+                     } else if (result.state === 'prompt') {
                          recording_permission_granted = false;
-                     } else if (result.state == 'denied') {
+                     } else if (result.state === 'denied') {
                          recording_permission_granted = false;
                      }
                      result.onchange = function() {
@@ -82,8 +89,8 @@
          if (recorder !== undefined) {
              recorder && recorder.stop();
              autoStopVideo();
-             cstm_log('Stopped recording.');
-             cstm_log('Creating audio link...');
+             cstm_log(getString('recording_stopped_log'));
+             cstm_log(getString('recording_link_log'));
              // create WAV download link using audio data blob
              createDownloadLink();
              recorder.clear();
@@ -91,9 +98,9 @@
          }
      } else {
          //shoe error
-         sweetAlert("Babelium recorder", "You have to start a record first", "error");
+         sweetAlert(getString('swal_record_first_title'), getString("swal_record_first_body"), "error");
      }
-     setStatus("Audio recording controls");
+     setStatus(getString('submission_recording_controls')); 
  }
 
  function initRecorder() {
@@ -109,9 +116,9 @@
              if (!is_page_insecure_msg_shown) {
                  document.body.innerHTML = '\
                 <div class="alert alert-danger">\
-                <strong>RECORDING DISABLED!</strong>\
-                For security reasons, audio recording is disabled on non HTTPS locations\
-                </div>' +
+                <strong>'+getString("no_https_web_title")+'</strong>'
+                         +getString("swal_msg_http_body")+
+                '</div>' +
                      document.body.innerHTML;
                  is_page_insecure_msg_shown = true;
              }
@@ -123,11 +130,17 @@
              window.URL = window.URL || window.webkitURL;
 
              audio_context = new AudioContext;
-             cstm_log('Audio context set up.');
-             cstm_log('navigator.getUserMedia() ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
+             cstm_log(getString("recorder_audio_context_log"));
+             cstm_log('navigator.getUserMedia() ' + (navigator.getUserMedia ? getString("available") : getString("not_present")));
          } catch (e) {
-             cstm_log('No web audio support in this browser!');
-             sweetAlert("Oops...", "No web audio support in this browser", "error");
+            cstm_log(
+                    getString("swal_noudio_support_body")
+                    );
+            sweetAlert(
+                getString("swal_oops_title"),
+                getString("swal_noudio_support_body"),
+                "error"
+            );
          }
 
          navigator.getUserMedia({
@@ -135,8 +148,15 @@
              },
              startUserMedia,
              function(e) {
-                 cstm_log('No live audio input: ' + e);
-                 sweetAlert("Oops...", "No live audio input", "error");
+                cstm_log(
+                    getString("swal_no_live_audio")
+                    + e
+                );
+                sweetAlert(
+                    getString("swal_oops_title"),
+                    getString("swal_no_live_audio"),
+                    "error"
+                );
              }
          );
      }
@@ -148,7 +168,7 @@
      if (mics > 0) {
          console.log("Audio tracks detected: " + mics);
          var input = audio_context.createMediaStreamSource(stream);
-         cstm_log('Media stream created.');
+         cstm_log(getString("recorder_media_log"));
          // Uncomment if you want the audio to feedback directly
          //input.connect(audio_context.destination);
          //cstm_log('Input connected to audio context destination.');
@@ -159,13 +179,17 @@
              numChannels: 1,
              bufferLen: 1024
          };
-         cstm_log('Setting recorder configuration...');
+         cstm_log(getString('recorder_config_log'));
 
          recorder = new Recorder(input, config);
-         cstm_log('Recorder initialised.');
+         cstm_log(getString("recorder_init_log"));
          recorderLoaded = true;
          recording_permission_granted = true;
      } else {
-         sweetAlert("Oops...", "No recording microphones detected", "error");
+         sweetAlert(
+            getString("swal_oops_title"),
+            getString("swal_no_mics_body"),
+            "error"
+         );
      }
  }

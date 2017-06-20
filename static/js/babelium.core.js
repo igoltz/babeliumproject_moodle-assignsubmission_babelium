@@ -13,6 +13,7 @@ window.onload = function() {
 
 function start() {
     debug("babelium.core.js::start()");
+    showLoading(true);
     //init recorder
     initRecorder();
     initView();
@@ -29,7 +30,11 @@ function overwriteFormControl() {
                 onSubmissionDoneListener(event);
             } else {
                 event.preventDefault();
-                sweetAlert("Warning", "Please, record an audio before submitting the exercise", "warning");
+                sweetAlert(
+                    getString("swal_no_record_submission_title"),
+                    getString("swal_no_record_submission_body"),
+                    "warning"
+                );
             }
         });
     }
@@ -63,19 +68,11 @@ function onVideoPlay() {
             video.play();
             console.log("recording...");
             startRecording();
-            setStatus("Recording...");
+            setStatus(getString("recording_status"));
         } else {
-            cstm_log("Recorded not loaded");
+            cstm_log(getString("recorder_no_loaded_log"));
             startRecording();
         }
-    }
-}
-
-function setStatus(text) {
-    debug("babelium.core.js::setStatus()");
-    var status = document.getElementById('status_text');
-    if (status !== undefined && status !== null && text !== null && text !== undefined) {
-        status.textContent = text;
     }
 }
 
@@ -201,14 +198,15 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError) {
     if (showProgressDialog) {
         //show success message
         swal({
-            title: "Recording finished",
+            title: getString("swal_audio_recorded_title"),
             html: true,
-            text: "<h3>Your audio has been successfully recorded.</h3>\
-              <p>Please wait while uploading...</p>\
+            text: "<h3>"+getString("swal_audio_recorded_h3")+"</h3>\
+              <p>"+getString("swal_audio_recorded_p")+"</p>\
               <div id='bar_container' style='margin: 20px;width: 400px;height: 8px;'>\
                   <progress id='progress_bar' value='0' max='100'>\
-                    <span>0</span>% uploaded\
-                  </progress>\
+                    <span>0</span>% "
+                    +getString("dialog_uploaded_ratio")+
+                  "</progress>\
               </div>\
               ",
             type: "info",
@@ -244,11 +242,11 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError) {
         fd.append("responsehash", getResponseHash());
 
         var method01 = 1;
-        if (method01 == 3) {
+        if (method01 === 3) {
             var request = new XMLHttpRequest();
             request.open("POST", audioPostUrl);
             request.send(fd);
-        } else if (method01 == 2) {
+        } else if (method01 === 2) {
             debug("babelium.core.js::demo get request to moodle()");
             var onSuccess = function(response, ajaxOptions, thrownError) {
                 console.log("demo request response: " + response);
@@ -290,8 +288,8 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError) {
                 success: function(data, textStatus, xhr) {
                     //show success dialog. and execute callback when click on button
                     swal({
-                            title: "Upload finished",
-                            text: "File successfully uploaded",
+                            title: getString("swal_file_uploaded_title"),
+                            text: getString("swal_file_uploaded_body"),
                             type: "success",
                             showCancelButton: false
                         },

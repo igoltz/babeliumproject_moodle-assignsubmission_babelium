@@ -379,6 +379,11 @@ class BabeliumHelper
 
        $domain = get_config(self::ASSIGNSUBMISSION_BABELIUM,'serverdomain');
        $lang = current_language();
+       
+       $html_content.='<script
+              src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/i18n.js"
+              language="javascript">
+          </script>'.PHP_EOL;
 
         $html_content.='<script
               src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.view.js"
@@ -457,6 +462,11 @@ class BabeliumHelper
 
        $domain = get_config(self::ASSIGNSUBMISSION_BABELIUM,'serverdomain');
        $lang = current_language();
+       
+       $html_content.='<script
+              src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/i18n.js"
+              language="javascript">
+          </script>'.PHP_EOL;
 
        $html_content.='<script
                            src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/audio.js"
@@ -648,8 +658,8 @@ class BabeliumHelper
     public function babeliumsubmission_html_output_error($submission) {
         Logging::logBabelium("Generating error HTML for failed submission preview");
         $html_content = '';
-        $html_content.='<h2>Could not load an exercise preview</h2>';
-        $html_content.='<p>An error happen while loading the exercise preview. Please contact your teacher or system administrator</p>';
+        $html_content.='<h2>'.get_string('title_not_load_exercise', 'assignsubmission_babelium').'</h2>';
+        $html_content.='<p>'.get_string('msg_not_load_exercise', 'assignsubmission_babelium').'</p>';
         $showDetails = false;
         if($showDetails){
             //capture var dump
@@ -705,7 +715,7 @@ class BabeliumHelper
            //conversion not started
             $html_content.='<div class="alert alert-info alert-block fade in" role="alert">
                                 <button type="button" class="close" data-dismiss="alert">×</button>
-                                Submitted video is added to processing queue, please wait...
+                                '.get_string("video_queued", 'assignsubmission_babelium').'
                             </div>';
        }
        else if( isset($info['isProcessed']) && $info['isProcessed']==1 ){
@@ -714,14 +724,14 @@ class BabeliumHelper
                //conversion started but not finished
                $html_content.='<div class="alert alert-info alert-block fade in" role="alert">
                                     <button type="button" class="close" data-dismiss="alert">×</button>
-                                    Submitted video is being processing, please wait...
+                                    '. get_string("video_processing", 'assignsubmission_babelium').'
                                 </div>';
            }
            else{
                //conversion finished
                $html_content.='<div class="alert alert-info alert-block fade in" role="alert">
                                     <button type="button" class="close" data-dismiss="alert">×</button>
-                                    Exercise preview is ready.
+                                    '. get_string("video_ready", 'assignsubmission_babelium').'
                                </div>';
            }
        }
