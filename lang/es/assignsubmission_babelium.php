@@ -76,3 +76,8 @@ $string['babeliumApiErrorCode403']='Babelium Error 403. Credenciales de autoriza
 $string['babeliumApiErrorCode404']='Babelium Error 404. Método no encontrado. Parámetros no válidos';
 $string['babeliumApiErrorCode500']='Babelium Error 500. Error interno del servidor';
 
+$string['title_not_load_exercise'] = "No se pudo cargar la vista previa del ejercicio";
+$string['msg_not_load_exercise'] = "Ocurrió un error al procesar el ejercicio. Por favor, contacta con tu profesor o administrador del sistema";
+$string['video_queued'] = "El ejercicio subido se procesará en breve, por favor espere...";
+$string['video_processing'] = "El ejercicio subido se está procesando, por favor espere...";
+$string['video_ready'] = "La vista previa está preparada";

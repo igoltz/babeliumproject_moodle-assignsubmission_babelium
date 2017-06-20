@@ -75,3 +75,9 @@ $string['babeliumApiErrorCode400']='Babelium 400 Errorea. Eskaera gaizki eraikia
 $string['babeliumApiErrorCode403']='Babelium 403 Errorea. Autorizazio kredentzial desegokia';
 $string['babeliumApiErrorCode404']='Babelium 404 Errorea. Metodoa ezezaguna. Baliogabeko parametroak';
 $string['babeliumApiErrorCode500']='Babelium 500 Errorea. Zerbitzariko barne errorea';
+
+$string['title_not_load_exercise'] = "Ariketaren aurreikuspena ezin da kargatu";
+$string['msg_not_load_exercise'] = "Errore bat gertatu da ariketa-aurrebista kargatzean. Mesedez, zure irakaslearekin edo sistemako administratzailearekin jarri harremanetan.";
+$string['video_queued'] = "Bidalitako bideoa bizpahiru minututan prozezatuko da, mesedez itxaron ...";
+$string['video_processing'] = "Bidalitako bideoa prozesatzen ari da, mesedez itxaron ...";
+$string['video_ready'] = "Ariketaren aurreikuspena prest dago";

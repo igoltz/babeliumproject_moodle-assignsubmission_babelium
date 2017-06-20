@@ -76,3 +76,10 @@ $string['babeliumApiErrorCode403']='Babelium Fehlermeldung 403. Berechtigungsnac
 $string['babeliumApiErrorCode404']='Babelium Fehlermeldung 404. Methode nicht gefunden. Parameter ungültig';
 $string['babeliumApiErrorCode500']='Babelium Fehlermeldung 500. Interner Serverfehler';
 
+//todo
+$string['title_not_load_exercise'] = "Could not load an exercise preview";
+$string['msg_not_load_exercise'] = "An error happen while loading the exercise preview. Please contact your teacher or system administrator";
+$string['video_queued'] = "Submitted video is added to processing queue, please wait...";
+$string['video_processing'] = "Submitted video is being processing, please wait...";
+$string['video_ready'] = "Exercise preview is ready.";
+
