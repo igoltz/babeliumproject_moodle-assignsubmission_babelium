@@ -12,6 +12,8 @@ var en = {
     "recorder_init_log" : "Recorder initialised.",
     "recorder_config_log" : "Setting recorder configuration...",
     "recorder_media_log" : "Media stream created",
+    "recorder_no_loaded_log" : "Recorded not loaded",
+    "recorder_audio_context_log" : "Audio context set up.",
     "swal_msg_allow_micro_title" : "Allow microphone",
     "swal_msg_allow_micro_body" : "Please, allow microphone access before recording.",
     "swal_msg_cancel_btn" : "Cancel",
@@ -29,7 +31,12 @@ var en = {
     "swal_audio_recorded_title":"Recording finished",
     "dialog_uploaded_ratio":"uploaded",
     "swal_audio_recorded_h3" : "Your audio has been successfully recorded",
-    "swal_audio_recorded_p":"Please wait while uploading..."
+    "swal_audio_recorded_p":"Please wait while uploading...",
+    "recording_status" : "Recording...",
+    "swal_no_record_submission_title" : "Warning",
+    "swal_no_record_submission_body" : "Please, record an audio before submitting the exercise",
+    "available" : "available.",
+    "not_present" : "not present!"
 };
 
 var es = {
@@ -41,6 +48,8 @@ var es = {
     "recorder_init_log" : "Grabador de audio listo.",
     "recorder_config_log" : "Configurando grabador de audio...",
     "recorder_media_log" : "Creado el stream de audio",
+    "recorder_no_loaded_log" : "Grabador de audio no iniciado",
+    "recorder_audio_context_log" : "Entorno de grabación preparado",
     "swal_msg_allow_micro_title" : "Permitir micrófono",
     "swal_msg_allow_micro_body" : "Por favor, permita acceso al microfono antes de grabar.",
     "swal_msg_cancel_btn" : "Cancelar",
@@ -58,7 +67,12 @@ var es = {
     "swal_audio_recorded_title" : "Grabación finalizada",
     "dialog_uploaded_ratio" : "subido",
     "swal_audio_recorded_h3" : "Audio grabado correctamente",
-    "swal_audio_recorded_p" : "Por favor, espere mientras se completa la subida..."
+    "swal_audio_recorded_p" : "Por favor, espere mientras se completa la subida...",
+    "recording_status" : "Grabando...",
+    "swal_no_record_submission_title" : "Atención",
+    "swal_no_record_submission_body" : "Debe grabar el audio antes de finalizar la entrega.",
+    "available" : "disponible.",
+    "not_present" : "no disponible!"
 };
 
 var de = {
@@ -70,6 +84,8 @@ var de = {
     "recorder_init_log" : "Recorder initialised.",    
     "recorder_config_log" : "Setting recorder configuration...",
     "recorder_media_log" : "Media stream created",
+    "recorder_no_loaded_log" : "Recorded not loaded",
+    "recorder_audio_context_log" : "Audio context set up.",
     "swal_msg_allow_micro_title" : "Allow microphone",
     "swal_msg_allow_micro_body" : "Please, allow microphone access before recording.",
     "swal_msg_cancel_btn" : "Cancel",
@@ -87,7 +103,12 @@ var de = {
     "swal_audio_recorded_title":"Recording finished",
     "dialog_uploaded_ratio":"uploaded",
     "swal_audio_recorded_h3" : "Your audio has been successfully recorded",
-    "swal_audio_recorded_p":"Please wait while uploading..."
+    "swal_audio_recorded_p":"Please wait while uploading...",
+    "recording_status" : "Recording...",
+    "swal_no_record_submission_title" : "Warning",
+    "swal_no_record_submission_body" : "Please, record an audio before submitting the exercise.",
+    "available" : "available.",
+    "not_present" : "not present!"
 };
 
 var eu = {
@@ -99,6 +120,8 @@ var eu = {
     "recorder_init_log" : "Grabatzailea prest",
     "recorder_config_log" : "Audio grabatzailea konfiguratzen...",
     "recorder_media_log" : "Audio MediaStream prest dago",
+    "recorder_no_loaded_log" : "Ezin da grabatzailea kargatu",
+    "recorder_audio_context_log" : "Grabazio tresnamenta prest",
     "swal_msg_allow_micro_title" : "Mikrofonoa onartu",
     "swal_msg_allow_micro_body" : "Mesedez, baimena eman mikrofonoa erabiltzeko grabatu baino lehen.",
     "swal_msg_cancel_btn" : "Ezeztatu",
@@ -116,7 +139,12 @@ var eu = {
     "swal_audio_recorded_title":"Grabazioa amaituta",
     "dialog_uploaded_ratio":" bidalita",
     "swal_audio_recorded_h3" : "Zure grabaketa amaituta dago",
-    "swal_audio_recorded_p":"Mesedez, itxaron..."
+    "swal_audio_recorded_p":"Mesedez, itxaron...",
+    "recording_status" : "Grabatzen...",
+    "swal_no_record_submission_title" : "Kontuz",
+    "swal_no_record_submission_body" : "Ariketa bidali baino lehen, audio grabatzea derrigorrezkoa da.",
+    "available" : "erabilgarri.",
+    "not_present" : "ez erabilgarria"
 
 };
 

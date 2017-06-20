@@ -29,7 +29,11 @@ function overwriteFormControl() {
                 onSubmissionDoneListener(event);
             } else {
                 event.preventDefault();
-                sweetAlert("Warning", "Please, record an audio before submitting the exercise", "warning");
+                sweetAlert(
+                    getString("swal_no_record_submission_title"),
+                    getString("swal_no_record_submission_body"),
+                    "warning"
+                );
             }
         });
     }
@@ -63,9 +67,9 @@ function onVideoPlay() {
             video.play();
             console.log("recording...");
             startRecording();
-            setStatus("Recording...");
+            setStatus(getString("recording_status"));
         } else {
-            cstm_log("Recorded not loaded");
+            cstm_log(getString("recorder_no_loaded_log"));
             startRecording();
         }
     }

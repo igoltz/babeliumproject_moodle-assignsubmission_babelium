@@ -31,7 +31,9 @@
                      recorder.record();
                      recorder && recorder.stop();
                      recorder && recorder.record();
-                     cstm_log(getString('recording_log'));
+                     cstm_log(
+                        getString('recording_log')
+                     );
                      is_recording = true;
                  }
              }
@@ -128,8 +130,8 @@
              window.URL = window.URL || window.webkitURL;
 
              audio_context = new AudioContext;
-             cstm_log('Audio context set up.');
-             cstm_log('navigator.getUserMedia() ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
+             cstm_log(getString("recorder_audio_context_log"));
+             cstm_log('navigator.getUserMedia() ' + (navigator.getUserMedia ? getString("available") : getString("not_present")));
          } catch (e) {
             cstm_log(
                     getString("swal_noudio_support_body")
