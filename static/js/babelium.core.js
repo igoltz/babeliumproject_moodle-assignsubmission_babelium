@@ -348,8 +348,8 @@ function setToogleText(toogleStatus){
     var clsnameRight = "video-toogle-text-right";
     var toogleTextRight = document.getElementsByClassName(clsnameRight)[0];
 
-    var focus_color = "#3a3a3a";
-    var no_focus_color = "#ccc";
+    var focus_color = "#2196f3";
+    var no_focus_color = "#3a3a3a";
 
     //reset text
     if(toogleTextLeft!==undefined){
