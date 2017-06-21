@@ -6,6 +6,7 @@ var audioPostUrl = "//babelium-dev.irontec.com/mod/assign/submission/babelium/po
 var debug_enabled = location.protocol === 'http:';
 var babelium_server_data = "";
 var no_value = -1;
+var is_babelium_view = true;
 
 function initView() {
     if($ === undefined && jQuery!==undefined){
@@ -17,7 +18,7 @@ function initView() {
     var subtitleId = exsubs[0].subtitleId;
     loadSubtitles(subtitleId);
     //load video
-    loadVideo(exinfo.id, subtitleId);
+    loadVideo(exinfo.id, subtitleId, "edited");
     loadExerciseDescription(exinfo.description);
 
     //translate text to user lang

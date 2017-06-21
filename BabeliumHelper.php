@@ -501,7 +501,6 @@ class BabeliumHelper
                                var rsinfo = '.$rsinfo.';
                                var rssubs = '.$rssubs.';
                                var recinfo = '.$recinfo.';
-                               init(exinfo, exsubs, rsinfo, rssubs, recinfo);
                          </script>'.PHP_EOL;
        Logging::logBabelium("Injecting ". strlen($html_content)." data bytes into babelium submission");
        return $html_content;

@@ -318,30 +318,68 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError) {
     }
 }
 
+/**
+    BEGIN TOOGLE CONTROL
+**/
+
 
 function initToogle() {
     var onVideoToogleChange = function () {
         toogle_changed = !toogle_changed;
         console.log("Toogle status: "+toogle_changed);
+        setToogleText(toogle_changed);
         if(toogle_changed){
             //view edited video
-            setToogleText("Mostrar video entregado");
+            onToogleGoesToTrueState();
         }
         else{
             //view original video
-            setToogleText("Mostrar video original");
+            onToogleGoesToFalseState();
         }
     }
     document.getElementsByClassName('video-toogle')[0].addEventListener('change',onVideoToogleChange,false);
-    setToogleText("Mostrar video original");
+    setToogleText(toogle_changed);
 }
 
-function setToogleText(text){
-    if(text){
-        var clsname = "video-toogle-text";
-        var toogleText = document.getElementsByClassName(clsname)[0];
-        if(toogleText!==undefined){
-            toogleText.innerHTML = text;
+function setToogleText(toogleStatus){
+    var clsnameLeft = "video-toogle-text-left";
+    var toogleTextLeft = document.getElementsByClassName(clsnameLeft)[0];
+
+    var clsnameRight = "video-toogle-text-right";
+    var toogleTextRight = document.getElementsByClassName(clsnameRight)[0];
+
+    if(toogleStatus){
+        if(toogleTextLeft!==undefined){
+            toogleTextLeft.style.fontWeight = "inherit";
+        }
+        if(toogleTextRight!==undefined){
+            toogleTextRight.style.fontWeight = "Bold";
+        }
+    }
+    else{
+        if(toogleTextLeft!==undefined){
+            toogleTextLeft.style.fontWeight = "Bold";
+        }
+        if(toogleTextRight!==undefined){
+            toogleTextRight.style.fontWeight = "inherit";
         }
     }
 }
+
+function onToogleGoesToTrueState(){
+    //load edited video
+    if(exinfo!==undefined){
+        injectVideoFromId(exinfo.exerciseId, exinfo.subtitleId, "edited");
+    }
+}
+
+function onToogleGoesToFalseState(){
+    //load original video
+    if(exinfo!==undefined){
+        injectVideoFromId(exinfo.id, exinfo.subtitleId, "original");
+    }
+}
+
+/**
+    END TOOGLE CONTROL
+**/

@@ -1,9 +1,9 @@
 var noPosterImageUrl = "//babelium-dev.irontec.com/static/_temp/novideo.jpg";
 var posterImage = noPosterImageUrl;
 
-function loadVideo(videoId, subtitleId) {
+function loadVideo(videoId, subtitleId, type) {
     debug("video.loader.js::loadVideo()");
-    downloadPosterImage(videoId, subtitleId);
+    downloadPosterImage(videoId, subtitleId, type);
 }
 
 
@@ -51,28 +51,37 @@ function getPosterUrl(videoId) {
     return noPosterImageUrl;
 }
 
-function downloadPosterImage(videoId, subtitleId) {
+function downloadPosterImage(videoId, subtitleId, type) {
     var expectedPosterUrl = getPosterUrl(videoId);
     debug("video.loader.js::downloadPosterImage()");
     var onSuccess = function(response, ajaxOptions, thrownError) {
         debug("Poster image is valid");
         posterImage = expectedPosterUrl;
-        injectVideo(videoId, subtitleId);
+        injectVideoFromId(videoId, subtitleId, type);
     };
     var onError = function(response, ajaxOptions, thrownError) {
         debug("Poster image is not valid");
         posterImage = noPosterImageUrl;
-        injectVideo(videoId, subtitleId);
+        injectVideoFromId(videoId, subtitleId, type);
     };
     rpc("GET", expectedPosterUrl, onSuccess, onError);
 }
 
-function injectVideo(videoId, subtitleId) {
+function injectVideoFromId(videoId, subtitleId, type) {
+    var videoUrl = getMP4video(videoId, type);
+    var videoWebmUrl = getWEBMvideo(videoId, type);
+    var subtitlesUrl = getSubtitlesURL(subtitleId);
+    var subcaption = getSubtitlesLangCaption(subtitleId);
+    var sublang = getSubtitlesLang(subtitleId);
+    injectVideo(posterImage, videoUrl,videoWebmUrl, subtitlesUrl, sublang, subcaption);
+}
+
+function injectVideo(posterImage, videoUrl, videoWebmUrl, subtitlesUrl, sublang, subcaption) {
     var videoStr = "\
     <video id='submission_video' style='width:100%' poster='" + posterImage + "' controls crossorigin='anonymous'>\
-        <source src='" + getMP4video(videoId) + "' type='video/mp4'>\
-        <source src='" + getWEBMvideo(videoId) + "' type='video/webm'>\
-        <track kind='captions' label='" + getSubtitlesLangCaption(subtitleId) + "' src='" + getSubtitlesURL(subtitleId) + "' srclang='" + getSubtitlesLang(subtitleId) + "' default>\
+        <source src='" + videoUrl + "' type='video/mp4'>\
+        <source src='" + videoWebmUrl + "' type='video/webm'>\
+        <track kind='captions' label='" + subcaption + "' src='" + subtitlesUrl + "' srclang='" + sublang + "' default>\
         video not supported\
     </video>";
     //append video element to div
@@ -116,22 +125,43 @@ function autoStopVideo() {
     }
 }
 
-function getMP4video(videoId) {
+function getMP4video(videoId, type) {
     debug("video.loader.js::getMP4video()");
-    var hasMedia = exinfo !== undefined;
-    if (hasMedia) {
-        var isExercise = !exinfo.exerciseId;
-        if (isExercise) {
-            //exercise
-            hasMedia = exinfo.media !== undefined;
-            if (hasMedia && exinfo.media.mp4Url !== undefined) {
-                return exinfo.media.mp4Url;
+    if(type === "edited"){
+        var hasMedia = exinfo !== undefined;
+        if (hasMedia) {
+            var isExercise = !exinfo.exerciseId;
+            if (isExercise) {
+                //exercise
+                hasMedia = exinfo.media !== undefined;
+                if (hasMedia && exinfo.media.mp4Url !== undefined) {
+                    return exinfo.media.mp4Url;
+                }
+            } else {
+                //response
+                hasMedia = exinfo.mp4Url !== undefined;
+                if (hasMedia) {
+                    return exinfo.mp4Url;
+                }
             }
-        } else {
-            //response
-            hasMedia = exinfo.mp4Url !== undefined;
-            if (hasMedia) {
-                return exinfo.mp4Url;
+        }
+    }
+    else if( type === "original"){
+        var hasMedia = exinfo !== undefined;
+        if (hasMedia) {
+            var isExercise = !exinfo.exerciseId;
+            if (isExercise) {
+                //exercise
+                hasMedia = exinfo.media !== undefined;
+                if (hasMedia && exinfo.media.mp4Url !== undefined) {
+                    return exinfo.media.mp4Url;
+                }
+            } else {
+                //response
+                hasMedia = exinfo.mp4Url !== undefined;
+                if (hasMedia) {
+                    return exinfo.mp4Url;
+                }
             }
         }
     }
@@ -139,7 +169,7 @@ function getMP4video(videoId) {
     return "//babelium-dev.irontec.com/static/_temp/video.mp4";
 }
 
-function getWEBMvideo(videoId) {
+function getWEBMvideo(videoId, type) {
     debug("video.loader.js::getWEBMvideo()");
     hasMedia = exinfo !== undefined && exinfo.media !== undefined;
     if (hasMedia && exinfo.media.webpUrl !== undefined) {
