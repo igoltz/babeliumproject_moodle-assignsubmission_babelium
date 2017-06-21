@@ -1,3 +1,5 @@
+var toogle_changed = false;
+
 window.onload = function() {
     debug("babelium.core.js::onload()");
     if (window.jQuery === undefined || $ === undefined) {
@@ -17,6 +19,7 @@ function start() {
     //init recorder
     initRecorder();
     initView();
+    initToogle();
     overwriteFormControl();
 }
 
@@ -312,5 +315,33 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError) {
         var xhr = new XMLHttpRequest();
         xhr.open("POST", audioPostUrl, true);
         xhr.send(fd);
+    }
+}
+
+
+function initToogle() {
+    var onVideoToogleChange = function () {
+        toogle_changed = !toogle_changed;
+        console.log("Toogle status: "+toogle_changed);
+        if(toogle_changed){
+            //view edited video
+            setToogleText("Mostrar video entregado");
+        }
+        else{
+            //view original video
+            setToogleText("Mostrar video original");
+        }
+    }
+    document.getElementsByClassName('video-toogle')[0].addEventListener('change',onVideoToogleChange,false);
+    setToogleText("Mostrar video original");
+}
+
+function setToogleText(text){
+    if(text){
+        var clsname = "video-toogle-text";
+        var toogleText = document.getElementsByClassName(clsname)[0];
+        if(toogleText!==undefined){
+            toogleText.innerHTML = text;
+        }
     }
 }

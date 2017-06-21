@@ -19,7 +19,7 @@ function initView() {
     //load video
     loadVideo(exinfo.id, subtitleId);
     loadExerciseDescription(exinfo.description);
-    
+
     //translate text to user lang
     translate();
     show();
@@ -109,7 +109,7 @@ function setlogs(){
     if(recording_list_title){
         recording_list_title.innerHTML = getString("recording_list_title");
     }
-    var recording_log_title = document.getElementsByClassName("recording_log_title")[0];  
+    var recording_log_title = document.getElementsByClassName("recording_log_title")[0];
     if(recording_log_title){
         recording_log_title.innerHTML = getString("recording_log_title");
     }
