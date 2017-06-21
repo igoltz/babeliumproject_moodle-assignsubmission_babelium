@@ -348,6 +348,15 @@ function setToogleText(toogleStatus){
     var clsnameRight = "video-toogle-text-right";
     var toogleTextRight = document.getElementsByClassName(clsnameRight)[0];
 
+    //reset text
+    if(toogleTextLeft!==undefined){
+        toogleTextLeft.innerHTML = getString("view_edited_video");
+    }
+    if(toogleTextRight!==undefined){
+        toogleTextRight.innerHTML = getString("view_original_video");
+    }
+
+    //update status
     if(toogleStatus){
         if(toogleTextLeft!==undefined){
             toogleTextLeft.style.fontWeight = "inherit";
