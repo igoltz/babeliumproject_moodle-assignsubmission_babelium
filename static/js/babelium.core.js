@@ -348,6 +348,9 @@ function setToogleText(toogleStatus){
     var clsnameRight = "video-toogle-text-right";
     var toogleTextRight = document.getElementsByClassName(clsnameRight)[0];
 
+    var focus_color = "#3a3a3a";
+    var no_focus_color = "#ccc";
+
     //reset text
     if(toogleTextLeft!==undefined){
         toogleTextLeft.innerHTML = getString("view_edited_video");
@@ -360,17 +363,21 @@ function setToogleText(toogleStatus){
     if(toogleStatus){
         if(toogleTextLeft!==undefined){
             toogleTextLeft.style.fontWeight = "inherit";
+            toogleTextLeft.style.color = no_focus_color;
         }
         if(toogleTextRight!==undefined){
             toogleTextRight.style.fontWeight = "Bold";
+            toogleTextRight.style.color = focus_color;
         }
     }
     else{
         if(toogleTextLeft!==undefined){
             toogleTextLeft.style.fontWeight = "Bold";
+            toogleTextLeft.style.color = focus_color;
         }
         if(toogleTextRight!==undefined){
             toogleTextRight.style.fontWeight = "inherit";
+            toogleTextRight.style.color = no_focus_color;
         }
     }
 }
@@ -378,14 +385,14 @@ function setToogleText(toogleStatus){
 function onToogleGoesToTrueState(){
     //load edited video
     if(exinfo!==undefined){
-        injectVideoFromId(exinfo.exerciseId, exinfo.subtitleId, "edited");
+        injectVideoFromId(exinfo.exerciseId, exinfo.subtitleId, "original");
     }
 }
 
 function onToogleGoesToFalseState(){
     //load original video
     if(exinfo!==undefined){
-        injectVideoFromId(exinfo.id, exinfo.subtitleId, "original");
+        injectVideoFromId(exinfo.id, exinfo.subtitleId, "edited");
     }
 }
 
