@@ -154,7 +154,11 @@ function getMP4video(videoId, type) {
             if(hasExerciseId!==undefined){
                 var exerciseUrl = CONSTANTS.exercise_info_api_path_via_middle + "?name=exerciseinfo&data=" + exinfo.exerciseId;
                 var responseAjaxData = sync_rpc("GET", exerciseUrl);
-                debug(responseAjaxData);
+                if(responseAjaxData !== undefined){
+                    if (responseAjaxData.media !== undefined && responseAjaxData.media.mp4Url !== undefined) {
+                        return responseAjaxData.media.mp4Url;
+                    }
+                }
             }
         }
     }
