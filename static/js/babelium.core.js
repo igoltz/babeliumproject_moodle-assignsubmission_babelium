@@ -1,16 +1,3 @@
- //init constants
-try{
-    var constantsStatus = typeof CONSTANTS === typeof undefined ? true : false;
-    if(constantsStatus){
-        console.log("loading constants file...");
-        $.getScript("http://babelium-dev.irontec.com/static/js/constants.js");
-        $.getScript("http://192.167.1.3/mod/assign/submission/babelium/static/js/constants.js");
-    }
-}
-catch(error){
-    debug(error.message);
-}
-
 var toogle_changed = false;
 
 window.onload = function() {
@@ -19,7 +6,7 @@ window.onload = function() {
         var script = document.createElement('script');
         document.head.appendChild(script);
         script.type = 'text/javascript';
-        script.src = CONSTANTS.ajax_path;
+        script.src = "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js";
         script.onload = start;
     } else {
         start();

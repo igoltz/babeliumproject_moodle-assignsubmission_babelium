@@ -1,8 +1,8 @@
 var CONSTANTS =
 {
-    babelium_host : "//babelium-server-dev.irontec.com/",
-    babelium_host_api : babelium_host + "api/v3",
-    babelium_audio_api : babelium_host + "mod/assign/submission/babelium/post.php",
+    babelium_host : "//babelium-server-dev.irontec.com",
+    babelium_host_api : "//babelium-server-dev.irontec.com/api/v3",
+    babelium_audio_api : "//babelium-server-dev.irontec.com/mod/assign/submission/babelium/post.php",
     ajax_path :  "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js",
     http : 'http:',
     micro  :'microphone',
@@ -11,7 +11,7 @@ var CONSTANTS =
     sample_rate : 48000,
     num_channels : 1,
     buffer_len : 1024,
-    no_poster_image_url : "//babelium-dev.irontec.com/static/_temp/novideo.jpg",
+    no_poster_image_url : "//babelium-dev.irontec.com/static/default/novideo.jpg",
     subtitles_extension : ".vtt",
     subtitles_api_path : "/sub-titles/",
     default_subtitle_lang : "en",
@@ -22,6 +22,6 @@ var CONSTANTS =
     grader_view_mark_found : -1,
     reset_video_time : 0,
     exercise_info_api_path: "/exercises/",
-    default_video_mp4_url : "//babelium-dev.irontec.com/static/_temp/video.mp4",
-    default_video_webm_url : "//babelium-dev.irontec.com/static/_temp/video.webm"
+    default_video_mp4_url : "//babelium-dev.irontec.com/static/default/novideo.mp4",
+    default_video_webm_url : "//babelium-dev.irontec.com/static/default/novideo.webm"
 };

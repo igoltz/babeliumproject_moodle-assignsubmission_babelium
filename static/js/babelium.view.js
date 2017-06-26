@@ -1,15 +1,3 @@
- //init constants
-try{
-    var constantsStatus = typeof CONSTANTS === typeof undefined ? true : false;
-    if(constantsStatus){
-        console.log("loading constants file...");
-        $.getScript("http://babelium-dev.irontec.com/static/js/constants.js");
-        $.getScript("http://192.167.1.3/mod/assign/submission/babelium/static/js/constants.js");
-    }
-}
-catch(error){
-    debug(error.message);
-}
 //Global scope objects
 var $bjq = jQuery.noConflict();
 var host = CONSTANTS.babelium_host;
