@@ -155,6 +155,7 @@ function getMP4video(videoId, type) {
                 var exerciseUrl = CONSTANTS.exercise_info_api_path_via_middle + "?name=exerciseinfo&data=" + exinfo.exerciseId;
                 var responseAjaxData = sync_rpc("GET", exerciseUrl);
                 if(responseAjaxData !== undefined){
+                    responseAjaxData = JSON.parse(responseAjaxData);
                     if (responseAjaxData.media !== undefined && responseAjaxData.media.mp4Url !== undefined) {
                         return responseAjaxData.media.mp4Url;
                     }
