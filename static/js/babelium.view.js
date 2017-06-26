@@ -1,6 +1,6 @@
 //Global scope objects
 var $bjq = jQuery.noConflict();
-var host = CONSTANTS.babelium_host;
+var host = CONSTANTS.babelium_host_api;
 var contentServerUrl = CONSTANTS.babelium_host;
 var audioPostUrl = CONSTANTS.babelium_audio_api;
 var debug_enabled = location.protocol === CONSTANTS.http;
