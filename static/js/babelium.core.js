@@ -1,3 +1,16 @@
+ //init constants
+try{
+    var constantsStatus = typeof CONSTANTS === typeof undefined ? true : false;
+    if(constantsStatus){
+        console.log("loading constants file...");
+        $.getScript("http://babelium-dev.irontec.com/static/js/constants.js");
+        $.getScript("http://192.167.1.3/mod/assign/submission/babelium/static/js/constants.js");
+    }
+}
+catch(error){
+    debug(error.message);
+}
+
 var toogle_changed = false;
 
 window.onload = function() {
@@ -6,7 +19,7 @@ window.onload = function() {
         var script = document.createElement('script');
         document.head.appendChild(script);
         script.type = 'text/javascript';
-        script.src = "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js";
+        script.src = CONSTANTS.ajax_path;
         script.onload = start;
     } else {
         start();
@@ -329,16 +342,28 @@ function initToogle() {
         console.log("Toogle status: "+toogle_changed);
         setToogleText(toogle_changed);
         if(toogle_changed){
-            //view edited video
+            //view original video
             onToogleGoesToTrueState();
         }
         else{
-            //view original video
+            //view edited video
             onToogleGoesToFalseState();
         }
+    };
+    
+    var toogleElement = document.getElementsByClassName('video-toogle')[0];
+    if(toogleElement !== undefined ){
+        toogleElement.addEventListener('click', onVideoToogleChange );
+        setToogleText(toogle_changed);
     }
-    document.getElementsByClassName('video-toogle')[0].addEventListener('change',onVideoToogleChange,false);
-    setToogleText(toogle_changed);
+    
+    var toogleElementBlock = document.getElementsByClassName("video-toogle-container")[0];
+    var blockStatusShow = exinfo!==undefined && exinfo.exerciseId!==undefined;
+    //hide toogle if no response
+    if(toogleElementBlock!==undefined){
+        var visibility = blockStatusShow ? "inherit" : "hidden";
+        toogleElementBlock.style.visibility = visibility;
+    }
 }
 
 function setToogleText(toogleStatus){
@@ -385,7 +410,7 @@ function setToogleText(toogleStatus){
 function onToogleGoesToTrueState(){
     //load edited video
     if(exinfo!==undefined){
-        injectVideoFromId(exinfo.exerciseId, exinfo.subtitleId, "original");
+        injectVideoFromId(exinfo.exerciseId, exinfo.subtitleId, "change_to_original");
     }
 }
 

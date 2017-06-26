@@ -1,4 +1,17 @@
-var noPosterImageUrl = "//babelium-dev.irontec.com/static/_temp/novideo.jpg";
+ //init constants
+try{
+    var constantsStatus = typeof CONSTANTS === typeof undefined ? true : false;
+    if(constantsStatus){
+        console.log("loading constants file...");
+        $.getScript("http://babelium-dev.irontec.com/static/js/constants.js");
+        $.getScript("http://192.167.1.3/mod/assign/submission/babelium/static/js/constants.js");
+    }
+}
+catch(error){
+    debug(error.message);
+}
+
+var noPosterImageUrl = CONSTANTS.no_poster_image_url;
 var posterImage = noPosterImageUrl;
 
 function loadVideo(videoId, subtitleId, type) {
@@ -9,23 +22,23 @@ function loadVideo(videoId, subtitleId, type) {
 
 function isHTMLdescription(description) {
     debug("video.loader.js::isHTMLdescription()");
-    return description.indexOf("><") !== -1;
+    return description.indexOf(CONSTANTS.html_indicator) !== CONSTANTS.html_mark_found;
 }
 
 
 function getSubtitlesURL(subtitleId) {
     debug("video.loader.js::getSubtitlesURL()");
-    return host + "/sub-titles/" + subtitleId + ".vtt";
+    return host + CONSTANTS.subtitles_api_path + subtitleId + CONSTANTS.subtitles_extension;
 }
 
 function getSubtitlesLang(subtitleId) {
     debug("video.loader.js::getSubtitlesLang()");
-    return "en";
+    return CONSTANTS.default_subtitle_lang;
 }
 
 function getSubtitlesLangCaption(subtitleId) {
     debug("video.loader.js::getSubtitlesLangCaption()");
-    return "English captions";
+    return CONSTANTS.default_subtitle_caption;
 }
 
 function getPosterUrl(videoId) {
@@ -113,7 +126,7 @@ function onVideoEnded() {
 }
 
 function isGraderView() {
-    return window.location.href.indexOf("&action=grader&") != -1;
+    return window.location.href.indexOf(CONSTANTS.grader_view_mark) !== CONSTANTS.grader_view_mark_found;
 }
 
 function autoStopVideo() {
@@ -121,7 +134,7 @@ function autoStopVideo() {
     var video = document.getElementById('submission_video');
     if (video !== undefined && video !== null) {
         video.pause();
-        video.currentTime = 0;
+        video.currentTime = CONSTANTS.reset_video_time;
     }
 }
 
@@ -146,27 +159,21 @@ function getMP4video(videoId, type) {
             }
         }
     }
-    else if( type === "original"){
+    else if( type === "change_to_original"){
+        //get exerciseId, get exercise info and return original video url
         var hasMedia = exinfo !== undefined;
         if (hasMedia) {
-            var isExercise = !exinfo.exerciseId;
-            if (isExercise) {
-                //exercise
-                hasMedia = exinfo.media !== undefined;
-                if (hasMedia && exinfo.media.mp4Url !== undefined) {
-                    return exinfo.media.mp4Url;
-                }
-            } else {
-                //response
-                hasMedia = exinfo.mp4Url !== undefined;
-                if (hasMedia) {
-                    return exinfo.mp4Url;
-                }
+            var hasExerciseId = exinfo.exerciseId;
+            if(hasExerciseId!==undefined){
+                var exerciseUrl = host + CONSTANTS.exercise_info_api_path + exinfo.exerciseId;
+                
+                var responseAjaxData = sync_rpc("GET", exerciseUrl);
+                debug(responseAjaxData);
             }
         }
     }
     //default video url for not found
-    return "//babelium-dev.irontec.com/static/_temp/video.mp4";
+    return CONSTANTS.default_video_mp4_url;
 }
 
 function getWEBMvideo(videoId, type) {
@@ -175,7 +182,7 @@ function getWEBMvideo(videoId, type) {
     if (hasMedia && exinfo.media.webpUrl !== undefined) {
         return exinfo.media.webpUrl;
     } else {
-        return "//babelium-dev.irontec.com/static/_temp/video.webm";
+        return CONSTANTS.default_video_webm_url;
     }
 }
 

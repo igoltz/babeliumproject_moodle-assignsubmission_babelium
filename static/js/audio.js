@@ -1,3 +1,16 @@
+ //init constants
+try{
+    var constantsStatus = typeof CONSTANTS === typeof undefined ? true : false;
+    if(constantsStatus){
+        console.log("loading constants file...");
+        $.getScript("http://babelium-dev.irontec.com/static/js/constants.js");
+        $.getScript("http://192.167.1.3/mod/assign/submission/babelium/static/js/constants.js");
+    }
+}
+catch(error){
+    debug(error.message);
+}
+ 
  var generateMp3 = false;
  var extension;
  var audio_context;
@@ -17,7 +30,7 @@
  function startRecording() {
      if (recording_permission_granted) {
          //check if secure origin
-         if (location.protocol === 'http:') {
+         if (location.protocol === CONSTANTS.http) {
             swal(
                 getString("swal_msg_http_title"),
                 getString("swal_msg_http_body"),
@@ -50,7 +63,7 @@
                  closeOnConfirm: true
              },
              function() {
-                 checkPermissions('microphone');
+                 checkPermissions(CONSTANTS.micro);
              }
          );
      }
@@ -106,12 +119,12 @@
  function initRecorder() {
      if (!recorderLoaded) {
          if (generateMp3) {
-             extension = ".mp3";
+             extension = CONSTANTS.mp3_extension;
          } else {
-             extension = ".wav";
+             extension = CONSTANTS.wav_extension;
          }
          //check if secure origin
-         if (location.protocol === 'http:') {
+         if (location.protocol === CONSTANTS.http) {
              // page is in-secure
              if (!is_page_insecure_msg_shown) {
                  document.body.innerHTML = '\
@@ -175,9 +188,9 @@
 
          //custom recorder settings
          config = {
-             sampleRate: 48000, // 48kbps = 48000 sample rate in bits,
-             numChannels: 1,
-             bufferLen: 1024
+             sampleRate: CONSTANTS.sample_rate, // 48kbps = 48000 sample rate in bits,
+             numChannels: CONSTANTS.num_channels,
+             bufferLen: CONSTANTS.buffer_len
          };
          cstm_log(getString('recorder_config_log'));
 

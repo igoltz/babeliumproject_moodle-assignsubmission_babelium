@@ -89,6 +89,7 @@ var es = {
     "view_edited_video" : "Ver video editado"
 };
 
+//todo translate to Deutsch
 var de = {
     "swal_msg_http_title":"Recording disabled",
     "swal_msg_http_body": "For security reasons, audio recording is disabled on non HTTPS websites",

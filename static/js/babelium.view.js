@@ -1,9 +1,21 @@
+ //init constants
+try{
+    var constantsStatus = typeof CONSTANTS === typeof undefined ? true : false;
+    if(constantsStatus){
+        console.log("loading constants file...");
+        $.getScript("http://babelium-dev.irontec.com/static/js/constants.js");
+        $.getScript("http://192.167.1.3/mod/assign/submission/babelium/static/js/constants.js");
+    }
+}
+catch(error){
+    debug(error.message);
+}
 //Global scope objects
 var $bjq = jQuery.noConflict();
-var host = "//babelium-server-dev.irontec.com/api/v3";
-var contentServerUrl = "//babelium-server-dev.irontec.com/";
-var audioPostUrl = "//babelium-dev.irontec.com/mod/assign/submission/babelium/post.php";
-var debug_enabled = location.protocol === 'http:';
+var host = CONSTANTS.babelium_host;
+var contentServerUrl = CONSTANTS.babelium_host;
+var audioPostUrl = CONSTANTS.babelium_audio_api;
+var debug_enabled = location.protocol === CONSTANTS.http;
 var babelium_server_data = "";
 var no_value = -1;
 var is_babelium_view = true;
@@ -66,6 +78,15 @@ function rpc(method, url, onSuccess, onError) {
     });
 }
 
+function sync_rpc(method, url, onSuccess, onError){
+    debug("babelium.core.js::sync_rpc()");
+    // Request with custom header
+    return jQuery.ajax({
+        type: method,
+        url: url,
+        async: false
+    }).responseText;
+}
 
 function showLoading(value){
     var babelium_loading_row = document.getElementsByClassName("babelium_loading_row")[0];
