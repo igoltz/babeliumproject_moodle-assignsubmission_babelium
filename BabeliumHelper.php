@@ -172,16 +172,22 @@ class BabeliumHelper
 
     public function getExerciseData($data){
         Logging::logBabelium("Getting exercise data...");
+        $connector = new BabeliumConnector();
         //original code
-        //$exercise_data = !empty($data->responsehash) ? babeliumsubmission_get_exercise_data(0, $data->responseid) : babeliumsubmission_get_exercise_data($exerciseid);
+        //$exercise_data = !empty($data->responsehash) ? $connector->babeliumsubmission_get_exercise_data(0, $data->responseid) : $connector->babeliumsubmission_get_exercise_data($exerciseid);
         if( !empty($data->responsehash) ){
             $defaultExerciseId = 0;
-            $this->exercise_data = babeliumsubmission_get_exercise_data($defaultExerciseId, $data->responseid);
+            $this->exercise_data = $connector->babeliumsubmission_get_exercise_data($defaultExerciseId, $data->responseid);
         }
         else{
-            $this->exercise_data = babeliumsubmission_get_exercise_data($this->exerciseid);
+            $this->exercise_data = $connector->babeliumsubmission_get_exercise_data($this->exerciseid);
         }
         return $this->exercise_data;
+    }
+    
+    public function getExerciseDataOnly($id){
+        $connector = new BabeliumConnector();
+        return $connector->babeliumsubmission_get_exercise_data_only($id);
     }
 
     public function hasExerciseData(){

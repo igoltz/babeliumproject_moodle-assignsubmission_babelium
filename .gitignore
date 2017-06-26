@@ -2,7 +2,6 @@
 
 *.wav
 *.mp3
-*.mp4
 *.old
 
 #Ignore config files
