@@ -21,6 +21,7 @@ function start() {
     initView();
     initToogle();
     overwriteFormControl();
+    setTimeout(startClockCounting(), 1000);
 }
 
 function overwriteFormControl() {
@@ -56,12 +57,14 @@ function onSubmissionCancelledListener(event) {
     event.preventDefault();
     var url = window.location.href;
     url = url.replace("editsubmission", "view");
+    //redirect to exercise view page
     window.location.href = url;
 }
 
 function onVideoPlay() {
     debug("babelium.core.js::onVideoPlay()");
-    var video = document.getElementById('submission_video');
+    startClockCountingOn("clock");
+    /*var video = document.getElementById('submission_video');
     if (video !== undefined && video !== null) {
         if (recorderLoaded) {
             console.log("playing video...");
@@ -69,6 +72,8 @@ function onVideoPlay() {
             video.currentTime = 0;
             //play video
             video.play();
+            //set counter on
+            setTheTime(".clock");
             console.log("recording...");
             startRecording();
             setStatus(getString("recording_status"));
@@ -76,7 +81,7 @@ function onVideoPlay() {
             cstm_log(getString("recorder_no_loaded_log"));
             startRecording();
         }
-    }
+    }*/
 }
 
 function createDownloadLink() {
@@ -337,13 +342,13 @@ function initToogle() {
             onToogleGoesToFalseState();
         }
     };
-    
+
     var toogleElement = document.getElementsByClassName('video-toogle')[0];
     if(toogleElement !== undefined ){
         toogleElement.addEventListener('click', onVideoToogleChange );
         setToogleText(toogle_changed);
     }
-    
+
     var toogleElementBlock = document.getElementsByClassName("video-toogle-container")[0];
     var blockStatusShow = exinfo!==undefined && exinfo.exerciseId!==undefined;
     //hide toogle if no response
