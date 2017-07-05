@@ -90,7 +90,7 @@ function showLoading(value){
 }
 
 function translate(){
-    setStatus(getString('submission_recording_controls'));
+    showRecordingMode(false);
     setButtonsText();
     setTitle();
     setlogs();
@@ -138,7 +138,23 @@ function show(){
 function setStatus(text) {
     debug("babelium.core.js::setStatus()");
     var status = document.getElementById('status_text');
-    if (status !== undefined && status !== null && text !== null && text !== undefined) {
+    if (status !== undefined && text !== undefined) {
         status.textContent = text;
+    }
+}
+
+function setStatusColor(color) {
+    debug("babelium.core.js::setStatusColor()");
+    var status = document.getElementById('status_text');
+    if (status !== undefined && color !== undefined) {
+        status.style.color = color;
+    }
+}
+
+function setCounterColor(color){
+    debug("babelium.core.js::setCounterColor()");
+    var counter = document.getElementsByClassName('clock')[0];
+    if (counter !== undefined && color !== undefined) {
+        counter.style.color = color;
     }
 }

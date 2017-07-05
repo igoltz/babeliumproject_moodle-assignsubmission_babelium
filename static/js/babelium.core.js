@@ -59,20 +59,15 @@ function onSubmissionCancelledListener(event) {
     window.location.href = url;
 }
 
-function onVideoPlay() {
-    debug("babelium.core.js::onVideoPlay()");
+function onRecordingButtonPress() {
+    debug("babelium.core.js::onRecordingButtonPress()");
     var video = document.getElementById('submission_video');
     if (video !== undefined && video !== null) {
+        //start video at the beginning
+        video.currentTime = 0;
+        //play video
+        video.play();
         if (recorderLoaded) {
-            console.log("playing video...");
-            //start video at the beginning
-            video.currentTime = 0;
-            //play video
-            video.play();
-            console.log("recording...");
-            startRecording();
-        } else {
-            cstm_log(getString("recorder_no_loaded_log"));
             startRecording();
         }
     }
@@ -82,7 +77,6 @@ function createDownloadLink() {
     debug("babelium.core.js::createDownloadLink()");
     recorder && recorder.exportWAV(function(blob) {
         var url = URL.createObjectURL(blob);
-        console.log(url);
         var li = document.createElement('li');
         var au = document.createElement('audio');
         var hf = document.createElement('a');
