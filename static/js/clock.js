@@ -3,14 +3,23 @@ var formatmin = 0;
 var formatsec = 0;
 var clockIdentifier;
 var videoStartTime;
+var timer;
 
 function startClockCountingOn(id) {
     if(id !== undefined){
         clockIdentifier = id;
+        timer = setInterval(startClockCounting(), 1000);
     }
 }
 
-function startClockCounting() {
+function stopClockCountingOn() {
+    if(timer !== undefined ){
+        timer.clearInterval();
+    }
+}
+
+function startClockCounting()
+    alert("clock");
     console.log("timer");
     if(clockIdentifier !== undefined){
         var today = new Date();

@@ -89,6 +89,7 @@
          if (recorder !== undefined) {
              recorder && recorder.stop();
              autoStopVideo();
+             stopClockCountingOn();
              cstm_log(getString('recording_stopped_log'));
              cstm_log(getString('recording_link_log'));
              // create WAV download link using audio data blob
@@ -100,7 +101,7 @@
          //shoe error
          sweetAlert(getString('swal_record_first_title'), getString("swal_record_first_body"), "error");
      }
-     setStatus(getString('submission_recording_controls')); 
+     setStatus(getString('submission_recording_controls'));
  }
 
  function initRecorder() {

@@ -21,7 +21,6 @@ function start() {
     initView();
     initToogle();
     overwriteFormControl();
-    setTimeout(startClockCounting(), 1000);
 }
 
 function overwriteFormControl() {
