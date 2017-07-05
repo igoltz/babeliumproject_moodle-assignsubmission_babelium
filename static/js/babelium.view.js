@@ -90,7 +90,6 @@ function showLoading(value){
 }
 
 function translate(){
-    showRecordingMode(false);
     setButtonsText();
     setTitle();
     setlogs();
@@ -156,43 +155,5 @@ function setCounterColor(color){
     var counter = document.getElementsByClassName('clock')[0];
     if (counter !== undefined && color !== undefined && counter !== null && color !== null) {
         counter.style.color = color;
-    }
-}
-
-function showRecordingMode(isRecording){
-    //get recording logo
-    var image = document.getElementsByClassName('recording-image')[0];
-    if(image !== undefined && image !== null){
-        //show or hide recording image
-        image.style.display = isRecording ? "inherit" : "none";
-    }
-    //set recording color
-    var color = isRecording ? "red" : "black";
-    setStatusColor(color);
-    setCounterColor(color);
-    if(isRecording){
-        //update text
-        setStatus(getString('recording_status'));
-        //start counter
-        startClockCountingOn('clock');
-        //update log
-        cstm_log(
-            getString('recording_log')
-        );
-    }
-    else{
-        //update text
-        setStatus(getString('submission_recording_controls'));
-        //stop counter
-        stopClockCountingOn();
-        //start counter
-        if(audio_recorded){
-            cstm_log(
-                getString('recording_stopped_log')
-            );
-            cstm_log(
-                getString('recording_link_log')
-            );
-        }
     }
 }
