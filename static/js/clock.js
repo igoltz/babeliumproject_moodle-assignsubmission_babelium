@@ -1,40 +1,57 @@
 var formathour = 0;
 var formatmin = 0;
 var formatsec = 0;
+var clockIdentifier;
+var videoStartTime;
+var timer;
 
-function myclock() {
-    var date = new Date(); // Get the current date/time
-    var hour = 0; // Save hours
-    var min = 0; // Save minutes
-    var sec = 0; // Save seconds
-    formathour = 0; // Format hours
-    formatmin = 0; // Format minutes
-    formatsec = 0; // Format seconds
-    timeout = setTimeout(myclock, 1000);
-}
-
-function format(x) {
-    if (x < 10) x = "0" + x;
-    return x;
-}
-/*
-var c;
-
-$("#startRecord").click(function() {
-    var started = is_recording;
-    if (!started) {
-        c = setInterval(setTheTime, 1000);
-        started = true; //redundant
+function startClockCountingOn(id) {
+    if(id !== undefined){
+        clockIdentifier = id;
+        timer = setInterval(function(){
+            startClockCounting();
+        },500);
     }
-    else {
-        started = false; //redundant
-        clearInterval(c);
-     }
-});
+}
+
+function demo(){
+    console.log("timer");
+}
+
+function stopClockCountingOn() {
+    if(timer !== undefined ){
+        clearInterval(timer);
+    }
+}
+
+function startClockCounting(){
+    if(clockIdentifier !== undefined){
+        var today = new Date();
+        if(videoStartTime===undefined){
+            videoStartTime = today;
+        }
+        today = today - videoStartTime;
+        today = new Date(today);
+        var h = today.getHours();
+        h = h - 1;
+        var m = today.getMinutes();
+        var s = today.getSeconds();
+        formathour = checkTime(h);
+        formatmin = checkTime(m);
+        formatsec = checkTime(s);
+        setTheTime();
+    }
+}
+
+function checkTime(i) {
+    if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+    return i;
+}
 
 function setTheTime() {
-    myclock();
     var curTime = formathour + ":" + formatmin + ":" + formatsec // Current time formatted
-    $("#clock").prop('value', curTime);
+    clockHolder = document.getElementsByClassName(clockIdentifier);
+    if(clockHolder && clockHolder[0]){
+        clockHolder[0].innerText = curTime;
+    }
 }
-*/

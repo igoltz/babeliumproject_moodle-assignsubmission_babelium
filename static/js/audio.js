@@ -83,23 +83,24 @@
  }
 
  function stopRecording() {
-     if (is_recording) {
-         is_recording = false;
-         if (recorder !== undefined) {
-             recorder && recorder.stop();
-             autoStopVideo();
-             cstm_log(getString('recording_stopped_log'));
-             cstm_log(getString('recording_link_log'));
-             // create WAV download link using audio data blob
-             createDownloadLink();
-             recorder.clear();
-             audio_recorded = true;
-         }
-     } else {
-         //show error
-         sweetAlert(getString('swal_record_first_title'), getString("swal_record_first_body"), "error");
-     }
-     showRecordingMode(is_recording);
+    if (is_recording) {
+        is_recording = false;
+        if (recorder !== undefined) {
+            recorder && recorder.stop();
+            autoStopVideo();
+            stopClockCountingOn();
+            cstm_log(getString('recording_stopped_log'));
+            cstm_log(getString('recording_link_log'));
+            // create WAV download link using audio data blob
+            createDownloadLink();
+            recorder.clear();
+            audio_recorded = true;
+        }
+    } else {
+        //show error
+        sweetAlert(getString('swal_record_first_title'), getString("swal_record_first_body"), "error");
+    }
+    showRecordingMode(is_recording);
  }
 
  function initRecorder() {

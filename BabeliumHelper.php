@@ -184,7 +184,7 @@ class BabeliumHelper
         }
         return $this->exercise_data;
     }
-    
+
     public function getExerciseDataOnly($id){
         $connector = new BabeliumConnector();
         return $connector->babeliumsubmission_get_exercise_data_only($id);
@@ -385,26 +385,18 @@ class BabeliumHelper
 
        $domain = get_config(self::ASSIGNSUBMISSION_BABELIUM,'serverdomain');
        $lang = current_language();
-       
-       $html_content.='<script
-              src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/constants.js"
-              language="javascript">
-          </script>'.PHP_EOL;
-       
-       $html_content.='<script
-              src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/i18n.js"
-              language="javascript">
-          </script>'.PHP_EOL;
 
-        $html_content.='<script
-              src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.view.js"
-              language="javascript">
-          </script>'.PHP_EOL;
-        
-        $html_content.='<script
-             src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
-             language="javascript">
-         </script>'.PHP_EOL;
+         $includeScripts = [
+            "/mod/assign/submission/babelium/static/js/constants.js",
+            "/mod/assign/submission/babelium/static/js/i18n.js",
+            "/mod/assign/submission/babelium/static/js/babelium.view.js",
+            "/mod/assign/submission/babelium/static/js/video.loader.js"
+        ];
+
+        for($i=0 ; $i < count($includeScripts) ; $i++){
+            $CFG->wwwroot .
+            $html_content.='<script src="'.$CFG->wwwroot .$includeScripts[$i].'" language="javascript"></script>'.PHP_EOL;
+        }
 
        $html_content .= '<script language="javascript" type="text/javascript">
                                var domain = "'.$domain.'";
@@ -419,7 +411,7 @@ class BabeliumHelper
                                debug("built-in::onload()");
                                initView();
                          </script>'.PHP_EOL;
-       
+
        Logging::logBabelium("Injecting ". strlen($html_content)." data bytes into babelium submission");
        return $html_content;
    }
@@ -461,7 +453,6 @@ class BabeliumHelper
             $recinfo = json_encode($rmedia);
         }
 
-       $html_content = '';
        $html_content = $this->generateStatusAlert($html_content, $info);
 
        if(isset($info['title'])){
@@ -473,41 +464,24 @@ class BabeliumHelper
 
        $domain = get_config(self::ASSIGNSUBMISSION_BABELIUM,'serverdomain');
        $lang = current_language();
-       
-       $html_content.='<script
-              src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/constants.js"
-              language="javascript">
-          </script>'.PHP_EOL;
-       
-       $html_content.='<script
-              src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/i18n.js"
-              language="javascript">
-          </script>'.PHP_EOL;
 
-       $html_content.='<script
-                           src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/audio.js"
-                           language="javascript">
-                       </script>'.PHP_EOL;
+       $includeScripts = [
+            "/mod/assign/submission/babelium/static/js/constants.js",
+            "/mod/assign/submission/babelium/static/js/i18n.js",
+            "/mod/assign/submission/babelium/static/js/clock.js",
+            "/mod/assign/submission/babelium//static/dist/sweetalert/sweetalert.min.js",
+            "/mod/assign/submission/babelium/static/js/audio.js",
+            "/mod/assign/submission/babelium/static/js/babelium.view.js",
+            "/mod/assign/submission/babelium/static/js/video.loader.js",
+            "/mod/assign/submission/babelium/static/js/babelium.core.js",
+            "/mod/assign/submission/babelium/static/dist/progressbar/progressbar.min.js",
+            "/mod/assign/submission/babelium/static/dist/recorder/recorder.js"
+        ];
 
-       $html_content.='<script
-                     src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.view.js"
-                     language="javascript">
-                 </script>'.PHP_EOL;
-
-        $html_content.='<script
-                     src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/video.loader.js"
-                     language="javascript">
-                 </script>'.PHP_EOL;
-
-       $html_content.='<script
-                           src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/babelium.core.js"
-                           language="javascript">
-                       </script>'.PHP_EOL;
-
-        $html_content.='<script async defer
-                        src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/dist/progressbar/progressbar.min.js"
-                        language="javascript">
-                        </script>'.PHP_EOL;
+        for($i=0 ; $i < count($includeScripts) ; $i++){
+            $CFG->wwwroot .
+            $html_content.='<script src="'.$CFG->wwwroot .$includeScripts[$i].'" language="javascript"></script>'.PHP_EOL;
+        }
 
        $html_content .= '<script language="javascript" type="text/javascript">
                                var domain = "'.$domain.'";

@@ -1,5 +1,17 @@
 var toogle_changed = false;
 
+/* CLOCK VARIABLES BEGIN */
+
+var formathour = 0;
+var formatmin = 0;
+var formatsec = 0;
+var clockIdentifier;
+var videoStartTime;
+var timer;
+
+/* CLOCK VARIABLES END */
+
+
 window.onload = function() {
     debug("babelium.core.js::onload()");
     if (window.jQuery === undefined || $ === undefined) {
@@ -56,6 +68,7 @@ function onSubmissionCancelledListener(event) {
     event.preventDefault();
     var url = window.location.href;
     url = url.replace("editsubmission", "view");
+    //redirect to exercise view page
     window.location.href = url;
 }
 
