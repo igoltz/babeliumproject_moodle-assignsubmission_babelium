@@ -342,7 +342,7 @@ function initToogle() {
     //hide toogle if no response
     if(toogleElementBlock!==undefined){
         var visibility = blockStatusShow ? "inherit" : "hidden";
-        var display = blockStatusShow ? "inherit" : "none";
+        var display = blockStatusShow ? "" : "none";
         //css visibility
         toogleElementBlock.style.visibility = visibility;
         //css display
