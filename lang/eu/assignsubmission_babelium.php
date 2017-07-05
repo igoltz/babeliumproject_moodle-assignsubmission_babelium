@@ -81,3 +81,6 @@ $string['msg_not_load_exercise'] = "Errore bat gertatu da ariketa-aurrebista kar
 $string['video_queued'] = "Bidalitako bideoa bizpahiru minututan prozezatuko da, mesedez itxaron ...";
 $string['video_processing'] = "Bidalitako bideoa prozesatzen ari da, mesedez itxaron ...";
 $string['video_ready'] = "Ariketaren aurreikuspena prest dago";
+
+$string['connectivity_error_title'] = 'Konexio errorea';
+$string['connectivity_error_subtitle'] = 'Ezinezkoa izan da ariketaren datuak jasotzea Babelium plataformaren arazo batengatik';

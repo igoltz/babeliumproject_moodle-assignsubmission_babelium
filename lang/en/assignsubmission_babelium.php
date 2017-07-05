@@ -84,3 +84,6 @@ $string['msg_not_load_exercise'] = "An error happen while loading the exercise p
 $string['video_queued'] = "Submitted video is added to processing queue, please wait...";
 $string['video_processing'] = "Submitted video is being processing, please wait...";
 $string['video_ready'] = "Exercise preview is ready.";
+
+$string['connectivity_error_title'] = 'Connectivity error';
+$string['connectivity_error_subtitle'] = 'Could not retrieve exercise data due to remote issue with babelium platform.';
