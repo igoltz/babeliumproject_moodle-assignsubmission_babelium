@@ -90,6 +90,7 @@ function showLoading(value){
 }
 
 function translate(){
+    showRecordingMode(false);
     setButtonsText();
     setTitle();
     setlogs();

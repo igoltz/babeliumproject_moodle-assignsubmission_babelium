@@ -425,8 +425,10 @@ function onToogleGoesToFalseState(){
 function showRecordingMode(isRecording){
     //get recording logo
     var image = document.getElementsByClassName('recording-image')[0];
-    //show or hide recording image
-    image.style.display = isRecording ? "inherit" : "none";
+    if(image !== undefined){
+        //show or hide recording image
+        image.style.display = isRecording ? "inherit" : "none";
+    }
     //set recording color
     var color = isRecording ? "red" : "black";
     setStatusColor(color);
