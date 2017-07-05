@@ -207,7 +207,7 @@
         //update text
         setStatus(getString('recording_status'));
         //start counter
-        startClockCountingOn('.clock');
+        startClockCountingOn('clock');
         //update log
         cstm_log(
             getString('recording_log')
