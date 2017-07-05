@@ -207,7 +207,7 @@
         //update text
         setStatus(getString('recording_status'));
         //start counter
-
+        startClockCountingOn('.clock');
         //update log
         cstm_log(
             getString('recording_log')
@@ -217,7 +217,7 @@
         //update text
         setStatus(getString('submission_recording_controls'));
         //stop counter
-
+        stopClockCountingOn();
         //start counter
         if(audio_recorded){
             cstm_log(
