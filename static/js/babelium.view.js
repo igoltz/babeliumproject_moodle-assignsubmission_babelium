@@ -1,11 +1,12 @@
 //Global scope objects
 var $bjq = jQuery.noConflict();
-var host = "//babelium-server-dev.irontec.com/api/v3";
-var contentServerUrl = "//babelium-server-dev.irontec.com/";
-var audioPostUrl = "//babelium-dev.irontec.com/mod/assign/submission/babelium/post.php";
-var debug_enabled = location.protocol === 'http:';
+var host = CONSTANTS.babelium_host_api;
+var contentServerUrl = CONSTANTS.babelium_host;
+var audioPostUrl = CONSTANTS.babelium_audio_api;
+var debug_enabled = location.protocol === CONSTANTS.http;
 var babelium_server_data = "";
 var no_value = -1;
+var is_babelium_view = true;
 
 function initView() {
     if($ === undefined && jQuery!==undefined){
@@ -17,9 +18,9 @@ function initView() {
     var subtitleId = exsubs[0].subtitleId;
     loadSubtitles(subtitleId);
     //load video
-    loadVideo(exinfo.id, subtitleId);
+    loadVideo(exinfo.id, subtitleId, "edited");
     loadExerciseDescription(exinfo.description);
-    
+
     //translate text to user lang
     translate();
     show();
@@ -65,6 +66,15 @@ function rpc(method, url, onSuccess, onError) {
     });
 }
 
+function sync_rpc(method, url, onSuccess, onError){
+    debug("babelium.core.js::sync_rpc()");
+    // Request with custom header
+    return jQuery.ajax({
+        type: method,
+        url: url,
+        async: false
+    }).responseText;
+}
 
 function showLoading(value){
     var babelium_loading_row = document.getElementsByClassName("babelium_loading_row")[0];
@@ -80,7 +90,7 @@ function showLoading(value){
 }
 
 function translate(){
-    setStatus(getString('submission_recording_controls'));
+    showRecordingMode(false);
     setButtonsText();
     setTitle();
     setlogs();
@@ -109,7 +119,7 @@ function setlogs(){
     if(recording_list_title){
         recording_list_title.innerHTML = getString("recording_list_title");
     }
-    var recording_log_title = document.getElementsByClassName("recording_log_title")[0];  
+    var recording_log_title = document.getElementsByClassName("recording_log_title")[0];
     if(recording_log_title){
         recording_log_title.innerHTML = getString("recording_log_title");
     }
@@ -128,7 +138,23 @@ function show(){
 function setStatus(text) {
     debug("babelium.core.js::setStatus()");
     var status = document.getElementById('status_text');
-    if (status !== undefined && status !== null && text !== null && text !== undefined) {
+    if (status !== undefined && text !== undefined) {
         status.textContent = text;
+    }
+}
+
+function setStatusColor(color) {
+    debug("babelium.core.js::setStatusColor()");
+    var status = document.getElementById('status_text');
+    if (status !== undefined && color !== undefined) {
+        status.style.color = color;
+    }
+}
+
+function setCounterColor(color){
+    debug("babelium.core.js::setCounterColor()");
+    var counter = document.getElementsByClassName('clock')[0];
+    if (counter !== undefined && color !== undefined) {
+        counter.style.color = color;
     }
 }

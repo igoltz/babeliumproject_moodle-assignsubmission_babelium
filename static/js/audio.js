@@ -17,7 +17,7 @@
  function startRecording() {
      if (recording_permission_granted) {
          //check if secure origin
-         if (location.protocol === 'http:') {
+         if (location.protocol === CONSTANTS.http) {
             swal(
                 getString("swal_msg_http_title"),
                 getString("swal_msg_http_body"),
@@ -31,9 +31,6 @@
                      recorder.record();
                      recorder && recorder.stop();
                      recorder && recorder.record();
-                     cstm_log(
-                        getString('recording_log')
-                     );
                      is_recording = true;
                  }
              }
@@ -50,10 +47,12 @@
                  closeOnConfirm: true
              },
              function() {
-                 checkPermissions('microphone');
+                 checkPermissions(CONSTANTS.micro);
              }
          );
+         is_recording = false;
      }
+     showRecordingMode(is_recording);
  }
 
  function checkPermissions(permissionName, descriptor) {
@@ -97,21 +96,21 @@
              audio_recorded = true;
          }
      } else {
-         //shoe error
+         //show error
          sweetAlert(getString('swal_record_first_title'), getString("swal_record_first_body"), "error");
      }
-     setStatus(getString('submission_recording_controls')); 
+     showRecordingMode(is_recording);
  }
 
  function initRecorder() {
      if (!recorderLoaded) {
          if (generateMp3) {
-             extension = ".mp3";
+             extension = CONSTANTS.mp3_extension;
          } else {
-             extension = ".wav";
+             extension = CONSTANTS.wav_extension;
          }
          //check if secure origin
-         if (location.protocol === 'http:') {
+         if (location.protocol === CONSTANTS.http) {
              // page is in-secure
              if (!is_page_insecure_msg_shown) {
                  document.body.innerHTML = '\
@@ -175,9 +174,9 @@
 
          //custom recorder settings
          config = {
-             sampleRate: 48000, // 48kbps = 48000 sample rate in bits,
-             numChannels: 1,
-             bufferLen: 1024
+             sampleRate: CONSTANTS.sample_rate, // 48kbps = 48000 sample rate in bits,
+             numChannels: CONSTANTS.num_channels,
+             bufferLen: CONSTANTS.buffer_len
          };
          cstm_log(getString('recorder_config_log'));
 
@@ -192,4 +191,40 @@
             "error"
          );
      }
+ }
+
+ function showRecordingMode(isRecording){
+    //get recording logo
+    var image = document.getElementsByClassName('recording-image')[0];
+    //show or hide recording image
+    image.style.display = isRecording ? "inherit" : "none";
+    //set recording color
+    var color = isRecording ? "red" : "black";
+    setStatusColor(color);
+    setCounterColor(color);
+    if(isRecording){
+        //update text
+        setStatus(getString('recording_status'));
+        //start counter
+
+        //update log
+        cstm_log(
+            getString('recording_log')
+        );
+    }
+    else{
+        //update text
+        setStatus(getString('submission_recording_controls'));
+        //stop counter
+
+        //start counter
+        if(audio_recorded){
+            cstm_log(
+                getString('recording_stopped_log')
+            );
+            cstm_log(
+                getString('recording_link_log')
+            );
+        }
+    }
  }

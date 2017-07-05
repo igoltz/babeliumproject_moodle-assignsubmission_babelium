@@ -81,3 +81,6 @@ $string['msg_not_load_exercise'] = "Ocurrió un error al procesar el ejercicio. 
 $string['video_queued'] = "El ejercicio subido se procesará en breve, por favor espere...";
 $string['video_processing'] = "El ejercicio subido se está procesando, por favor espere...";
 $string['video_ready'] = "La vista previa está preparada";
+
+$string['connectivity_error_title'] = 'Error de conexión';
+$string['connectivity_error_subtitle'] = 'No se puede establecer una conexión con la plataforma babelium actualmente';

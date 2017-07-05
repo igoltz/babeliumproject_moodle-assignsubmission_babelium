@@ -1,4 +1,4 @@
-/* 
+/*
  * language file
  */
 var default_lang = "es";
@@ -41,7 +41,9 @@ var en = {
     "stop" : "Stop",
     "exercise_title" : "Exercise description",
     "recording_list_title" : "Recordings list",
-    "recording_log_title" : "Recording log"
+    "recording_log_title" : "Recording log",
+    "view_original_video" : "View original video",
+    "view_edited_video" : "View edited video"
 };
 
 var es = {
@@ -82,16 +84,19 @@ var es = {
     "stop" : "Parar",
     "exercise_title" : "Descripción del ejercicio",
     "recording_list_title" : "Listado de grabaciones",
-    "recording_log_title" : "Log de grabaciones"
+    "recording_log_title" : "Log de grabaciones",
+    "view_original_video" : "Ver video original",
+    "view_edited_video" : "Ver video editado"
 };
 
+//todo translate to Deutsch
 var de = {
     "swal_msg_http_title":"Recording disabled",
     "swal_msg_http_body": "For security reasons, audio recording is disabled on non HTTPS websites",
     "recording_log" : "Recording...",
     "recording_stopped_log" : "Stopped recording.",
     "recording_link_log" : "Creating audio link...",
-    "recorder_init_log" : "Recorder initialised.",    
+    "recorder_init_log" : "Recorder initialised.",
     "recorder_config_log" : "Setting recorder configuration...",
     "recorder_media_log" : "Media stream created",
     "recorder_no_loaded_log" : "Recorded not loaded",
@@ -123,7 +128,9 @@ var de = {
     "stop" : "Stop",
     "exercise_title" : "Exercise description",
     "recording_list_title" : "Recordings list",
-    "recording_log_title" : "Recording log"
+    "recording_log_title" : "Recording log",
+    "view_original_video" : "View original video",
+    "view_edited_video" : "View edited video"
 };
 
 var eu = {
@@ -164,8 +171,9 @@ var eu = {
     "stop" : "Gelditu",
     "exercise_title" : "Ariketaren azalpena",
     "recording_list_title" : "Grabazio zerrenda",
-    "recording_log_title" : "Grabazio historikoa"
-
+    "recording_log_title" : "Grabazio historikoa",
+    "view_original_video" : "Ikusi originala",
+    "view_edited_video" : "Ikusi editatua"
 };
 
 var languages = {
@@ -179,9 +187,9 @@ function getString(key){
     if(lang===null || lang===undefined){
         lang = default_lang; //Default language
     }
-    
+
     lang = "es"; //for debug
-    
+
     var languageData = languages[lang];
     if(key!==null && key!==undefined){
         var stringData = languageData[key];

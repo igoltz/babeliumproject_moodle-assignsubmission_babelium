@@ -184,6 +184,20 @@ class BabeliumConnector {
             $value
         );
    }
+   
+   /**
+    * Retrieves the locales, subtitles, roles and data of a particular exercise
+    * @param int $exerciseid
+    * 		An exercise identificator
+    * @return mixed $exercise
+    * 		An associative array with the info, the roles, the languages and the subtitle lines of the exercise, or false on error/when empty query results
+    */
+   function babeliumsubmission_get_exercise_data_only($exerciseid){
+       Logging::logBabelium("Getting exercise data only");
+        $g = $this->getBabeliumRemoteService();
+        $data = $g->getExerciseInformation($exerciseid);
+        return $data;
+   }
 
    /**
     * Retrieves the locales, subtitles, roles and data of a particular exercise

@@ -172,16 +172,22 @@ class BabeliumHelper
 
     public function getExerciseData($data){
         Logging::logBabelium("Getting exercise data...");
+        $connector = new BabeliumConnector();
         //original code
-        //$exercise_data = !empty($data->responsehash) ? babeliumsubmission_get_exercise_data(0, $data->responseid) : babeliumsubmission_get_exercise_data($exerciseid);
+        //$exercise_data = !empty($data->responsehash) ? $connector->babeliumsubmission_get_exercise_data(0, $data->responseid) : $connector->babeliumsubmission_get_exercise_data($exerciseid);
         if( !empty($data->responsehash) ){
             $defaultExerciseId = 0;
-            $this->exercise_data = babeliumsubmission_get_exercise_data($defaultExerciseId, $data->responseid);
+            $this->exercise_data = $connector->babeliumsubmission_get_exercise_data($defaultExerciseId, $data->responseid);
         }
         else{
-            $this->exercise_data = babeliumsubmission_get_exercise_data($this->exerciseid);
+            $this->exercise_data = $connector->babeliumsubmission_get_exercise_data($this->exerciseid);
         }
         return $this->exercise_data;
+    }
+    
+    public function getExerciseDataOnly($id){
+        $connector = new BabeliumConnector();
+        return $connector->babeliumsubmission_get_exercise_data_only($id);
     }
 
     public function hasExerciseData(){
@@ -381,6 +387,11 @@ class BabeliumHelper
        $lang = current_language();
        
        $html_content.='<script
+              src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/constants.js"
+              language="javascript">
+          </script>'.PHP_EOL;
+       
+       $html_content.='<script
               src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/i18n.js"
               language="javascript">
           </script>'.PHP_EOL;
@@ -464,6 +475,11 @@ class BabeliumHelper
        $lang = current_language();
        
        $html_content.='<script
+              src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/constants.js"
+              language="javascript">
+          </script>'.PHP_EOL;
+       
+       $html_content.='<script
               src="'. $CFG->wwwroot .'/mod/assign/submission/babelium/static/js/i18n.js"
               language="javascript">
           </script>'.PHP_EOL;
@@ -501,7 +517,6 @@ class BabeliumHelper
                                var rsinfo = '.$rsinfo.';
                                var rssubs = '.$rssubs.';
                                var recinfo = '.$recinfo.';
-                               init(exinfo, exsubs, rsinfo, rssubs, recinfo);
                          </script>'.PHP_EOL;
        Logging::logBabelium("Injecting ". strlen($html_content)." data bytes into babelium submission");
        return $html_content;

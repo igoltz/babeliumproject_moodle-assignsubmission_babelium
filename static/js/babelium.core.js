@@ -1,3 +1,5 @@
+var toogle_changed = false;
+
 window.onload = function() {
     debug("babelium.core.js::onload()");
     if (window.jQuery === undefined || $ === undefined) {
@@ -17,6 +19,7 @@ function start() {
     //init recorder
     initRecorder();
     initView();
+    initToogle();
     overwriteFormControl();
 }
 
@@ -56,21 +59,15 @@ function onSubmissionCancelledListener(event) {
     window.location.href = url;
 }
 
-function onVideoPlay() {
-    debug("babelium.core.js::onVideoPlay()");
+function onRecordingButtonPress() {
+    debug("babelium.core.js::onRecordingButtonPress()");
     var video = document.getElementById('submission_video');
     if (video !== undefined && video !== null) {
+        //start video at the beginning
+        video.currentTime = 0;
+        //play video
+        video.play();
         if (recorderLoaded) {
-            console.log("playing video...");
-            //start video at the beginning
-            video.currentTime = 0;
-            //play video
-            video.play();
-            console.log("recording...");
-            startRecording();
-            setStatus(getString("recording_status"));
-        } else {
-            cstm_log(getString("recorder_no_loaded_log"));
             startRecording();
         }
     }
@@ -80,7 +77,6 @@ function createDownloadLink() {
     debug("babelium.core.js::createDownloadLink()");
     recorder && recorder.exportWAV(function(blob) {
         var url = URL.createObjectURL(blob);
-        console.log(url);
         var li = document.createElement('li');
         var au = document.createElement('audio');
         var hf = document.createElement('a');
@@ -314,3 +310,101 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError) {
         xhr.send(fd);
     }
 }
+
+/**
+    BEGIN TOOGLE CONTROL
+**/
+
+
+function initToogle() {
+    var onVideoToogleChange = function () {
+        toogle_changed = !toogle_changed;
+        console.log("Toogle status: "+toogle_changed);
+        setToogleText(toogle_changed);
+        if(toogle_changed){
+            //view original video
+            onToogleGoesToTrueState();
+        }
+        else{
+            //view edited video
+            onToogleGoesToFalseState();
+        }
+    };
+
+    var toogleElement = document.getElementsByClassName('video-toogle')[0];
+    if(toogleElement !== undefined ){
+        toogleElement.addEventListener('click', onVideoToogleChange );
+        setToogleText(toogle_changed);
+    }
+
+    var toogleElementBlock = document.getElementsByClassName("video-toogle-container")[0];
+    var blockStatusShow = exinfo!==undefined && exinfo.exerciseId!==undefined;
+    //hide toogle if no response
+    if(toogleElementBlock!==undefined){
+        var visibility = blockStatusShow ? "inherit" : "hidden";
+        var display = blockStatusShow ? "inherit" : "none";
+        //css visibility
+        toogleElementBlock.style.visibility = visibility;
+        //css display
+        toogleElementBlock.style.display = display;
+    }
+}
+
+function setToogleText(toogleStatus){
+    var clsnameLeft = "video-toogle-text-left";
+    var toogleTextLeft = document.getElementsByClassName(clsnameLeft)[0];
+
+    var clsnameRight = "video-toogle-text-right";
+    var toogleTextRight = document.getElementsByClassName(clsnameRight)[0];
+
+    var focus_color = "#2196f3";
+    var no_focus_color = "#3a3a3a";
+
+    //reset text
+    if(toogleTextLeft!==undefined){
+        toogleTextLeft.innerHTML = getString("view_edited_video");
+    }
+    if(toogleTextRight!==undefined){
+        toogleTextRight.innerHTML = getString("view_original_video");
+    }
+
+    //update status
+    if(toogleStatus){
+        if(toogleTextLeft!==undefined){
+            toogleTextLeft.style.fontWeight = "inherit";
+            toogleTextLeft.style.color = no_focus_color;
+        }
+        if(toogleTextRight!==undefined){
+            toogleTextRight.style.fontWeight = "Bold";
+            toogleTextRight.style.color = focus_color;
+        }
+    }
+    else{
+        if(toogleTextLeft!==undefined){
+            toogleTextLeft.style.fontWeight = "Bold";
+            toogleTextLeft.style.color = focus_color;
+        }
+        if(toogleTextRight!==undefined){
+            toogleTextRight.style.fontWeight = "inherit";
+            toogleTextRight.style.color = no_focus_color;
+        }
+    }
+}
+
+function onToogleGoesToTrueState(){
+    //load edited video
+    if(exinfo!==undefined){
+        injectVideoFromId(exinfo.exerciseId, exinfo.subtitleId, "change_to_original");
+    }
+}
+
+function onToogleGoesToFalseState(){
+    //load original video
+    if(exinfo!==undefined){
+        injectVideoFromId(exinfo.id, exinfo.subtitleId, "edited");
+    }
+}
+
+/**
+    END TOOGLE CONTROL
+**/

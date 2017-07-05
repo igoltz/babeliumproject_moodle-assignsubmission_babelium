@@ -151,20 +151,26 @@ class assign_submission_babelium extends assign_submission_plugin
         else{
             $exercise_data = $this->getBabeliumConnector()->babeliumsubmission_get_exercise_data($exerciseid);
         }
-        if (!$exercise_data)
-            throw new dml_exception("Error while retrieving Babelium external data. No data returned");
-
-        //error_log(print_r($exercise_data,true),3,"/tmp/error.log");
-
-        $this->get_babelium_form_elements($mform, array(
-            $data,
-            $exercise_data['info'],
-            $exercise_data['roles'],
-            $exercise_data['languages'],
-            $exercise_data['subtitles'],
-            $exercise_data['recinfo']
-        ));
-        return true;
+        if (!$exercise_data){
+            //error_log(print_r($exercise_data,true),3,"/tmp/error.log");
+            $html_content = "<div style='text-align: center;padding: 2%;'>";
+            $html_content .= "<h1>". get_string("connectivity_error_title")."</h1>";
+            $html_content .= "<p>". get_string("connectivity_error_subtitle")."</p>";
+            $html_content .= "</div>";
+            $mform->addElement('html', $html_content);
+            return false;
+        }
+        else{
+            $this->get_babelium_form_elements($mform, array(
+                $data,
+                $exercise_data['info'],
+                $exercise_data['roles'],
+                $exercise_data['languages'],
+                $exercise_data['subtitles'],
+                $exercise_data['recinfo']
+            ));
+            return true;
+        }
     }
 
     /**

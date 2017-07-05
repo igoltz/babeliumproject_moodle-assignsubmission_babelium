@@ -7,7 +7,8 @@
 <!-- cue styles -->
 <link rel='stylesheet' href='//babelium-dev.irontec.com/static/css/cue.css'>
 <!-- video player styles -->
-<link rel='stylesheet' href='//babelium-dev.irontec.com/static/dist/plyr/dist/plyr.css'>
+<link rel='stylesheet' href='//babelium-dev.irontec.com/static/css/toogle.css'>
+<link rel="stylesheet" type="text/css" href="//mod/assign/submission/babelium/static/css/toogle.css">
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
   <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -15,10 +16,10 @@
 <![endif]-->
 
 <div class="container">
-    
+
     <div class="row babelium_loading_row" style="text-align: center;padding: 50px;">
-        <img 
-            src="https://babelium-dev.irontec.com/static/img/loading.svg" 
+        <img
+            src="/mod/assign/submission/babelium/static/img/loading.svg"
             alt="loading logo for babelium exercise"
             height="100px"
             width="auto" />
@@ -31,15 +32,27 @@
                 <div class="videocontent"></div>
              </div>
        </div>
-   
         <div class="col-md-12">
-            <div class="centered">
-                <h2 id="status_text">Audio recording controls</h2>
-                <h3 class="clock">00:00:00</h3>
+            <div class="centered" style="padding-top: 10px;">
+              <h2 id="status_text">Controles de grabacion de audio</h2>
+              <div style="display: inline-flex;">
+                <img class="recording-image" src="/mod/assign/submission/babelium/static/img/recording.png" alt="recording icon" style="margin: 7px;" width="50" height="50">
+                <h3 class="clock" style="padding: 20px;">00:00:00</h3>
+              </div>
+            </div>
+
+            <div class="button-container video-toogle-container">
+            <p class="video-toogle-text-left" style="font-size: 14pt; padding: 16px;">Mostrar video original</p>
+              <!-- Rounded switch -->
+              <label class="switch" style="margin: 15px;">
+                <input class="video-toogle" type="checkbox">
+                <div class="slider round"></div>
+              </label>
+              <p class="video-toogle-text-right" style="font-size: 14pt; padding: 16px;">Mostrar video entregado</p>
             </div>
 
             <div class="button-container">
-                <a class='button -green center startRecord' onclick='onVideoPlay();'>Record</a>
+                <a class='button -green center startRecord' onclick='onRecordingButtonPress();'>Record</a>
                 <a class='button -salmon center stopRecord' onclick="stopRecording(this);">Stop</a>
             </div>
 
