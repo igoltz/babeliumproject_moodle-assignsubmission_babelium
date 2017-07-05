@@ -138,7 +138,7 @@ function show(){
 function setStatus(text) {
     debug("babelium.core.js::setStatus()");
     var status = document.getElementById('status_text');
-    if (status !== undefined && text !== undefined) {
+    if (status !== undefined && text !== undefined && status !== null && text !== null) {
         status.textContent = text;
     }
 }
@@ -146,7 +146,7 @@ function setStatus(text) {
 function setStatusColor(color) {
     debug("babelium.core.js::setStatusColor()");
     var status = document.getElementById('status_text');
-    if (status !== undefined && color !== undefined) {
+    if (status !== undefined && color !== undefined && status !== null && color !== null) {
         status.style.color = color;
     }
 }
@@ -154,7 +154,7 @@ function setStatusColor(color) {
 function setCounterColor(color){
     debug("babelium.core.js::setCounterColor()");
     var counter = document.getElementsByClassName('clock')[0];
-    if (counter !== undefined && color !== undefined) {
+    if (counter !== undefined && color !== undefined && counter !== null && color !== null) {
         counter.style.color = color;
     }
 }
@@ -162,7 +162,7 @@ function setCounterColor(color){
 function showRecordingMode(isRecording){
     //get recording logo
     var image = document.getElementsByClassName('recording-image')[0];
-    if(image !== undefined){
+    if(image !== undefined && image !== null){
         //show or hide recording image
         image.style.display = isRecording ? "inherit" : "none";
     }
