@@ -453,7 +453,6 @@ class BabeliumHelper
             $recinfo = json_encode($rmedia);
         }
 
-       $html_content = '';
        $html_content = $this->generateStatusAlert($html_content, $info);
 
        if(isset($info['title'])){

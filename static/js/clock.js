@@ -8,19 +8,23 @@ var timer;
 function startClockCountingOn(id) {
     if(id !== undefined){
         clockIdentifier = id;
-        timer = setInterval(startClockCounting(), 1000);
+        timer = setInterval(function(){
+            startClockCounting();
+        },500);
     }
+}
+
+function demo(){
+    console.log("timer");
 }
 
 function stopClockCountingOn() {
     if(timer !== undefined ){
-        timer.clearInterval();
+        clearInterval(timer);
     }
 }
 
-function startClockCounting()
-    alert("clock");
-    console.log("timer");
+function startClockCounting(){
     if(clockIdentifier !== undefined){
         var today = new Date();
         if(videoStartTime===undefined){
