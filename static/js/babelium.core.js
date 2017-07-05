@@ -71,7 +71,6 @@ function onVideoPlay() {
             video.play();
             console.log("recording...");
             startRecording();
-            setStatus(getString("recording_status"));
         } else {
             cstm_log(getString("recorder_no_loaded_log"));
             startRecording();

@@ -24,6 +24,7 @@
                 "error"
             );
              autoStopVideo();
+             setStatus(getString('submission_recording_controls'));
          } else {
              if (!is_recording) {
                  if (recorder !== undefined) {
@@ -100,7 +101,7 @@
          //shoe error
          sweetAlert(getString('swal_record_first_title'), getString("swal_record_first_body"), "error");
      }
-     setStatus(getString('submission_recording_controls')); 
+     setStatus(getString('submission_recording_controls'));
  }
 
  function initRecorder() {
