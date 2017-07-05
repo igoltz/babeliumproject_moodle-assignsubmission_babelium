@@ -337,19 +337,23 @@ function initToogle() {
             onToogleGoesToFalseState();
         }
     };
-    
+
     var toogleElement = document.getElementsByClassName('video-toogle')[0];
     if(toogleElement !== undefined ){
         toogleElement.addEventListener('click', onVideoToogleChange );
         setToogleText(toogle_changed);
     }
-    
+
     var toogleElementBlock = document.getElementsByClassName("video-toogle-container")[0];
     var blockStatusShow = exinfo!==undefined && exinfo.exerciseId!==undefined;
     //hide toogle if no response
     if(toogleElementBlock!==undefined){
         var visibility = blockStatusShow ? "inherit" : "hidden";
+        var display = blockStatusShow ? "inherit" : "none";
+        //css visibility
         toogleElementBlock.style.visibility = visibility;
+        //css display
+        toogleElementBlock.style.display = display;
     }
 }
 
