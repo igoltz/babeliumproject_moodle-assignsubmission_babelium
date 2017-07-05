@@ -6,6 +6,7 @@ var videoStartTime;
 var timer;
 
 function startClockCountingOn(id) {
+    videoStartTime = undefined;
     if(id !== undefined){
         clockIdentifier = id;
         timer = setInterval(function(){
