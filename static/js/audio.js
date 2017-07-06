@@ -14,7 +14,7 @@
      log.innerHTML += "\n" + e + " " + (data || '');
  }
 
- function startRecording() {
+ function startRecording(recorded_loaded) {
      if (recording_permission_granted) {
          //check if secure origin
          if (location.protocol === CONSTANTS.http) {

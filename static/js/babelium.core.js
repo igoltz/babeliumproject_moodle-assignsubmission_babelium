@@ -77,12 +77,14 @@ function onRecordingButtonPress() {
     debug("babelium.core.js::onRecordingButtonPress()");
     var video = document.getElementById('submission_video');
     if (video !== undefined && video !== null) {
-        //start video at the beginning
-        video.currentTime = 0;
-        //play video
-        video.play();
         if (recorderLoaded) {
-            startRecording();
+            //recording is enabled. play video
+            //start video at the beginning
+            video.currentTime = 0;
+            //play video
+            video.play();
+            //start recording
+            startRecording(recorderLoaded);
         }
     }
 }
