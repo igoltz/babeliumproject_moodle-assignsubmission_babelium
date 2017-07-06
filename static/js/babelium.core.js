@@ -75,18 +75,20 @@ function onSubmissionCancelledListener(event) {
 
 function onRecordingButtonPress() {
     debug("babelium.core.js::onRecordingButtonPress()");
-    var video = document.getElementById('submission_video');
-    if (video !== undefined && video !== null) {
-        if (recorderLoaded) {
-            //recording is enabled. play video
-            //start video at the beginning
-            video.currentTime = 0;
-            //play video
-            video.play();
-            //start recording
+    if(!is_recording){
+        var video = document.getElementById('submission_video');
+        if (video !== undefined && video !== null) {
+            if (recorderLoaded) {
+                //recording is enabled. play video
+                //start video at the beginning
+                video.currentTime = 0;
+                //play video
+                video.play();
+                //start recording
+            }
+            //call recording with status flag
+            startRecording(recorderLoaded);
         }
-        //call recording with status flag
-        startRecording(recorderLoaded);
     }
 }
 
