@@ -15,7 +15,7 @@
  }
 
  function startRecording(recorded_loaded) {
-     if (recording_permission_granted) {
+     if (recording_permission_granted && recorded_loaded) {
          //check if secure origin
          if (location.protocol === CONSTANTS.http) {
             swal(

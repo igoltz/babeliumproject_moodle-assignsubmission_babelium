@@ -84,8 +84,9 @@ function onRecordingButtonPress() {
             //play video
             video.play();
             //start recording
-            startRecording(recorderLoaded);
         }
+        //call recording with status flag
+        startRecording(recorderLoaded);
     }
 }
 
