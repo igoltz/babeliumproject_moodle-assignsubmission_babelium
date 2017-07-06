@@ -1,6 +1,14 @@
 var noPosterImageUrl = CONSTANTS.no_poster_image_url;
 var posterImage = noPosterImageUrl;
 
+/** CACHE **/
+
+var posterURL = undefined;
+var originalVideoURL = undefined;
+var editedVideoURL = undefined;
+
+/** CACHE **/
+
 function loadVideo(videoId, subtitleId, type) {
     debug("video.loader.js::loadVideo()");
     downloadPosterImage(videoId, subtitleId, type);
@@ -30,25 +38,28 @@ function getSubtitlesLangCaption(subtitleId) {
 
 function getPosterUrl(videoId) {
     debug("video.loader.js::getPosterUrl()");
-    var hasMedia = exinfo !== undefined;
-    if (hasMedia) {
-        var isExercise = !exinfo.exerciseId;
-        if (isExercise) {
-            //exercise
-            hasMedia = exinfo.media !== undefined;
-            if (hasMedia && exinfo.media.thumbnail !== undefined) {
-                return exinfo.media.thumbnail;
-            }
-        } else {
-            //response
-            hasMedia = exinfo.thumbnail !== undefined;
-            if (hasMedia) {
-                return exinfo.thumbnail;
+    if(posterURL === undefined){
+        var hasMedia = exinfo !== undefined;
+        if (hasMedia) {
+            var isExercise = !exinfo.exerciseId;
+            if (isExercise) {
+                //exercise
+                hasMedia = exinfo.media !== undefined;
+                if (hasMedia && exinfo.media.thumbnail !== undefined) {
+                    posterURL = exinfo.media.thumbnail;
+                }
+            } else {
+                //response
+                hasMedia = exinfo.thumbnail !== undefined;
+                if (hasMedia) {
+                    posterURL = exinfo.thumbnail;
+                }
             }
         }
+        //default video url for not found
+        posterURL = noPosterImageUrl;
     }
-    //default video url for not found
-    return noPosterImageUrl;
+    return posterURL;
 }
 
 function downloadPosterImage(videoId, subtitleId, type) {
@@ -128,43 +139,50 @@ function autoStopVideo() {
 function getMP4video(videoId, type) {
     debug("video.loader.js::getMP4video()");
     if(type === "edited"){
-        var hasMedia = exinfo !== undefined;
-        if (hasMedia) {
-            var isExercise = !exinfo.exerciseId;
-            if (isExercise) {
-                //exercise
-                hasMedia = exinfo.media !== undefined;
-                if (hasMedia && exinfo.media.mp4Url !== undefined) {
-                    return exinfo.media.mp4Url;
-                }
-            } else {
-                //response
-                hasMedia = exinfo.mp4Url !== undefined;
-                if (hasMedia) {
-                    return exinfo.mp4Url;
-                }
-            }
-        }
-    }
-    else if( type === "change_to_original"){
-        //get exerciseId, get exercise info and return original video url
-        var hasMedia = exinfo !== undefined;
-        if (hasMedia) {
-            var hasExerciseId = exinfo.exerciseId;
-            if(hasExerciseId!==undefined){
-                var exerciseUrl = CONSTANTS.exercise_info_api_path_via_middle + "?name=exerciseinfo&data=" + exinfo.exerciseId;
-                var responseAjaxData = sync_rpc("GET", exerciseUrl);
-                if(responseAjaxData !== undefined){
-                    responseAjaxData = JSON.parse(responseAjaxData);
-                    if (responseAjaxData.media !== undefined && responseAjaxData.media.mp4Url !== undefined) {
-                        return responseAjaxData.media.mp4Url;
+        if(editedVideoURL === undefined){
+            var hasMedia = exinfo !== undefined;
+            if (hasMedia) {
+                var isExercise = !exinfo.exerciseId;
+                if (isExercise) {
+                    //exercise
+                    hasMedia = exinfo.media !== undefined;
+                    if (hasMedia && exinfo.media.mp4Url !== undefined) {
+                        editedVideoURL = exinfo.media.mp4Url;
+                    }
+                } else {
+                    //response
+                    hasMedia = exinfo.mp4Url !== undefined;
+                    if (hasMedia) {
+                        editedVideoURL = exinfo.mp4Url;
                     }
                 }
             }
         }
+        return editedVideoURL;
+    }
+    else if( type === "change_to_original"){
+        //get exerciseId, get exercise info and return original video url
+        if(originalVideoURL === undefined){
+            var hasMedia = exinfo !== undefined;
+            if (hasMedia) {
+                var hasExerciseId = exinfo.exerciseId;
+                if(hasExerciseId!==undefined){
+                    var exerciseUrl = CONSTANTS.exercise_info_api_path_via_middle + "?name=exerciseinfo&data=" + exinfo.exerciseId;
+                    var responseAjaxData = sync_rpc("GET", exerciseUrl);
+                    if(responseAjaxData !== undefined){
+                        responseAjaxData = JSON.parse(responseAjaxData);
+                        if (responseAjaxData.media !== undefined && responseAjaxData.media.mp4Url !== undefined) {
+                            originalVideoURL = responseAjaxData.media.mp4Url;
+                        }
+                    }
+                }
+            }
+        }
+        return originalVideoURL;
     }
     //default video url for not found
-    return CONSTANTS.default_video_mp4_url;
+    originalVideoURL = CONSTANTS.default_video_mp4_url;
+    return originalVideoURL;
 }
 
 function getWEBMvideo(videoId, type) {
