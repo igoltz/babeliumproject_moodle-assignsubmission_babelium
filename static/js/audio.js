@@ -37,24 +37,27 @@
          }
      } else {
          autoStopVideo();
-         swal({
-                 title: getString("swal_msg_allow_micro_title"),
-                 text: getString("swal_msg_allow_micro_body"),
-                 type: "warning",
-                 showCancelButton: true,
-                 confirmButtonText: getString("swal_msg_allow_btn"),
-                 cancelButtonText: getString("swal_msg_cancel_btn"),
-                 closeOnConfirm: true
-             },
-             function() {
-                 checkPermissions(CONSTANTS.micro);
-             }
-         );
+         showPermissionMessage();
          is_recording = false;
      }
      showRecordingMode(is_recording);
  }
 
+function showPermissionMessage(){
+    swal({
+            title: getString("swal_msg_allow_micro_title"),
+            text: getString("swal_msg_allow_micro_body"),
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: getString("swal_msg_allow_btn"),
+            cancelButtonText: getString("swal_msg_cancel_btn"),
+            closeOnConfirm: true
+        },
+        function() {
+            checkPermissions(CONSTANTS.micro);
+        }
+    );
+}
  function checkPermissions(permissionName, descriptor) {
      if (!recording_permission_granted) {
          initRecorder();
@@ -143,22 +146,18 @@
             );
          }
 
-         navigator.getUserMedia({
-                 audio: true
-             },
-             startUserMedia,
-             function(e) {
+        navigator.getUserMedia({
+                audio: true
+            },
+            startUserMedia,
+            function(e) {
                 cstm_log(
                     getString("swal_no_live_audio")
                     + e
                 );
-                sweetAlert(
-                    getString("swal_oops_title"),
-                    getString("swal_no_live_audio"),
-                    "error"
-                );
-             }
-         );
+                showPermissionMessage();
+            }
+        );
      }
  };
 
