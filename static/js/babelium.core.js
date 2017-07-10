@@ -483,21 +483,26 @@ function initCanvas(){
     if(can!==undefined){
         ctx = can.getContext('2d');
         if(ctx !== undefined ){
-            //customize canvas style
-            can.style.backgroundColor = canvas_background_color;
             block_height = can.height;
-            //craw cuepoints
-            generateCuePoints();
             window.requestAnimationFrame(updateCueInfo);
         }
     }
 }
 
 function updateCueInfo(){
+    //clear canvas
+    ctx.clearRect(0, 0, can.width, can.height);
+    //set background color
+    //customize canvas style
+    can.style.backgroundColor = canvas_background_color;
+    //draw blocks
+    generateCuePoints();
+    //draw cursor
     //draw user timer arrow indicator
     var video = document.getElementById('submission_video');
     var position = convertTimeToPixelPosition(video);
     updateIndicatorPosition(position);
+
     window.requestAnimationFrame(updateCueInfo);
 }
 
