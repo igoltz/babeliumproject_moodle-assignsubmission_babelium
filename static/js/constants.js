@@ -2,7 +2,7 @@ var CONSTANTS =
 {
     babelium_host : "//babelium-server-dev.irontec.com/",
     babelium_host_api : "//babelium-server-dev.irontec.com/api/v3",
-    babelium_audio_api : "//babelium-server-dev.irontec.com/mod/assign/submission/babelium/post.php",
+    babelium_audio_api : "//babelium-dev.irontec.com/mod/assign/submission/babelium/post.php",
     ajax_path :  "//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js",
     http : 'http:',
     micro  :'microphone',
