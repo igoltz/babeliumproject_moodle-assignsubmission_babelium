@@ -488,9 +488,24 @@ function initCanvas(){
             block_height = can.height;
             //craw cuepoints
             generateCuePoints();
-            //draw user timer arrow indicator
-            updateIndicatorPosition(5);
+            setInterval(
+                function(){
+                    //draw user timer arrow indicator
+                    var video = document.getElementById('submission_video');
+                    var position = convertTimeToPixelPosition(video);
+                    updateIndicatorPosition(position);
+                }, 3000
+            );
         }
+    }
+}
+
+function convertTimeToPixelPosition(video) {
+    if(video!==null && video!==undefined){
+        return ( video.currentTime / video.duration ) * can.width;
+    }
+    else{
+        return 0;
     }
 }
 
