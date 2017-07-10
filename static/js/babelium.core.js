@@ -11,6 +11,17 @@ var timer;
 
 /* CLOCK VARIABLES END */
 
+/* CANVAS VARAIBLES BEGIN */
+
+var block_height; //block height is canvas height
+var block_color = "rgb(255,0,0)"; //red
+var canvas_background_color = 'rgba(0, 0 ,0, .7)'; //bg color canvas
+var can;
+var ctx;
+var cue_indicator_width = 2; //2 pixel width for cue indicator
+var cue_indicator_color = "white" //cue indicator color
+/* CANVAS VARIABLES END */
+
 
 window.onload = function() {
     debug("babelium.core.js::onload()");
@@ -33,6 +44,7 @@ function start() {
     initRecorder();
     initView();
     initToogle();
+    initCanvas();
     overwriteFormControl();
 }
 
@@ -463,5 +475,71 @@ function showRecordingMode(isRecording){
                 getString('recording_link_log')
             );
         }
+    }
+}
+
+function initCanvas(){
+    can = document.getElementsByClassName('cuepointsCanvas')[0];
+    if(can!==undefined){
+        ctx = can.getContext('2d');
+        if(ctx !== undefined ){
+            //customize canvas style
+            can.style.backgroundColor = canvas_background_color;
+            block_height = can.height;
+            //craw cuepoints
+            generateCuePoints();
+            //draw user timer arrow indicator
+            updateIndicatorPosition(5);
+        }
+    }
+}
+
+function generateCuePoints(){
+    //////draw cuepoints
+    var cuelist = getCuePointList(); //cuepoint list to bew drawn
+    for (var i = 0; i < cuelist.length; i++) {
+        var point = cuelist[i];
+        canvas_rect(ctx, point.startX, point.startY, point.width, block_height, block_color);
+    }
+}
+
+function getCuePointList(){
+    var point = {
+        startX:0,
+        startY:0,
+        width:20
+    };
+    return [point];
+}
+
+function updateIndicatorPosition(position_x) {
+    var fromx = position_x; //top left
+    var tox = position_x;
+    var fromy = 0;
+    var toy = block_height; //bottom
+    canvas_arrow(ctx, fromx, fromy, tox, toy, cue_indicator_width, cue_indicator_color);
+}
+
+function canvas_arrow(context, fromx, fromy, tox, toy, lineWidth, lineColor){
+    context.beginPath();
+    context.moveTo(fromx, fromy);
+    context.lineTo(tox, toy);
+    if(lineWidth > 1){
+        context.lineWidth = lineWidth;
+    }
+    if(lineColor !== undefined){
+        context.strokeStyle = lineColor;
+    }
+    context.stroke();
+}
+
+function canvas_rect(ctx, a, b, c, d, color) {
+    //a, b --> upper left point coordinates
+    //c, d --> width, height
+    if(ctx!==undefined){
+        //set fill style
+        ctx.fillStyle = color;
+        //filñ
+        ctx.fillRect(a, b, c, d);
     }
 }
