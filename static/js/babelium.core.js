@@ -488,16 +488,17 @@ function initCanvas(){
             block_height = can.height;
             //craw cuepoints
             generateCuePoints();
-            setInterval(
-                function(){
-                    //draw user timer arrow indicator
-                    var video = document.getElementById('submission_video');
-                    var position = convertTimeToPixelPosition(video);
-                    updateIndicatorPosition(position);
-                }, 3000
-            );
+            window.requestAnimationFrame(updateCueInfo);
         }
     }
+}
+
+function updateCueInfo(){
+    //draw user timer arrow indicator
+    var video = document.getElementById('submission_video');
+    var position = convertTimeToPixelPosition(video);
+    updateIndicatorPosition(position);
+    window.requestAnimationFrame(updateCueInfo);
 }
 
 function convertTimeToPixelPosition(video) {
