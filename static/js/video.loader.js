@@ -56,8 +56,10 @@ function getPosterUrl(videoId) {
                 }
             }
         }
-        //default video url for not found
-        posterURL = noPosterImageUrl;
+        else{
+            //default video url for not found
+            posterURL = noPosterImageUrl;
+        }
     }
     return posterURL;
 }
