@@ -527,18 +527,19 @@ function parseCuePointList(){
             //read each cue and get times
             //cue.endTime & cue.startTime
             //create cue block
-            var x = convertCueTimeToPixelPosition(video, cue.startTime);
-            var l = convertCueTimeToPixelPosition(video, cue.endTime - cue.startTime);
-            console.log(video.currentTime+"   "+cue.startTime+"    "+video.duration+"       "+x+"      "+l);
-            var point = {
-                startX: x,
-                startY: 0,
-                width: l,
-                outside_color: cue_block_outside_color,
-                inside_color: cue_block_inside_color,
-                passed_color: cue_block_passed_color
-            };
-            cuePointList.push(point);
+            if( isUserCuePoint(cue) ){
+                var x = convertCueTimeToPixelPosition(video, cue.startTime);
+                var l = convertCueTimeToPixelPosition(video, cue.endTime - cue.startTime);
+                var point = {
+                    startX: x,
+                    startY: 0,
+                    width: l,
+                    outside_color: cue_block_outside_color,
+                    inside_color: cue_block_inside_color,
+                    passed_color: cue_block_passed_color
+                };
+                cuePointList.push(point);
+            }
             //for debug
             debug(point);
         };
@@ -556,6 +557,13 @@ function parseCuePointList(){
         //Will also trigger onflush.
         parser.flush();
     }
+}
+
+function isUserCuePoint(cue) {
+    if(cue === undefined){
+        return true; //paint cue by default
+    }
+    return cue.text.indexOf("<v Yourself>") !== -1; //paint cue if is for user
 }
 
 function updateCueInfo(){
