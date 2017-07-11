@@ -493,16 +493,14 @@ function updateCueInfo(){
     //clear canvas
     ctx.clearRect(0, 0, can.width, can.height);
     //set background color
-    //customize canvas style
     can.style.backgroundColor = canvas_background_color;
-    //draw blocks
+    //draw cue blocks
     generateCuePoints();
-    //draw cursor
-    //draw user timer arrow indicator
+    //draw cursor (user timer arrow indicator)
     var video = document.getElementById('submission_video');
     var position = convertTimeToPixelPosition(video);
     updateIndicatorPosition(position);
-
+    //request new animation frame
     window.requestAnimationFrame(updateCueInfo);
 }
 
@@ -525,12 +523,17 @@ function generateCuePoints(){
 }
 
 function getCuePointList(){
-    var point = {
-        startX:0,
-        startY:0,
-        width:20
-    };
-    return [point];
+    if(subtitle_file_data!==undefined){
+        var point = {
+            startX:0,
+            startY:0,
+            width:20
+        };
+        return [point];
+    }
+    else{
+        return [];
+    }
 }
 
 function updateIndicatorPosition(position_x) {

@@ -15,14 +15,14 @@ var CONSTANTS =
     subtitles_extension : ".vtt",
     subtitles_api_path : "/sub-titles/",
     default_subtitle_lang : "en",
-    default_subtitle_caption : "English captions",
+    default_subtitle_caption : "Default subtitles",
     html_indicator : "><",
     html_mark_found : -1,
     grader_view_mark : "&action=grader&",
     grader_view_mark_found : -1,
     reset_video_time : 0,
     exercise_info_api_path: "/exercises/",
-    
+
     default_video_mp4_url : "//babelium-dev.irontec.com/static/default/novideo.mp4",
     default_video_webm_url : "//babelium-dev.irontec.com/static/default/novideo.webm",
     exercise_info_api_path_via_middle : "//babelium-dev.irontec.com/mod/assign/submission/babelium/middle.php",

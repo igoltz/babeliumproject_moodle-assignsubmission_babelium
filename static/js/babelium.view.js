@@ -7,6 +7,7 @@ var debug_enabled = location.protocol === CONSTANTS.http;
 var babelium_server_data = "";
 var no_value = -1;
 var is_babelium_view = true;
+var subtitle_file_data = undefined;
 
 function initView() {
     if($ === undefined && jQuery!==undefined){
@@ -30,6 +31,7 @@ function loadSubtitles(id) {
     debug("babelium.core.js::loadSubtitles()");
     var onSuccess = function(response, ajaxOptions, thrownError) {
         console.log("Success: " + response);
+        subtitle_file_data = response;
     };
     var onError = function(response, ajaxOptions, thrownError) {
         console.log("Error: " + response);
