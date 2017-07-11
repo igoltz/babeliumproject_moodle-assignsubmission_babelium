@@ -524,6 +524,26 @@ function generateCuePoints(){
 
 function getCuePointList(){
     if(subtitle_file_data!==undefined){
+        //parse subtitle file
+        var parser = new WebVTT.Parser(window, WebVTT.StringDecoder());
+
+        parser.onregion = function(region) {
+            console.log(region);
+        };
+        parser.oncue = function(cue) {
+            console.log(cue);
+        };
+        parser.onflush = function() {
+            console.log("Flushed");
+        };
+        parser.onparsingerror = function(e) {
+            console.log(e);
+        };
+
+        parser.parse(subtitle_file_data);
+        //Indicates that no more data is expected and will force the parser to parse any unparsed data that it may have.
+        //Will also trigger onflush.
+        parser.flush();
         var point = {
             startX:0,
             startY:0,
