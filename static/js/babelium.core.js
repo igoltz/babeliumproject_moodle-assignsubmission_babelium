@@ -14,20 +14,18 @@ var timer;
 /* CANVAS VARAIBLES BEGIN */
 
 var block_height; //block height is canvas height
-var block_color = "rgb(255,0,0)"; //red
-var canvas_background_color = 'rgba(0, 0 ,0, .7)'; //bg color canvas
 var can;
 var ctx;
 var cue_indicator_width = 2; //2 pixel width for cue indicator
-var cue_indicator_color = "white" //cue indicator color
 var cue_point_list_ready = false;
 
 var cue_block_outside_color = "red"
 var cue_block_inside_color = "green"
 var cue_block_passed_color = "blue";
+var cue_indicator_color = "white" //cue indicator color
+var canvas_background_color = 'rgba(0, 0 ,0, .7)'; //bg color canvas
 
 /* CANVAS VARIABLES END */
-
 
 window.onload = function() {
     debug("babelium.core.js::onload()");
