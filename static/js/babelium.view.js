@@ -7,9 +7,13 @@ var debug_enabled = location.protocol === CONSTANTS.http;
 var babelium_server_data = "";
 var no_value = -1;
 var is_babelium_view = true;
-var subtitle_file_data = undefined;
+var subtitle_file_data;
+var cuePointList = [];
 
-function initView() {
+var mode;
+function initView(exec_mode) {
+    mode = exec_mode;
+
     if($ === undefined && jQuery!==undefined){
         debug("Reseeting $ value as jQuery");
         $ = jQuery;
@@ -21,10 +25,6 @@ function initView() {
     //load video
     loadVideo(exinfo.id, subtitleId, "edited");
     loadExerciseDescription(exinfo.description);
-
-    //translate text to user lang
-    translate();
-    show();
 }
 
 function loadSubtitles(id) {
@@ -57,12 +57,14 @@ function rpc(method, url, onSuccess, onError) {
         url: url,
         success: function(xhr, ajaxOptions, thrownError) {
             if (onSuccess !== undefined) {
-                onSuccess(xhr.responseText);
+                var data = xhr !== undefined ? xhr : xhr.responseText;
+                onSuccess(data);
             }
         },
         error: function(xhr, ajaxOptions, thrownError) {
             if (onError !== undefined) {
-                onError(xhr.responseText);
+                var data = xhr !== undefined ? xhr : xhr.responseText;
+                onError(data);
             }
         }
     });

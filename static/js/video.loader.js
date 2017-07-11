@@ -105,6 +105,13 @@ function injectVideo(posterImage, videoUrl, videoWebmUrl, subtitlesUrl, sublang,
     if (video !== undefined) {
         video.addEventListener('ended', onVideoEnded, false);
     }
+
+    if(mode == 'submission_mode'){
+        parseCuePointList();
+    }
+    //translate text to user lang
+    translate();
+    show();
 }
 
 function onVideoEnded() {

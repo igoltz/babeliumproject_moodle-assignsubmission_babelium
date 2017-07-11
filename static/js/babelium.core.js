@@ -20,6 +20,12 @@ var can;
 var ctx;
 var cue_indicator_width = 2; //2 pixel width for cue indicator
 var cue_indicator_color = "white" //cue indicator color
+var cue_point_list_ready = false;
+
+var cue_block_outside_color = "red"
+var cue_block_inside_color = "green"
+var cue_block_passed_color = "blue";
+
 /* CANVAS VARIABLES END */
 
 
@@ -42,7 +48,8 @@ function start() {
     showRecordingMode(false);
     //init recorder
     initRecorder();
-    initView();
+    var mode = "submission_mode";
+    initView(mode);
     initToogle();
     initCanvas();
     overwriteFormControl();
@@ -490,40 +497,66 @@ function initCanvas(){
 }
 
 function updateCueInfo(){
-    //clear canvas
-    ctx.clearRect(0, 0, can.width, can.height);
-    //set background color
-    can.style.backgroundColor = canvas_background_color;
-    //draw cue blocks
-    generateCuePoints();
-    //draw cursor (user timer arrow indicator)
     var video = document.getElementById('submission_video');
-    var position = convertTimeToPixelPosition(video);
-    updateIndicatorPosition(position);
+    if(video!==undefined && video!==null){
+        var currentVideoTime = video.currentTime;
+        //clear canvas
+        ctx.clearRect(0, 0, can.width, can.height);
+        //set background color
+        can.style.backgroundColor = canvas_background_color;
+
+        if(cue_point_list_ready){
+            //draw cue blocks
+            paintCuePoints(currentVideoTime);
+        }
+
+        //draw cursor (user timer arrow indicator)
+        var position = convertTimeToPixelPosition(video);
+        updateIndicatorPosition(position);
+    }
     //request new animation frame
     window.requestAnimationFrame(updateCueInfo);
 }
 
-function convertTimeToPixelPosition(video) {
-    if(video!==null && video!==undefined){
-        return ( video.currentTime / video.duration ) * can.width;
+function paintCuePoints(currentVideoTime){
+    //draw cuepoints
+    if(cuePointList!==undefined){
+        for (var i = 0; i < cuePointList.length; i++) {
+            var point = cuePointList[i];
+            canvas_rect(ctx, point.startX, point.startY, point.width, block_height, calculateBlockColor(point, currentVideoTime));
+        }
+    }
+}
+
+function calculateBlockColor(point, currentVideoTime){
+    //convert time to pixel
+    if(currentVideoTime!==undefined){
+        currentVideoTime = convertTimeToPixelPosition(currentVideoTime);
+    }
+
+    if( currentVideoTime < point.startX){
+        //cursor is outside of the block
+        return point.outside_color;
+    }
+    else if(currentVideoTime >= point.startX && currentVideoTime <= (point.startX + point.width)){
+        //cursor is inside the block
+        return point.inside_color;
+    }
+    else if(currentVideoTime > (point.startX + point.width)){
+        //cursor has passed the block
+        return point.passed_color;
     }
     else{
-        return 0;
+        //default color
+        return point.outside_color;
     }
 }
 
-function generateCuePoints(){
-    //////draw cuepoints
-    var cuelist = getCuePointList(); //cuepoint list to bew drawn
-    for (var i = 0; i < cuelist.length; i++) {
-        var point = cuelist[i];
-        canvas_rect(ctx, point.startX, point.startY, point.width, block_height, block_color);
-    }
-}
+function parseCuePointList(){
+    return;
+    var video = document.getElementById('submission_video');
 
-function getCuePointList(){
-    if(subtitle_file_data!==undefined){
+    if(subtitle_file_data!==undefined && video!==null && video!==undefined){
         //parse subtitle file
         var parser = new WebVTT.Parser(window, WebVTT.StringDecoder());
 
@@ -531,9 +564,24 @@ function getCuePointList(){
             console.log(region);
         };
         parser.oncue = function(cue) {
-            console.log(cue);
+            //read each cue and get times
+            //cue.endTime & cue.startTime
+            //create cue block
+            var point = {
+                startX: convertCueTimeToPixelPosition(video, cue.startTime),
+                startY: 0,
+                width: convertCueTimeToPixelPosition(video, cue.endTime - cue.startTime),
+                outside_color: cue_block_outside_color,
+                inside_color: cue_block_inside_color,
+                passed_color: cue_block_passed_color
+            };
+            cuePointList.push(point);
+            //for debug
+            debug(point);
         };
         parser.onflush = function() {
+            cue_point_list_ready = true;
+            paintCuePoints();
             console.log("Flushed");
         };
         parser.onparsingerror = function(e) {
@@ -544,15 +592,6 @@ function getCuePointList(){
         //Indicates that no more data is expected and will force the parser to parse any unparsed data that it may have.
         //Will also trigger onflush.
         parser.flush();
-        var point = {
-            startX:0,
-            startY:0,
-            width:20
-        };
-        return [point];
-    }
-    else{
-        return [];
     }
 }
 
@@ -585,5 +624,23 @@ function canvas_rect(ctx, a, b, c, d, color) {
         ctx.fillStyle = color;
         //filñ
         ctx.fillRect(a, b, c, d);
+    }
+}
+
+function convertTimeToPixelPosition(video) {
+    if(video!==null && video!==undefined){
+        return ( video.currentTime / video.duration ) * can.width;
+    }
+    else{
+        return 0;
+    }
+}
+
+function convertCueTimeToPixelPosition(video, time) {
+    if(video!==null && video!==undefined){
+        return ( time / video.duration ) * can.width;
+    }
+    else{
+        return 0;
     }
 }
