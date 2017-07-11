@@ -12,6 +12,7 @@ var cuePointList = [];
 
 var mode;
 function initView(exec_mode) {
+    debug("babelium.view.js::initView()");
     mode = exec_mode;
 
     if($ === undefined && jQuery!==undefined){
@@ -28,7 +29,7 @@ function initView(exec_mode) {
 }
 
 function loadSubtitles(id) {
-    debug("babelium.core.js::loadSubtitles()");
+    debug("babelium.view.js::loadSubtitles()");
     var onSuccess = function(response, ajaxOptions, thrownError) {
         console.log("Success: " + response);
         subtitle_file_data = response;
@@ -40,7 +41,7 @@ function loadSubtitles(id) {
 }
 
 function loadExerciseDescription(description) {
-    debug("babelium.core.js::loadExerciseDescription()");
+    debug("babelium.view.js::loadExerciseDescription()");
     if (isHTMLdescription(description)) {
         //warning: possible XSS injection if value of description is not correctly sanitized
         $('.exdescription').html(description);
@@ -50,7 +51,7 @@ function loadExerciseDescription(description) {
 }
 
 function rpc(method, url, onSuccess, onError) {
-    debug("babelium.core.js::rpc()");
+    debug("babelium.view.js::rpc()");
     // Request with custom header
     jQuery.ajax({
         type: method,
@@ -71,7 +72,7 @@ function rpc(method, url, onSuccess, onError) {
 }
 
 function sync_rpc(method, url, onSuccess, onError){
-    debug("babelium.core.js::sync_rpc()");
+    debug("babelium.view.js::sync_rpc()");
     // Request with custom header
     return jQuery.ajax({
         type: method,
@@ -81,6 +82,7 @@ function sync_rpc(method, url, onSuccess, onError){
 }
 
 function showLoading(value){
+    debug("babelium.view.js::showLoading()");
     var babelium_loading_row = document.getElementsByClassName("babelium_loading_row")[0];
     if(babelium_loading_row){
         //make sure it is shown
@@ -94,12 +96,14 @@ function showLoading(value){
 }
 
 function translate(){
+    debug("babelium.view.js::translate()");
     setButtonsText();
     setTitle();
     setlogs();
 }
 
 function setButtonsText(){
+    debug("babelium.view.js::setButtonsText()");
     var record = document.getElementsByClassName("startRecord")[0];
     if(record){
         record.innerHTML = getString("record");
@@ -111,6 +115,7 @@ function setButtonsText(){
 }
 
 function setTitle(){
+    debug("babelium.view.js::setTitle()");
     var title = document.getElementsByClassName("exercise-desc-title")[0];
     if(title){
         title.innerHTML = getString("exercise_title");
@@ -118,6 +123,7 @@ function setTitle(){
 }
 
 function setlogs(){
+    debug("babelium.view.js::setlogs()");
     var recording_list_title = document.getElementsByClassName("recording_list_title")[0];
     if(recording_list_title){
         recording_list_title.innerHTML = getString("recording_list_title");
@@ -129,6 +135,7 @@ function setlogs(){
 }
 
 function show(){
+    debug("babelium.view.js::show()");
     //hide loader
     showLoading(false);
     //show container
@@ -139,7 +146,7 @@ function show(){
 }
 
 function setStatus(text) {
-    debug("babelium.core.js::setStatus()");
+    debug("babelium.view.js::setStatus()");
     var status = document.getElementById('status_text');
     if (status !== undefined && text !== undefined && status !== null && text !== null) {
         status.textContent = text;
@@ -147,7 +154,7 @@ function setStatus(text) {
 }
 
 function setStatusColor(color) {
-    debug("babelium.core.js::setStatusColor()");
+    debug("babelium.view.js::setStatusColor()");
     var status = document.getElementById('status_text');
     if (status !== undefined && color !== undefined && status !== null && color !== null) {
         status.style.color = color;
@@ -155,7 +162,7 @@ function setStatusColor(color) {
 }
 
 function setCounterColor(color){
-    debug("babelium.core.js::setCounterColor()");
+    debug("babelium.view.js::setCounterColor()");
     var counter = document.getElementsByClassName('clock')[0];
     if (counter !== undefined && color !== undefined && counter !== null && color !== null) {
         counter.style.color = color;

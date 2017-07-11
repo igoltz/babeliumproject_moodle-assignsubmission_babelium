@@ -6,6 +6,7 @@ var videoStartTime;
 var timer;
 
 function startClockCountingOn(id) {
+    debug("clock.js::startClockCountingOn()");
     videoStartTime = undefined;
     if(id !== undefined){
         clockIdentifier = id;
@@ -20,12 +21,14 @@ function demo(){
 }
 
 function stopClockCountingOn() {
+    debug("clock.js::startClockCountingOn()");
     if(timer !== undefined ){
         clearInterval(timer);
     }
 }
 
 function startClockCounting(){
+    debug("clock.js::startClockCounting()");
     if(clockIdentifier !== undefined){
         var today = new Date();
         if(videoStartTime===undefined){

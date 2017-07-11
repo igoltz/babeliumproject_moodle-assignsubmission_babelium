@@ -65,8 +65,8 @@ function getPosterUrl(videoId) {
 }
 
 function downloadPosterImage(videoId, subtitleId, type) {
-    var expectedPosterUrl = getPosterUrl(videoId);
     debug("video.loader.js::downloadPosterImage()");
+    var expectedPosterUrl = getPosterUrl(videoId);
     var onSuccess = function(response, ajaxOptions, thrownError) {
         debug("Poster image is valid");
         posterImage = expectedPosterUrl;
@@ -81,6 +81,7 @@ function downloadPosterImage(videoId, subtitleId, type) {
 }
 
 function injectVideoFromId(videoId, subtitleId, type) {
+    debug("video.loader.js::injectVideoFromId()");
     var videoUrl = getMP4video(videoId, type);
     var videoWebmUrl = getWEBMvideo(videoId, type);
     var subtitlesUrl = getSubtitlesURL(subtitleId);
@@ -90,6 +91,7 @@ function injectVideoFromId(videoId, subtitleId, type) {
 }
 
 function injectVideo(posterImage, videoUrl, videoWebmUrl, subtitlesUrl, sublang, subcaption) {
+    debug("video.loader.js::injectVideo()");
     var videoStr = "\
     <video id='submission_video' style='width:100%' poster='" + posterImage + "' controls crossorigin='anonymous'>\
         <source src='" + videoUrl + "' type='video/mp4'>\
@@ -103,11 +105,15 @@ function injectVideo(posterImage, videoUrl, videoWebmUrl, subtitlesUrl, sublang,
     //set listeners
     var video = document.getElementById('submission_video');
     if (video !== undefined) {
+        //on video ended event
         video.addEventListener('ended', onVideoEnded, false);
-    }
-
-    if(mode == 'submission_mode'){
-        parseCuePointList();
+        //on load metadata event
+        if(mode == 'submission_mode'){
+            video.addEventListener('loadedmetadata', function() {
+                debug("video metadata loaded! parse subtitles now");
+                parseCuePointList();
+            });
+        }
     }
     //translate text to user lang
     translate();
@@ -133,6 +139,7 @@ function onVideoEnded() {
 }
 
 function isGraderView() {
+    debug("video.loader.js::isGraderView()");
     return window.location.href.indexOf(CONSTANTS.grader_view_mark) !== CONSTANTS.grader_view_mark_found;
 }
 

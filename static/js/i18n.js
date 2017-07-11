@@ -188,7 +188,10 @@ function getString(key){
         lang = default_lang; //Default language
     }
 
-    lang = "es"; //for debug
+    if(debug_enabled){
+        //overwrite moodle language if development env
+        lang = "es"; //for debug
+    }
 
     var languageData = languages[lang];
     if(key!==null && key!==undefined){

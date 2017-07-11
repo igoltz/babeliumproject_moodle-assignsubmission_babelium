@@ -85,6 +85,7 @@ function overwriteFormControl() {
 }
 
 function onSubmissionCancelledListener(event) {
+    debug("babelium.core.js::onSubmissionCancelledListener()");
     event.preventDefault();
     var url = window.location.href;
     url = url.replace("editsubmission", "view");
@@ -194,10 +195,12 @@ function onSubmissionDoneListener(event) {
 }
 
 function getRecordedRole() {
+    debug("babelium.core.js::getRecordedRole()");
     return $bjq('#id_roleCombo option:selected').text();
 }
 
 function getResponseHash() {
+    debug("babelium.core.js::getResponseHash()");
     if (exinfo.media) {
         return exinfo.media.mp4Url ? exinfo.media.mp4Url : "";
     } else {
@@ -206,10 +209,12 @@ function getResponseHash() {
 }
 
 function getResponseData() {
+    debug("babelium.core.js::getResponseData()");
     return babelium_server_data;
 }
 
 function getSubtitleId() {
+    debug("babelium.core.js::getSubtitleId()");
     if (exinfo.media) {
         return exinfo.media.subtitleId ? exinfo.media.subtitleId : no_value;
     } else {
@@ -218,6 +223,7 @@ function getSubtitleId() {
 }
 
 function getExerciseId() {
+    debug("babelium.core.js::getExerciseId()");
     if (exinfo.exerciseId) {
         //response mode
         return exinfo.exerciseId ? exinfo.exerciseId : no_value;
@@ -355,6 +361,7 @@ function sendAudioDataToMiddleWare(audioPostUrl, onSuccess, onError) {
 
 
 function initToogle() {
+    debug("babelium.core.js::initToogle()");
     var onVideoToogleChange = function () {
         toogle_changed = !toogle_changed;
         console.log("Toogle status: "+toogle_changed);
@@ -389,6 +396,7 @@ function initToogle() {
 }
 
 function setToogleText(toogleStatus){
+    debug("babelium.core.js::setToogleText()");
     var clsnameLeft = "video-toogle-text-left";
     var toogleTextLeft = document.getElementsByClassName(clsnameLeft)[0];
 
@@ -430,6 +438,7 @@ function setToogleText(toogleStatus){
 }
 
 function onToogleGoesToTrueState(){
+    debug("babelium.core.js::onToogleGoesToTrueState()");
     //load edited video
     if(exinfo!==undefined){
         injectVideoFromId(exinfo.exerciseId, exinfo.subtitleId, "change_to_original");
@@ -437,6 +446,7 @@ function onToogleGoesToTrueState(){
 }
 
 function onToogleGoesToFalseState(){
+    debug("babelium.core.js::onToogleGoesToFalseState()");
     //load original video
     if(exinfo!==undefined){
         injectVideoFromId(exinfo.id, exinfo.subtitleId, "edited");
@@ -448,6 +458,7 @@ function onToogleGoesToFalseState(){
 **/
 
 function showRecordingMode(isRecording){
+    debug("babelium.core.js::showRecordingMode()");
     //get recording logo
     var image = document.getElementsByClassName('recording-image')[0];
     if(image !== undefined && image !== null){
@@ -485,7 +496,12 @@ function showRecordingMode(isRecording){
     }
 }
 
+////////////////////////////
+// BEGIN CANVAS FUNCTIONS //
+////////////////////////////
+
 function initCanvas(){
+    debug("babelium.core.js::initCanvas()");
     can = document.getElementsByClassName('cuepointsCanvas')[0];
     if(can!==undefined){
         ctx = can.getContext('2d');
@@ -496,64 +512,8 @@ function initCanvas(){
     }
 }
 
-function updateCueInfo(){
-    var video = document.getElementById('submission_video');
-    if(video!==undefined && video!==null){
-        var currentVideoTime = video.currentTime;
-        //clear canvas
-        ctx.clearRect(0, 0, can.width, can.height);
-        //set background color
-        can.style.backgroundColor = canvas_background_color;
-
-        if(cue_point_list_ready){
-            //draw cue blocks
-            paintCuePoints(currentVideoTime);
-        }
-
-        //draw cursor (user timer arrow indicator)
-        var position = convertTimeToPixelPosition(video);
-        updateIndicatorPosition(position);
-    }
-    //request new animation frame
-    window.requestAnimationFrame(updateCueInfo);
-}
-
-function paintCuePoints(currentVideoTime){
-    //draw cuepoints
-    if(cuePointList!==undefined){
-        for (var i = 0; i < cuePointList.length; i++) {
-            var point = cuePointList[i];
-            canvas_rect(ctx, point.startX, point.startY, point.width, block_height, calculateBlockColor(point, currentVideoTime));
-        }
-    }
-}
-
-function calculateBlockColor(point, currentVideoTime){
-    //convert time to pixel
-    if(currentVideoTime!==undefined){
-        currentVideoTime = convertTimeToPixelPosition(currentVideoTime);
-    }
-
-    if( currentVideoTime < point.startX){
-        //cursor is outside of the block
-        return point.outside_color;
-    }
-    else if(currentVideoTime >= point.startX && currentVideoTime <= (point.startX + point.width)){
-        //cursor is inside the block
-        return point.inside_color;
-    }
-    else if(currentVideoTime > (point.startX + point.width)){
-        //cursor has passed the block
-        return point.passed_color;
-    }
-    else{
-        //default color
-        return point.outside_color;
-    }
-}
-
 function parseCuePointList(){
-    return;
+    debug("babelium.core.js::parseCuePointList()");
     var video = document.getElementById('submission_video');
 
     if(subtitle_file_data!==undefined && video!==null && video!==undefined){
@@ -567,10 +527,13 @@ function parseCuePointList(){
             //read each cue and get times
             //cue.endTime & cue.startTime
             //create cue block
+            var x = convertCueTimeToPixelPosition(video, cue.startTime);
+            var l = convertCueTimeToPixelPosition(video, cue.endTime - cue.startTime);
+            console.log(video.currentTime+"   "+cue.startTime+"    "+video.duration+"       "+x+"      "+l);
             var point = {
-                startX: convertCueTimeToPixelPosition(video, cue.startTime),
+                startX: x,
                 startY: 0,
-                width: convertCueTimeToPixelPosition(video, cue.endTime - cue.startTime),
+                width: l,
                 outside_color: cue_block_outside_color,
                 inside_color: cue_block_inside_color,
                 passed_color: cue_block_passed_color
@@ -581,7 +544,7 @@ function parseCuePointList(){
         };
         parser.onflush = function() {
             cue_point_list_ready = true;
-            paintCuePoints();
+            paintCuePoints(video);
             console.log("Flushed");
         };
         parser.onparsingerror = function(e) {
@@ -592,6 +555,62 @@ function parseCuePointList(){
         //Indicates that no more data is expected and will force the parser to parse any unparsed data that it may have.
         //Will also trigger onflush.
         parser.flush();
+    }
+}
+
+function updateCueInfo(){
+    var video = document.getElementById('submission_video');
+    //clear canvas
+    ctx.clearRect(0, 0, can.width, can.height);
+    //set background color
+    can.style.backgroundColor = canvas_background_color;
+
+    if(cue_point_list_ready && video!==undefined && video!==null){
+        //draw cue blocks
+        paintCuePoints(video);
+    }
+
+    //draw cursor (user timer arrow indicator)
+    var position = convertTimeToPixelPosition(video);
+    updateIndicatorPosition(position);
+
+    //request new animation frame
+    window.requestAnimationFrame(updateCueInfo);
+}
+
+function paintCuePoints(video){
+    //draw cuepoints
+    if(cuePointList!==undefined){
+        for (var i = 0; i < cuePointList.length; i++) {
+            var point = cuePointList[i];
+            canvas_rect(ctx, point.startX, point.startY, point.width, block_height, calculateBlockColor(point, video));
+        }
+    }
+}
+
+function calculateBlockColor(point, video){
+    //convert time to pixel
+    if(video!==undefined){
+        currentVideoTime = convertTimeToPixelPosition(video);
+        if( currentVideoTime < point.startX){
+            //cursor is outside of the block
+            return point.outside_color;
+        }
+        else if(currentVideoTime >= point.startX && currentVideoTime <= (point.startX + point.width)){
+            //cursor is inside the block
+            return point.inside_color;
+        }
+        else if(currentVideoTime > (point.startX + point.width)){
+            //cursor has passed the block
+            return point.passed_color;
+        }
+        else{
+            //default color
+            return point.outside_color;
+        }
+    }
+    else{
+        return point.outside_color;
     }
 }
 
@@ -629,7 +648,12 @@ function canvas_rect(ctx, a, b, c, d, color) {
 
 function convertTimeToPixelPosition(video) {
     if(video!==null && video!==undefined){
-        return ( video.currentTime / video.duration ) * can.width;
+        if( video.duration === 0 ){
+            return 0;
+        }
+        else{
+            return ( video.currentTime / video.duration ) * can.width;
+        }
     }
     else{
         return 0;
@@ -638,9 +662,18 @@ function convertTimeToPixelPosition(video) {
 
 function convertCueTimeToPixelPosition(video, time) {
     if(video!==null && video!==undefined){
-        return ( time / video.duration ) * can.width;
+        if( video.duration === 0 ){
+            return 0;
+        }
+        else{
+            return ( time / video.duration ) * can.width;
+        }
     }
     else{
         return 0;
     }
 }
+
+//////////////////////////
+// END CANVAS FUNCTIONS //
+//////////////////////////

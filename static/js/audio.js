@@ -15,6 +15,7 @@
  }
 
  function startRecording(recorded_loaded) {
+    debug("audio.js::startRecording()");
      if (recording_permission_granted && recorded_loaded) {
          //check if secure origin
          if (location.protocol === CONSTANTS.http) {
@@ -44,6 +45,7 @@
  }
 
 function showPermissionMessage(){
+    debug("audio.js::showPermissionMessage()");
     swal({
             title: getString("swal_msg_allow_micro_title"),
             text: getString("swal_msg_allow_micro_body"),
@@ -59,6 +61,7 @@ function showPermissionMessage(){
     );
 }
  function checkPermissions(permissionName, descriptor) {
+    debug("audio.js::checkPermissions()");
      if (!recording_permission_granted) {
          initRecorder();
          //request required permissions
@@ -86,6 +89,7 @@ function showPermissionMessage(){
  }
 
  function stopRecording() {
+    debug("audio.js::stopRecording()");
     if (is_recording) {
         is_recording = false;
         if (recorder !== undefined) {
@@ -107,6 +111,7 @@ function showPermissionMessage(){
  }
 
  function initRecorder() {
+    debug("audio.js::initRecorder()");
      if (!recorderLoaded) {
          if (generateMp3) {
              extension = CONSTANTS.mp3_extension;
@@ -162,6 +167,7 @@ function showPermissionMessage(){
  };
 
  function startUserMedia(stream) {
+    debug("audio.js::startUserMedia()");
      //detecting mics
      var mics = stream.getAudioTracks().length;
      if (mics > 0) {
