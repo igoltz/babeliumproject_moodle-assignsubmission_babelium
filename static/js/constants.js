@@ -11,7 +11,7 @@ var CONSTANTS =
     sample_rate : 48000,
     num_channels : 1,
     buffer_len : 1024,
-    no_poster_image_url : "//babelium-dev.irontec.com/static/default/novideo.jpg",
+    no_poster_image_url : "/mod/assign/submission/babelium/static/default/novideo.jpg",
     subtitles_extension : ".vtt",
     subtitles_api_path : "/sub-titles/",
     default_subtitle_lang : "en",
@@ -23,7 +23,7 @@ var CONSTANTS =
     reset_video_time : 0,
     exercise_info_api_path: "/exercises/",
 
-    default_video_mp4_url : "//babelium-dev.irontec.com/static/default/novideo.mp4",
-    default_video_webm_url : "//babelium-dev.irontec.com/static/default/novideo.webm",
-    exercise_info_api_path_via_middle : "//babelium-dev.irontec.com/mod/assign/submission/babelium/middle.php",
+    default_video_mp4_url : "/mod/assign/submission/babelium/static/default/novideo.mp4",
+    default_video_webm_url : "/mod/assign/submission/babelium/static/default/novideo.webm",
+    exercise_info_api_path_via_middle : "/mod/assign/submission/babelium/middle.php",
 };

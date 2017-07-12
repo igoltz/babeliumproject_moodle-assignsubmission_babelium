@@ -100,7 +100,10 @@ function injectVideo(posterImage, videoUrl, videoWebmUrl, subtitlesUrl, sublang,
         video not supported\
     </video>";
     //append video element to div
-    $('.videocontent').html(videoStr);
+    var videocontent = document.getElementsByClassName("videocontent")[0];
+    if(videocontent!==undefined){
+        videocontent.innerHTML = videoStr;
+    }
 
     //set listeners
     var video = document.getElementById('submission_video');
