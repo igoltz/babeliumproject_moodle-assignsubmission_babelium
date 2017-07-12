@@ -135,10 +135,10 @@ function createDownloadLink() {
         //change audio style
         au.style.margin = "16px";
         au.style.display = "block";
-        au.style.width = "100%;";
+        au.style.width = "100%";
 
         //change link style
-        hf.style.class = "button-green center";
+        hf.style.className = "button-green center";
         hf.style.display = "inline";
         hf.style.margin = "15px";
         hf.style.background = "#3a3b45";
