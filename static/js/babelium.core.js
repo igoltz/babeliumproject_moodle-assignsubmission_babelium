@@ -138,7 +138,7 @@ function createDownloadLink() {
         au.style.width = "100%";
 
         //change link style
-        hf.style.className = "button-green center";
+        hf.className = "button -green center";
         hf.style.display = "inline";
         hf.style.margin = "15px";
         hf.style.background = "#3a3b45";
