@@ -519,6 +519,9 @@ function initCanvas(){
     can = document.getElementsByClassName('cuepointsCanvas')[0];
     if(can!==undefined){
         ctx = can.getContext('2d');
+        //fix blurred canvas issue
+        ctx.translate(0.5, 0.5);
+        ctx.scale(1, 1);
         if(ctx !== undefined ){
             block_height = can.height;
             window.requestAnimationFrame(updateCueInfo);
