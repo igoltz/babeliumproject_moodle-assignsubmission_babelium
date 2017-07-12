@@ -123,10 +123,26 @@ function createDownloadLink() {
         hf.href = url;
         var filename = new Date().toISOString() + extension;
         hf.download = filename;
-        hf.innerHTML = hf.download;
+        hf.innerHTML = "Download audio"
         li.appendChild(au);
         li.appendChild(hf);
         recordingslist.appendChild(li);
+
+        //change li style
+        li.style.display = "inline-flex";
+        li.style.width = "100%";
+
+        //change audio style
+        au.style.margin = "16px";
+        au.style.display = "block";
+        au.style.width = "100%;";
+
+        //change link style
+        hf.style.class = "button-green center";
+        hf.style.display = "inline";
+        hf.style.margin = "15px";
+        hf.style.background = "#3a3b45";
+
         if (url !== undefined) {
             getRecordedAudioStream(blob, url, onAudioStreamReceived);
         }
