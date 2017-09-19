@@ -161,10 +161,14 @@ function setStatusColor(color) {
     }
 }
 
-function setCounterColor(color){
+function setCounterColor(isRecording){
     debug("babelium.view.js::setCounterColor()");
     var counter = document.getElementsByClassName('clock')[0];
-    if (counter !== undefined && color !== undefined && counter !== null && color !== null) {
-        counter.style.color = color;
+    if (counter !== undefined && counter !== null) {
+    	if(isRecording){
+    		$(counter).addClass('active');
+    	}else{
+    		$(counter).removeClass('active');
+    	}
     }
 }

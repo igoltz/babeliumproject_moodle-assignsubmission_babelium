@@ -103,9 +103,15 @@ li{
   outline-offset: -4px;
 }
 
-.button.-green {
+.button-container .button.-green {
   color: #FFFFFF;
+  font-weight: 700;
   background: #3ac569;
+}
+
+.button-container .button.-green:hover {
+	color: #ffffff;
+    opacity: .75;
 }
 
 .button.-blue {
@@ -113,9 +119,15 @@ li{
   background: #2b90d9;
 }
 
-.button.-salmon {
+.button-container .button.-salmon {
   color: #FFFFFF;
+  font-weight: 700;
   background: #F32C52;
+}
+
+.button-container .button.-salmon:hover {
+	color: #ffffff;
+    opacity: .75;
 }
 
 .button.-sun {
@@ -149,12 +161,30 @@ li{
 .recording-controls > *:last-child{
 	margin-right: 0;
 }
+.recording-controls .clock{
+	background-color: #dddddd;
+	padding: 4px;
+	border-radius: 5px;
+	font-size: 90%;
+	
+	-webkit-transition: all 300ms linear;
+    -ms-transition: all 300ms linear;
+    transition: all 300ms linear;
+}
+.recording-controls .clock.active{
+	background-color: #ef2929;
+	color: white;
+}
 .recording-icon{
 	display: inline-block;
 	width: 16px;
 	height: 16px;
 	background-color: #dddddd;
-	border-radius: 50%
+	border-radius: 50%;
+
+	-webkit-transition: background-color 300ms linear;
+    -ms-transition: background-color 300ms linear;
+    transition: background-color 300ms linear;
 }
 .recording-icon.active{
 	background-color: #ef2929;	
@@ -186,4 +216,7 @@ li{
     -webkit-transform: translateX(15px);
     -ms-transform: translateX(15px);
     transform: translateX(15px);
+}
+.recording-volume-indicator{
+	min-height: 10px;
 }
