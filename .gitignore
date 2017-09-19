@@ -19,3 +19,4 @@ bin-release/
 
 #ignore phpintel folder
 \.phpintel/
+.project
