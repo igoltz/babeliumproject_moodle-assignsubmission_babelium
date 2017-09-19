@@ -33,30 +33,31 @@
                   <div class="videocontent">
                   </div>
                   <div class="canvascontent">
-                    <canvas class="cuepointsCanvas" height="100" width="1000" style="position: relative; width: 100%; height: 50px; padding: 0;margin: 0;"></canvas>
+                    <canvas class="cuepointsCanvas" height="100" width="1000" style="position: relative; width: 100%; height: 40px; padding: 0;margin: 0;"></canvas>
                   </div>
                 </div>
              </div>
        </div>
-        <div class="col-md-12">
-            <div class="centered" style="padding-top: 10px;">
-              <h2 id="status_text">Controles de grabacion de audio</h2>
-              <div style="display: inline-flex;">
-                <img class="recording-image" src="/mod/assign/submission/babelium/static/img/recording.png" alt="recording icon" style="margin: 7px;" width="50" height="50">
-                <h3 class="clock" style="padding: 20px;">00:00:00</h3>
+        
+        <div class="col-md-6">
+              <div class="recording-controls">
+                <span class="recording-icon"></span>
+                <span class="clock">00:00 / 00:00</span>
+                <span id="status_text">Controles de grabacion de audio</h2>
               </div>
-            </div>
-
+		</div>
+		<div class="col-md-6">
             <div class="button-container video-toogle-container">
-            <p class="video-toogle-text-left" style="font-size: 14pt; padding: 16px;">Mostrar video original</p>
+            <span class="video-toogle-text-left">Mostrar video original</span>
               <!-- Rounded switch -->
-              <label class="switch" style="margin: 15px;">
+              <label class="switch">
                 <input class="video-toogle" type="checkbox">
                 <div class="slider round"></div>
               </label>
-              <p class="video-toogle-text-right" style="font-size: 14pt; padding: 16px;">Mostrar video entregado</p>
+              <span class="video-toogle-text-right">Mostrar video entregado</span>
             </div>
-
+         </div>
+		<div class="col-md-12">
             <div class="button-container">
                 <a class='button -green center startRecord' onclick='onRecordingButtonPress();'>Record</a>
                 <a class='button -salmon center stopRecord' onclick="stopRecording(this);">Stop</a>

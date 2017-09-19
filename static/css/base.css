@@ -139,3 +139,51 @@ li{
     text-align: center;
     padding: 0px;
 }
+.recording-controls{
+	margin: 1em 0;
+}
+.recording-controls > *{
+	vertical-align: middle;
+	margin-right: .5em;
+}
+.recording-controls > *:last-child{
+	margin-right: 0;
+}
+.recording-icon{
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	background-color: #dddddd;
+	border-radius: 50%
+}
+.recording-icon.active{
+	background-color: #ef2929;	
+}
+.video-toogle-container{
+	margin: 1em 0;
+	text-align: right;
+}
+.video-toogle-container > * {
+	vertical-align:middle;
+}
+.video-toogle-container .switch{
+	margin: 0 .5em;
+    width: 40px;
+    height: 25px;
+}
+.video-toogle-container .slider:before {
+    position: absolute;
+    content: "";
+    height: 17px;
+    width: 17px;
+    left: 4px;
+    bottom: 4px;
+}
+.video-toogle-container .slider.round{
+	border-radius: 25px	
+}
+.video-toogle-container input:checked + .slider:before {
+    -webkit-transform: translateX(15px);
+    -ms-transform: translateX(15px);
+    transform: translateX(15px);
+}
