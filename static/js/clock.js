@@ -3,15 +3,23 @@ var formatmin = 0;
 var formatsec = 0;
 var clockIdentifier;
 var videoStartTime;
+var videoCurTime = 0;
+var videoDuration = 0;
 var timer;
 
 function startClockCountingOn(id) {
     debug("clock.js::startClockCountingOn()");
-    videoStartTime = undefined;
+    
+    var video = document.getElementById('submission_video');
+	if(videoDuration === 0){
+		videoDuration = video.duration;
+		setTheTime();
+	}
+	videoStartTime = undefined;
     if(id !== undefined){
         clockIdentifier = id;
         timer = setInterval(function(){
-            startClockCounting();
+            startClockCounting(video);
         },500);
     }
 }
@@ -23,14 +31,15 @@ function demo(){
 function stopClockCountingOn() {
     debug("clock.js::startClockCountingOn()");
     if(timer !== undefined ){
+    	console.log('Clear Clock interval');
         clearInterval(timer);
     }
 }
 
-function startClockCounting(){
+function startClockCounting(video){
     debug("clock.js::startClockCounting()");
     if(clockIdentifier !== undefined){
-        var today = new Date();
+        /*var today = new Date();
         if(videoStartTime===undefined){
             videoStartTime = today;
         }
@@ -42,7 +51,8 @@ function startClockCounting(){
         var s = today.getSeconds();
         formathour = checkTime(h);
         formatmin = checkTime(m);
-        formatsec = checkTime(s);
+        formatsec = checkTime(s);*/
+    	videoCurTime = video.currentTime;
         setTheTime();
     }
 }
@@ -53,9 +63,23 @@ function checkTime(i) {
 }
 
 function setTheTime() {
-    var curTime = formathour + ":" + formatmin + ":" + formatsec // Current time formatted
+	//var curTime = formatmin + ":" + formatsec;   // Current time formatted
+    var curTime = formatClockDigits(parseInt(videoCurTime / 60, 10)) + ":" + formatClockDigits(Math.round(videoCurTime % 60)) + ' / ' +  formatClockDigits(parseInt(videoDuration / 60, 10)) + ":" + formatClockDigits(Math.round(videoDuration % 60));
     clockHolder = document.getElementsByClassName(clockIdentifier);
     if(clockHolder && clockHolder[0]){
-        clockHolder[0].innerText = curTime;
+       clockHolder[0].innerText = curTime;
     }
+}
+
+function formatClockDigits(val){
+	return ("0" + val).slice(-2);
+}
+
+function updateVideoTimer(){
+	var video = document.getElementById('submission_video');
+	if(video !== null && videoDuration === 0){
+		console.log(video.duration);
+		videoDuration = video.duration;
+		setTheTime();
+	}
 }
