@@ -80,6 +80,8 @@ function updateVideoTimer(){
 	if(video !== null && videoDuration === 0){
 		console.log(video.duration);
 		videoDuration = video.duration;
-		setTheTime();
+		if(is_recording){
+			setTheTime();
+		}
 	}
 }
