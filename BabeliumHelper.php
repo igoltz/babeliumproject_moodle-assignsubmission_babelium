@@ -475,7 +475,9 @@ class BabeliumHelper
             "/mod/assign/submission/babelium/static/js/video.loader.js",
             "/mod/assign/submission/babelium/static/js/babelium.core.js",
             "/mod/assign/submission/babelium/static/dist/progressbar/progressbar.min.js",
-            "/mod/assign/submission/babelium/static/dist/recorder/recorder.js"
+           "/mod/assign/submission/babelium/static/dist/recorder/recorder.js",
+           "/mod/assign/submission/babelium/static/dist/volume-meter/volume-meter.js",
+            "/mod/assign/submission/babelium/static/js/volume-indicator.js"
         ];
 
         for($i=0 ; $i < count($includeScripts) ; $i++){
@@ -499,7 +501,8 @@ class BabeliumHelper
     public function getSumbissionUploadHTMLPath() {
         Logging::logBabelium("Loading submission upload template from local file");
          if($this->isDevelopment()){
-             $content_path = self::$rootPath.'/mod/assign/submission/babelium/iframe/upload.body.html';
+             $content_path = '/var/www/babelium-moodle-local/mod/assign/submission/babelium/iframe/upload.body.html';
+             //$content_path = self::$rootPath.'/mod/assign/submission/babelium/iframe/upload.body.html';
          }
          else{
              $content_path = '/var/www/babelium-moodle/moodle32/iframe/upload.body.html';
@@ -511,7 +514,8 @@ class BabeliumHelper
      public function getSumbissionViewHTMLPath() {
         Logging::logBabelium("Loading submission view template from local file");
          if($this->isDevelopment()){
-             $content_path = self::$rootPath.'/mod/assign/submission/babelium/iframe/view.body.html';
+             $content_path = '/var/www/babelium-moodle-local/mod/assign/submission/babelium/iframe/view.body.html';
+             //$content_path = self::$rootPath.'/mod/assign/submission/babelium/iframe/view.body.html';
          }
          else{
              $content_path = '/var/www/babelium-moodle/moodle32/iframe/view.body.html';
