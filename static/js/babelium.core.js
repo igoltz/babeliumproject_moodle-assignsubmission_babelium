@@ -19,11 +19,12 @@ var ctx;
 var cue_indicator_width = 2; //2 pixel width for cue indicator
 var cue_point_list_ready = false;
 
-var cue_block_outside_color = "red"
-var cue_block_inside_color = "green"
-var cue_block_passed_color = "blue";
+var cue_block_outside_color = 'rgb(12, 113, 206)';
+var cue_block_inside_color = 'rgb(224, 36, 36)';
+var cue_block_passed_color = 'rgb(68, 162, 14)';
 var cue_indicator_color = "white" //cue indicator color
-var canvas_background_color = 'rgba(0, 0 ,0, .7)'; //bg color canvas
+var canvas_background_color = 'rgba(0, 0 ,0, .5)'; //bg color canvas
+var recording_cue_status;
 
 /* CANVAS VARIABLES END */
 
@@ -106,6 +107,9 @@ function onRecordingButtonPress() {
             }
             //call recording with status flag
             startRecording(recorderLoaded);
+            
+            //start counter
+            startClockCountingOn('clock');
         }
     }
 }
@@ -473,21 +477,26 @@ function onToogleGoesToFalseState(){
 
 function showRecordingMode(isRecording){
     debug("babelium.core.js::showRecordingMode()");
-    //get recording logo
-    var image = document.getElementsByClassName('recording-image')[0];
-    if(image !== undefined && image !== null){
+    //get recording icon
+    //var image = document.getElementsByClassName('recording-icon')[0];
+    var icon = $('.recording-icon').first();
+    if(icon !== undefined && icon !== null){
         //show or hide recording image
-        image.style.display = isRecording ? "inherit" : "none";
+        //image.style.display = isRecording ? "inherit" : "none";
+        if(isRecording){
+        	icon.addClass('active');
+        }else{
+        	icon.removeClass('active');
+        }        
     }
     //set recording color
     var color = isRecording ? "red" : "black";
     setStatusColor(color);
     setCounterColor(color);
     if(isRecording){
+    	console.log('showRecordingMode');
         //update text
         setStatus(getString('recording_status'));
-        //start counter
-        startClockCountingOn('clock');
         //update log
         cstm_log(
             getString('recording_log')
@@ -496,8 +505,6 @@ function showRecordingMode(isRecording){
     else{
         //update text
         setStatus(getString('submission_recording_controls'));
-        //stop counter
-        stopClockCountingOn();
         //start counter
         if(audio_recorded){
             cstm_log(
@@ -593,14 +600,39 @@ function updateCueInfo(){
     if(cue_point_list_ready && video!==undefined && video!==null){
         //draw cue blocks
         paintCuePoints(video);
+        
+      //set cue status
+        var tmpStatus = checkRecordingStatus(video.currentTime);
+        if(tmpStatus !== recording_cue_status){
+        	console.log('Recording status changed', tmpStatus);
+        	showRecordingMode((tmpStatus === 'recording')? true : false);
+        	recording_cue_status = tmpStatus;
+        }
     }
 
     //draw cursor (user timer arrow indicator)
     var position = convertTimeToPixelPosition(video);
     updateIndicatorPosition(position);
-
+    
+    //draw video timer
+    //updateVideoTimer();
+    
     //request new animation frame
     window.requestAnimationFrame(updateCueInfo);
+}
+
+function checkRecordingStatus(video_current_time){
+	var status = 'waiting';
+	if(is_recording){
+		for (var i = 0; i < exsubs.length; i++){
+			//console.log(exsubs[i]['startTime']);
+			if(video_current_time > exsubs[i]['showTime'] && video_current_time < exsubs[i]['hideTime']){
+				status = 'recording';
+				break;
+			}
+		}
+	}
+	return status;
 }
 
 function paintCuePoints(video){
@@ -621,11 +653,11 @@ function calculateBlockColor(point, video){
             //cursor is outside of the block
             return point.outside_color;
         }
-        else if(currentVideoTime >= point.startX && currentVideoTime <= (point.startX + point.width)){
+        else if(is_recording && currentVideoTime >= point.startX && currentVideoTime <= (point.startX + point.width)){
             //cursor is inside the block
             return point.inside_color;
         }
-        else if(currentVideoTime > (point.startX + point.width)){
+        else if(is_recording && currentVideoTime > (point.startX + point.width)){
             //cursor has passed the block
             return point.passed_color;
         }

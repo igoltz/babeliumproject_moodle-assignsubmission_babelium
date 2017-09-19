@@ -36,12 +36,16 @@
                  }
              }
          }
+         
+         //disable video controls
+         var video = document.getElementById('submission_video');
+         video.controls = false;
      } else {
          autoStopVideo();
          showPermissionMessage();
          is_recording = false;
      }
-     showRecordingMode(is_recording);
+     //showRecordingMode(is_recording);
  }
 
 function showPermissionMessage(){
@@ -102,12 +106,15 @@ function showPermissionMessage(){
             createDownloadLink();
             recorder.clear();
             audio_recorded = true;
+            var video = document.getElementById('submission_video');
+            video.controls = true;
         }
     } else {
         //show error
         sweetAlert(getString('swal_record_first_title'), getString("swal_record_first_body"), "error");
     }
-    showRecordingMode(is_recording);
+    
+    //showRecordingMode(is_recording);
  }
 
  function initRecorder() {
