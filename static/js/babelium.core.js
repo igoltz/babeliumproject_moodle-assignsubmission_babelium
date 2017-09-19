@@ -23,7 +23,7 @@ var cue_block_outside_color = 'rgb(12, 113, 206)';
 var cue_block_inside_color = 'rgb(224, 36, 36)';
 var cue_block_passed_color = 'rgb(68, 162, 14)';
 var cue_indicator_color = "white" //cue indicator color
-var canvas_background_color = 'rgba(0, 0 ,0, .5)'; //bg color canvas
+var canvas_background_color = 'rgb(173, 173, 173)'; //bg color canvas
 var recording_cue_status;
 
 /* CANVAS VARIABLES END */
@@ -52,6 +52,7 @@ function start() {
     initToogle();
     initCanvas();
     overwriteFormControl();
+    initVolumeIndicator()
 }
 
 function overwriteFormControl() {
@@ -492,7 +493,7 @@ function showRecordingMode(isRecording){
     //set recording color
     var color = isRecording ? "red" : "black";
     setStatusColor(color);
-    setCounterColor(color);
+    setCounterColor(isRecording);
     if(isRecording){
     	console.log('showRecordingMode');
         //update text
@@ -501,6 +502,8 @@ function showRecordingMode(isRecording){
         cstm_log(
             getString('recording_log')
         );
+        //Display volume indicator
+        showInitVolumeIndicator();
     }
     else{
         //update text
@@ -514,6 +517,9 @@ function showRecordingMode(isRecording){
                 getString('recording_link_log')
             );
         }
+
+        //Hide volume indicator
+        hideInitVolumeIndicator();
     }
 }
 
