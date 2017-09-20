@@ -103,7 +103,7 @@ var de = {
     "swal_msg_http_body": "For security reasons, audio recording is disabled on non HTTPS websites",
     "recording_log" : "Recording...",
     "paused_log" : "Paused",
-    "recording_paused_log" : "Paused recording.",,
+    "recording_paused_log" : "Paused recording.",
     "recording_stopped_log" : "Stopped recording.",
     "recording_link_log" : "Creating audio link...",
     "recorder_init_log" : "Recorder initialised.",
