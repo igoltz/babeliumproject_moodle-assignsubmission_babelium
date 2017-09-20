@@ -189,9 +189,15 @@ li{
 .recording-icon.active{
 	background-color: #ef2929;	
 }
+.recording-icon.paused{
+    background-color: transparent;
+    border-left: 5px solid #dddddd;
+    border-right: 5px solid #dddddd;
+    border-radius: 0;
+    width: 13px;
+}
 .video-toogle-container{
 	margin: 1em 0;
-	text-align: right;
 }
 .video-toogle-container > * {
 	vertical-align:middle;
@@ -219,4 +225,10 @@ li{
 }
 .recording-volume-indicator{
 	min-height: 10px;
+}
+
+@media (min-width: 768px){
+	.video-toogle-container{
+	    justify-content: flex-end;
+	}
 }

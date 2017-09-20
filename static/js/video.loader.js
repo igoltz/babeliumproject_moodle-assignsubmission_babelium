@@ -155,6 +155,14 @@ function autoStopVideo() {
     }
 }
 
+function autoPauseVideo() {
+    debug("babelium.core.js::autoPauseVideo()");
+    var video = document.getElementById('submission_video');
+    if (video !== undefined && video !== null) {
+        video.pause();
+    }
+}
+
 function getMP4video(videoId, type) {
     debug("video.loader.js::getMP4video()");
     if(type === "edited"){

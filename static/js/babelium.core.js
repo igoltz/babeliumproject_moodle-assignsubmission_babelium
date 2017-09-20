@@ -101,7 +101,10 @@ function onRecordingButtonPress() {
             if (recorderLoaded) {
                 //recording is enabled. play video
                 //start video at the beginning
-                video.currentTime = 0;
+            	if(!is_recording_paused){
+            		video.currentTime = 0;
+            	}
+                
                 //play video
                 video.play();
                 //start recording
@@ -112,7 +115,23 @@ function onRecordingButtonPress() {
             //start counter
             startClockCountingOn('clock');
         }
+      //update status text
+        setStatus(getString('submission_recording_controls'));
+    }else{
+    	//call pause recording with status flag
+    	pauseRecording(recorderLoaded);
+    	
+    	//start counter
+        startClockCountingOn('clock');
+
+        //update status text
+        setStatus(getString('recording_paused_status'));
     }
+    setRecordingIconStyle(false, is_recording_paused);
+    
+    toggleStartRecordingButtonStatus(is_recording, is_recording_paused);
+    
+    hideVideoToogleOptions();
 }
 
 function createDownloadLink() {
@@ -476,26 +495,17 @@ function onToogleGoesToFalseState(){
     END TOOGLE CONTROL
 **/
 
-function showRecordingMode(isRecording){
+function showRecordingMode(isRecording, isPaused){
     debug("babelium.core.js::showRecordingMode()");
+    isPaused = (typeof isPaused !== 'undefined') ?  isPaused : false;  
     //get recording icon
-    //var image = document.getElementsByClassName('recording-icon')[0];
-    var icon = $('.recording-icon').first();
-    if(icon !== undefined && icon !== null){
-        //show or hide recording image
-        //image.style.display = isRecording ? "inherit" : "none";
-        if(isRecording){
-        	icon.addClass('active');
-        }else{
-        	icon.removeClass('active');
-        }        
-    }
+    setRecordingIconStyle(isRecording, is_recording_paused);
+    
     //set recording color
     var color = isRecording ? "red" : "black";
     setStatusColor(color);
     setCounterColor(isRecording);
     if(isRecording){
-    	console.log('showRecordingMode');
         //update text
         setStatus(getString('recording_status'));
         //update log
@@ -504,10 +514,14 @@ function showRecordingMode(isRecording){
         );
         //Display volume indicator
         showInitVolumeIndicator();
-    }
-    else{
+    }else{
         //update text
-        setStatus(getString('submission_recording_controls'));
+    	if(isPaused){
+    		setStatus(getString('paused_log'));
+    	}else{
+            setStatus(getString('submission_recording_controls'));
+    	}
+    	
         //start counter
         if(audio_recorded){
             cstm_log(
@@ -611,7 +625,7 @@ function updateCueInfo(){
         var tmpStatus = checkRecordingStatus(video.currentTime);
         if(tmpStatus !== recording_cue_status){
         	console.log('Recording status changed', tmpStatus);
-        	showRecordingMode((tmpStatus === 'recording')? true : false);
+        	showRecordingMode((tmpStatus === 'recording')? true : false, is_recording_paused);
         	recording_cue_status = tmpStatus;
         }
     }

@@ -3,6 +3,7 @@
  var audio_context;
  var recorder;
  var is_recording = false;
+ var is_recording_paused = false;
  var recorderLoaded = false;
  var showProgressDialog = true;
  var lastRecordedAudio = [];
@@ -33,6 +34,7 @@
                      recorder && recorder.stop();
                      recorder && recorder.record();
                      is_recording = true;
+                     is_recording_paused = false;
                  }
              }
          }
@@ -44,8 +46,24 @@
          autoStopVideo();
          showPermissionMessage();
          is_recording = false;
+         is_recording_paused = false;
      }
-     //showRecordingMode(is_recording);
+ }
+ 
+ function pauseRecording(recorded_loaded) {
+    debug("audio.js::pauseRecording()");
+    if (is_recording) {
+        is_recording = false;
+        is_recording_paused = true;
+        if (recorder !== undefined) {
+            recorder && recorder.stop();
+            autoPauseVideo();
+            cstm_log(getString('recording_paused_log'));
+        }
+    } else {
+        //show error
+        sweetAlert(getString('swal_record_first_title'), getString("swal_record_first_body"), "error");
+    }
  }
 
 function showPermissionMessage(){
@@ -94,8 +112,9 @@ function showPermissionMessage(){
 
  function stopRecording() {
     debug("audio.js::stopRecording()");
-    if (is_recording) {
+    if (is_recording || is_recording_paused) {
         is_recording = false;
+        is_recording_paused = false;
         if (recorder !== undefined) {
             recorder && recorder.stop();
             autoStopVideo();
@@ -106,8 +125,14 @@ function showPermissionMessage(){
             createDownloadLink();
             recorder.clear();
             audio_recorded = true;
+            
+            //Restore interface style
             var video = document.getElementById('submission_video');
             video.controls = true;
+            setStatus(getString('submission_recording_controls'));
+            setRecordingIconStyle(false, false);
+            toggleStartRecordingButtonStatus(false, false);
+            showVideoToogleOptions();
         }
     } else {
         //show error

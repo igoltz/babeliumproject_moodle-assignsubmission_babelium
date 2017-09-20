@@ -161,14 +161,55 @@ function setStatusColor(color) {
     }
 }
 
-function setCounterColor(isRecording){
+function setCounterColor(isRecording, isPaused ){
     debug("babelium.view.js::setCounterColor()");
+    isPaused = (typeof isPaused !== 'undefined') ?  isPaused : false;
     var counter = document.getElementsByClassName('clock')[0];
     if (counter !== undefined && counter !== null) {
     	if(isRecording){
+    		$(counter).removeClass('paused');
     		$(counter).addClass('active');
+    	}else if(isPaused){
+    		$(counter).removeClass('active');
+    		$(counter).addClass('paused');
     	}else{
     		$(counter).removeClass('active');
+    		$(counter).removeClass('paused');
     	}
     }
+}
+function setRecordingIconStyle(isRecording, isPaused ){
+    debug("babelium.view.js::setRecordingIconStyle()");
+    isPaused = (typeof isPaused !== 'undefined') ?  isPaused : false;   
+    var icon = $('.recording-icon').first();
+    if(icon !== undefined && icon !== null){
+        //show or hide recording image
+        if(isRecording){
+        	icon.removeClass('paused');
+        	icon.addClass('active');
+        }else if(isPaused){
+        	icon.removeClass('active');
+        	icon.addClass('paused');
+    	}else{
+        	icon.removeClass('active');
+        	icon.removeClass('paused');
+        }        
+    }
+}
+function toggleStartRecordingButtonStatus(isRecording){
+	debug("babelium.view.js::toggleStartRecordingButtonStatus()");
+	var button = document.getElementsByClassName('startRecord')[0];
+	if(button){
+		if(isRecording){
+			button.innerHTML = getString("pause");
+		}else{
+			button.innerHTML = getString("record");
+		}
+	}
+}
+function showVideoToogleOptions(){
+	document.getElementsByClassName( "video-toogle-container" )[0].style.opacity = 1;
+}
+function hideVideoToogleOptions(){
+	document.getElementsByClassName( "video-toogle-container" )[0].style.opacity = 0;
 }
