@@ -31,7 +31,6 @@ function demo(){
 function stopClockCountingOn() {
     debug("clock.js::startClockCountingOn()");
     if(timer !== undefined ){
-    	console.log('Clear Clock interval');
         clearInterval(timer);
     }
 }

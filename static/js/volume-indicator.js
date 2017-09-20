@@ -69,12 +69,10 @@ function initVolumeIndicator(){
 }
 
 function showInitVolumeIndicator(){
-	console.log('showInitVolumeIndicator');
 	document.getElementById( "volume-indicator" ).style.display = 'block';
 }
 
 function hideInitVolumeIndicator(){
-	console.log('hideInitVolumeIndicator');
 	document.getElementById( "volume-indicator" ).style.display = 'none';
 }
 
