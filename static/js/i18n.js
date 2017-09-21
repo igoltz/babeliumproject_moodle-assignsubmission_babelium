@@ -44,7 +44,7 @@ var en = {
     "stop" : "Stop",
     "pause" : "Pause",
     "exercise_title" : "Exercise description",
-    "recording_list_title" : "Recordings list",
+    "recording_list_title" : "My Recording",
     "recording_log_title" : "Recording log",
     "view_original_video" : "View original video",
     "view_edited_video" : "View edited video"
@@ -91,7 +91,7 @@ var es = {
     "stop" : "Parar",
     "pause" : "Pausar",
     "exercise_title" : "Descripción del ejercicio",
-    "recording_list_title" : "Listado de grabaciones",
+    "recording_list_title" : "Mi Grabación",
     "recording_log_title" : "Log de grabaciones",
     "view_original_video" : "Ver video original",
     "view_edited_video" : "Ver video editado"
@@ -139,7 +139,7 @@ var de = {
     "stop" : "Stop",
     "pause" : "Pause",
     "exercise_title" : "Exercise description",
-    "recording_list_title" : "Recordings list",
+    "recording_list_title" : "My Recording",
     "recording_log_title" : "Recording log",
     "view_original_video" : "View original video",
     "view_edited_video" : "View edited video"
@@ -186,7 +186,7 @@ var eu = {
     "stop" : "Bukatu",
     "pause" : "Gelditu",
     "exercise_title" : "Ariketaren azalpena",
-    "recording_list_title" : "Grabazio zerrenda",
+    "recording_list_title" : "Nire Grabazioa",
     "recording_log_title" : "Grabazio historikoa",
     "view_original_video" : "Ikusi originala",
     "view_edited_video" : "Ikusi editatua"

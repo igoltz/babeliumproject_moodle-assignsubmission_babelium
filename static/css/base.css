@@ -226,7 +226,17 @@ li{
 .recording-volume-indicator{
 	min-height: 10px;
 }
-
+#recordingslist li{
+	display: inline-flex;
+	width: 100%;
+}
+#recordingslist audio{
+	margin: 1em 0;
+	width: 100%;
+}
+#recordingslist .button{
+	background-color: #3a3b45;	
+}
 @media (min-width: 768px){
 	.video-toogle-container{
 	    justify-content: flex-end;

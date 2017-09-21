@@ -213,3 +213,9 @@ function showVideoToogleOptions(){
 function hideVideoToogleOptions(){
 	document.getElementsByClassName( "video-toogle-container" )[0].style.opacity = 0;
 }
+function showStopButton(){
+	document.getElementsByClassName( "stopRecord" )[0].style.display = 'inherit';
+}
+function hideStopButton(){
+	document.getElementsByClassName( "stopRecord" )[0].style.display = 'none';
+}

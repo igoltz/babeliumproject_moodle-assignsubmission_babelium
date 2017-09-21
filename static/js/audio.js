@@ -12,7 +12,7 @@
  var is_page_insecure_msg_shown = false;
 
  function cstm_log(e, data) {
-     log.innerHTML += "\n" + e + " " + (data || '');
+     //log.innerHTML += "\n" + e + " " + (data || '');
  }
 
  function startRecording(recorded_loaded) {
@@ -133,6 +133,7 @@ function showPermissionMessage(){
             setRecordingIconStyle(false, false);
             toggleStartRecordingButtonStatus(false, false);
             showVideoToogleOptions();
+            hideStopButton();
         }
     } else {
         //show error
