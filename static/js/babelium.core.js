@@ -52,7 +52,8 @@ function start() {
     initToogle();
     initCanvas();
     overwriteFormControl();
-    initVolumeIndicator()
+    initVolumeIndicator();
+    hideStopButton();
 }
 
 function overwriteFormControl() {
@@ -96,40 +97,52 @@ function onSubmissionCancelledListener(event) {
 function onRecordingButtonPress() {
     debug("babelium.core.js::onRecordingButtonPress()");
     if(!is_recording){
-        var video = document.getElementById('submission_video');
-        if (video !== undefined && video !== null) {
-            if (recorderLoaded) {
-                //recording is enabled. play video
-                //start video at the beginning
-            	if(!is_recording_paused){
-            		video.currentTime = 0;
-            	}
-                
-                //play video
-                video.play();
-                //start recording
-            }
-            //call recording with status flag
-            startRecording(recorderLoaded);
-            
-            //start counter
-            startClockCountingOn('clock');
-        }
-      //update status text
-        setStatus(getString('submission_recording_controls'));
+    	var promise = (isUserEditingVideo() && !is_recording_paused)? onToogleGoesToTrueState() : new Promise(function(resolve){ resolve(); });
+    	promise.then( function(){
+    		var video = document.getElementById('submission_video');
+    		if (video !== undefined && video !== null) {
+        		if (recorderLoaded) {
+                	
+                    //recording is enabled. play video
+                    //start video at the beginning
+                	if(!is_recording_paused){
+                		video.currentTime = 0;
+                	}
+                    
+                    //play video
+                    video.play();
+                    //start recording
+                }
+                //call recording with status flag
+                startRecording(recorderLoaded);
+                //start counter
+                startClockCountingOn('clock');
+    		}
+	        //update status text
+	        setStatus(getString('submission_recording_controls'));
+	        //Show stop recording button
+	        showStopButton();
+	      //update recording icon
+	        setRecordingIconStyle(false, false);
+	        toggleStartRecordingButtonStatus(true, false);
+    	});
     }else{
     	//call pause recording with status flag
     	pauseRecording(recorderLoaded);
     	
-    	//start counter
-        startClockCountingOn('clock');
+    	//stop counter
+    	stopClockCountingOn('clock');
 
         //update status text
         setStatus(getString('recording_paused_status'));
+        
+        //update recording icon
+        setRecordingIconStyle(false, true);
+        toggleStartRecordingButtonStatus(false, true);
     }
-    setRecordingIconStyle(false, is_recording_paused);
     
-    toggleStartRecordingButtonStatus(is_recording, is_recording_paused);
+    
+    
     
     hideVideoToogleOptions();
 }
@@ -150,23 +163,17 @@ function createDownloadLink() {
         hf.innerHTML = "Download audio"
         li.appendChild(au);
         li.appendChild(hf);
-        recordingslist.appendChild(li);
+        
+        if(recordingslist.hasChildNodes()){
+        	var item = recordingslist.childNodes[0];
+        	recordingslist.replaceChild(li, item);
+        }else{
+        	recordingslist.appendChild(li);
+        }
 
-        //change li style
-        li.style.display = "inline-flex";
-        li.style.width = "100%";
-
-        //change audio style
-        au.style.margin = "16px";
-        au.style.display = "block";
-        au.style.width = "100%";
-
-        //change link style
+        //change button style
         hf.className = "button -green center";
-        hf.style.display = "inline";
-        hf.style.margin = "15px";
-        hf.style.background = "#3a3b45";
-
+        
         if (url !== undefined) {
             getRecordedAudioStream(blob, url, onAudioStreamReceived);
         }
@@ -421,7 +428,7 @@ function initToogle() {
     }
 
     var toogleElementBlock = document.getElementsByClassName("video-toogle-container")[0];
-    var blockStatusShow = exinfo!==undefined && exinfo.exerciseId!==undefined;
+    var blockStatusShow = isUserEditingVideo();
     //hide toogle if no response
     if(toogleElementBlock!==undefined){
         var visibility = blockStatusShow ? "inherit" : "hidden";
@@ -479,7 +486,7 @@ function onToogleGoesToTrueState(){
     debug("babelium.core.js::onToogleGoesToTrueState()");
     //load edited video
     if(exinfo!==undefined){
-        injectVideoFromId(exinfo.exerciseId, exinfo.subtitleId, "change_to_original");
+        return injectVideoFromId(exinfo.exerciseId, exinfo.subtitleId, "change_to_original");
     }
 }
 
@@ -487,7 +494,7 @@ function onToogleGoesToFalseState(){
     debug("babelium.core.js::onToogleGoesToFalseState()");
     //load original video
     if(exinfo!==undefined){
-        injectVideoFromId(exinfo.id, exinfo.subtitleId, "edited");
+        return injectVideoFromId(exinfo.id, exinfo.subtitleId, "edited");
     }
 }
 
@@ -634,9 +641,6 @@ function updateCueInfo(){
     var position = convertTimeToPixelPosition(video);
     updateIndicatorPosition(position);
     
-    //draw video timer
-    //updateVideoTimer();
-    
     //request new animation frame
     window.requestAnimationFrame(updateCueInfo);
 }
@@ -754,3 +758,7 @@ function convertCueTimeToPixelPosition(video, time) {
 //////////////////////////
 // END CANVAS FUNCTIONS //
 //////////////////////////
+
+function isUserEditingVideo(){
+	return exinfo!==undefined && exinfo.exerciseId!==undefined;
+}

@@ -87,7 +87,7 @@ function injectVideoFromId(videoId, subtitleId, type) {
     var subtitlesUrl = getSubtitlesURL(subtitleId);
     var subcaption = getSubtitlesLangCaption(subtitleId);
     var sublang = getSubtitlesLang(subtitleId);
-    injectVideo(posterImage, videoUrl,videoWebmUrl, subtitlesUrl, sublang, subcaption);
+    return injectVideo(posterImage, videoUrl,videoWebmUrl, subtitlesUrl, sublang, subcaption);
 }
 
 function injectVideo(posterImage, videoUrl, videoWebmUrl, subtitlesUrl, sublang, subcaption) {
@@ -121,6 +121,13 @@ function injectVideo(posterImage, videoUrl, videoWebmUrl, subtitlesUrl, sublang,
     //translate text to user lang
     translate();
     show();
+    
+    return new Promise(function(resolve, reject){
+    	var video = document.getElementById('submission_video');
+    	video.addEventListener('loadedmetadata', function(){
+    		resolve();
+    	});
+    });
 }
 
 function onVideoEnded() {
@@ -194,7 +201,7 @@ function getMP4video(videoId, type) {
             if (hasMedia) {
                 var hasExerciseId = exinfo.exerciseId;
                 if(hasExerciseId!==undefined){
-                    var exerciseUrl = CONSTANTS.exercise_info_api_path_via_middle + "?name=exerciseinfo&data=" + exinfo.exerciseId;
+                    var exerciseUrl = babelium_subdomain + CONSTANTS.exercise_info_api_path_via_middle + "?name=exerciseinfo&data=" + exinfo.exerciseId;
                     var responseAjaxData = sync_rpc("GET", exerciseUrl);
                     if(responseAjaxData !== undefined){
                         responseAjaxData = JSON.parse(responseAjaxData);

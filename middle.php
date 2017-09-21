@@ -29,8 +29,16 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once '../../../../config.php';
+
+
+if(getenv("APPLICATION_ENV") == 'development'){
+    require_once '/var/www/babelium-moodle-local/config.php';
+}else{
+    require_once '../../../../config.php';
+}
+
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
+
 require_once './BabeliumHelper.php';
 
 if ( $_SERVER['REQUEST_METHOD'] == 'POST' ){

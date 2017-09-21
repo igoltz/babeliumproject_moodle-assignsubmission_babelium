@@ -24,6 +24,8 @@
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
 require_once($CFG->dirroot . '/mod/assign/submission/babelium/BabeliumConnector.php');
 
+require_once("$CFG->libdir/externallib.php");
+
 /**
  * BabeliumHelper class that contains BabeliumPlugin Business Logic
  *
@@ -487,6 +489,7 @@ class BabeliumHelper
 
        $html_content .= '<script language="javascript" type="text/javascript">
                                var domain = "'.$domain.'";
+                               var babelium_subdomain = "'.$CFG->wwwroot.'";
                                var lang = "'.$lang.'";
                                var exinfo = '.$exinfo.';
                                var exsubs = '.$exsubs.';
