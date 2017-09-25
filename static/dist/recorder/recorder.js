@@ -63,10 +63,17 @@ var Recorder = exports.Recorder = (function () {
             for (var channel = 0; channel < _this.config.numChannels; channel++) {
                 buffer.push(e.inputBuffer.getChannelData(channel));
             }
-            _this.worker.postMessage({
-                command: 'record',
-                buffer: buffer
-            });
+            if(recording_cue_status === 'waiting'){
+            	_this.worker.postMessage({
+                    command: 'mute',
+                    buffer: buffer
+                });
+            }else{
+            	_this.worker.postMessage({
+                    command: 'record',
+                    buffer: buffer
+                });
+            }
         };
 
         source.connect(this.node);
@@ -86,6 +93,9 @@ var Recorder = exports.Recorder = (function () {
                         break;
                     case 'record':
                         record(e.data.buffer);
+                        break;
+                    case 'mute':
+                        mute(e.data.buffer);
                         break;
                     case 'exportWAV':
                         exportWAV(e.data.type);
@@ -108,6 +118,13 @@ var Recorder = exports.Recorder = (function () {
             function record(inputBuffer) {
                 for (var channel = 0; channel < numChannels; channel++) {
                     recBuffers[channel].push(inputBuffer[channel]);
+                }
+                recLength += inputBuffer[0].length;
+            }
+            
+            function mute(inputBuffer) {
+            	for (var channel = 0; channel < numChannels; channel++) {
+                    recBuffers[channel].push(new Array(1024));
                 }
                 recLength += inputBuffer[0].length;
             }
@@ -243,6 +260,11 @@ var Recorder = exports.Recorder = (function () {
     _createClass(Recorder, [{
         key: 'record',
         value: function record() {
+            this.recording = true;
+        }
+    },{
+        key: 'mute',
+        value: function mute() {
             this.recording = true;
         }
     }, {

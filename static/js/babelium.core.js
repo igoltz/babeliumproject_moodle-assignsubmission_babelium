@@ -649,8 +649,7 @@ function checkRecordingStatus(video_current_time){
 	var status = 'waiting';
 	if(is_recording){
 		for (var i = 0; i < exsubs.length; i++){
-			//console.log(exsubs[i]['startTime']);
-			if(video_current_time > exsubs[i]['showTime'] && video_current_time < exsubs[i]['hideTime']){
+			if(video_current_time > exsubs[i]['showTime'] && video_current_time < exsubs[i]['hideTime'] + 1){ //Add 1 sec of recording after sbttle hides  
 				status = 'recording';
 				break;
 			}
