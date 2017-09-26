@@ -508,7 +508,7 @@ class BabeliumHelper
              //$content_path = self::$rootPath.'/mod/assign/submission/babelium/iframe/upload.body.html';
          }
          else{
-             $content_path = '/var/www/babelium-moodle/moodle32/iframe/upload.body.html';
+             $content_path = self::$config->dataroot .'mod/assign/submission/babelium/iframe/upload.body.html';
          }
          Logging::logBabelium("Injecting template data from file: ".$content_path);
          return $content_path;
@@ -521,7 +521,7 @@ class BabeliumHelper
              //$content_path = self::$rootPath.'/mod/assign/submission/babelium/iframe/view.body.html';
          }
          else{
-             $content_path = '/var/www/babelium-moodle/moodle32/iframe/view.body.html';
+             $content_path = self::$config->dataroot .'mod/assign/submission/babelium/iframe/view.body.html';
          }
          Logging::logBabelium("Injecting template data from file: ".$content_path);
          return $content_path;
