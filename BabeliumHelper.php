@@ -40,6 +40,7 @@ class BabeliumHelper
     private static $environment;
     private static $config;
     private static $rootPath;
+    private static $dirroot;
 
     const PRACTICE_MODE = 0;
     const REVIEW_MODE = 1;
@@ -86,6 +87,7 @@ class BabeliumHelper
         self::$config = $CFG;
         self::$environment = getenv("APPLICATION_ENV");
         self::$rootPath = $CFG->wwwroot;
+        self::$dirroot = $CFG->dirroot;
     }
 
     public function getDefaultExerciseId($plugin){
@@ -501,14 +503,14 @@ class BabeliumHelper
        return $html_content;
    }
 
-    public function getSumbissionUploadHTMLPath() {
+   public function getSumbissionUploadHTMLPath() {
         Logging::logBabelium("Loading submission upload template from local file");
          if($this->isDevelopment()){
              $content_path = '/var/www/babelium-moodle-local/mod/assign/submission/babelium/iframe/upload.body.html';
              //$content_path = self::$rootPath.'/mod/assign/submission/babelium/iframe/upload.body.html';
          }
          else{
-             $content_path = self::$config->dataroot .'mod/assign/submission/babelium/iframe/upload.body.html';
+             $content_path = self::$dirroot .'mod/assign/submission/babelium/iframe/upload.body.html';
          }
          Logging::logBabelium("Injecting template data from file: ".$content_path);
          return $content_path;
@@ -521,7 +523,7 @@ class BabeliumHelper
              //$content_path = self::$rootPath.'/mod/assign/submission/babelium/iframe/view.body.html';
          }
          else{
-             $content_path = self::$config->dataroot .'mod/assign/submission/babelium/iframe/view.body.html';
+             $content_path = self::$dirroot .'mod/assign/submission/babelium/iframe/view.body.html';
          }
          Logging::logBabelium("Injecting template data from file: ".$content_path);
          return $content_path;
