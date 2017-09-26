@@ -58,7 +58,7 @@ function getPosterUrl(videoId) {
         }
         else{
             //default video url for not found
-            posterURL = noPosterImageUrl;
+            posterURL = noPosterImageUrl + lang + '.jpg';
         }
     }
     return posterURL;
@@ -215,7 +215,7 @@ function getMP4video(videoId, type) {
         return originalVideoURL;
     }
     //default video url for not found
-    originalVideoURL = CONSTANTS.default_video_mp4_url;
+    originalVideoURL = CONSTANTS.default_video_mp4_url + lang + '.mp4';
     return originalVideoURL;
 }
 
@@ -225,7 +225,7 @@ function getWEBMvideo(videoId, type) {
     if (hasMedia && exinfo.media.webpUrl !== undefined) {
         return exinfo.media.webpUrl;
     } else {
-        return CONSTANTS.default_video_webm_url;
+        return CONSTANTS.default_video_webm_url + lang + '.webm';
     }
 }
 

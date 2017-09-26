@@ -11,7 +11,7 @@ var CONSTANTS =
     sample_rate : 48000,
     num_channels : 1,
     buffer_len : 1024,
-    no_poster_image_url : "/mod/assign/submission/babelium/static/default/novideo.jpg",
+    no_poster_image_url : "/mod/assign/submission/babelium/static/default/novideo-",
     subtitles_extension : ".vtt",
     subtitles_api_path : "/sub-titles/",
     default_subtitle_lang : "en",
@@ -23,7 +23,7 @@ var CONSTANTS =
     reset_video_time : 0,
     exercise_info_api_path: "/exercises/",
 
-    default_video_mp4_url : "/mod/assign/submission/babelium/static/default/novideo.mp4",
-    default_video_webm_url : "/mod/assign/submission/babelium/static/default/novideo.webm",
+    default_video_mp4_url : "/mod/assign/submission/babelium/static/default/novideo-",
+    default_video_webm_url : "/mod/assign/submission/babelium/static/default/novideo-",
     exercise_info_api_path_via_middle : "/mod/assign/submission/babelium/middle.php",
 };
