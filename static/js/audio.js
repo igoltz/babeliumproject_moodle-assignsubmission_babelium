@@ -4,6 +4,7 @@
  var recorder;
  var is_recording = false;
  var is_recording_paused = false;
+ var is_my_recording_playing = false;
  var recorderLoaded = false;
  var showProgressDialog = true;
  var lastRecordedAudio = [];
@@ -134,6 +135,8 @@ function showPermissionMessage(){
             toggleStartRecordingButtonStatus(false, false);
             showVideoToogleOptions();
             hideStopButton();
+            togglePlayMyRecordingButtonStatus(false);
+            showPlayMyRecordingButton();
         }
     } else {
         //show error
@@ -231,3 +234,56 @@ function showPermissionMessage(){
          );
      }
  }
+ 
+ function initMyRecordingListeners(){
+	 var audio = document.getElementById('my_recording_audio');
+	 if (audio !== undefined && audio !== null) {
+		 audio.removeEventListener('play', playMyRecording);
+		 audio.addEventListener('play', playMyRecording);
+		 
+		 audio.removeEventListener('pause', pauseMyRecording);
+		 audio.addEventListener('pause', pauseMyRecording);
+		 
+		 //audio.removeEventListener('timeupdate', updateMyRecording);  
+		 //audio.addEventListener('timeupdate', updateMyRecording);
+		 
+		 audio.removeEventListener('ended', endedMyRecording);
+		 audio.addEventListener('ended', endedMyRecording);
+	 }
+ }
+ 
+ var playMyRecording = function() {
+	 var audio = document.getElementById('my_recording_audio');
+ 	var video = document.getElementById('submission_video');
+ 	video.controls = false;
+  	video.currentTime = audio.currentTime;
+  	video.play();
+    hideVideoToogleOptions();
+ }
+ 
+ var pauseMyRecording = function() {
+	 var audio = document.getElementById('my_recording_audio');
+	 audio.controls = true;
+	 var video = document.getElementById('submission_video');
+  	video.muted = false;
+  	video.controls = true;
+  	video.pause();
+    showVideoToogleOptions();
+ }
+ 
+ var updateMyRecording = function() {
+	 var audio = document.getElementById('my_recording_audio');
+	 var video = document.getElementById('submission_video');
+	 video.currentTime = audio.currentTime;
+ }
+ 
+ var endedMyRecording = function() {
+	 var video = document.getElementById('submission_video');
+  	video.muted = false;
+  	video.controls = true;
+  	video.pause();
+  	is_my_recording_playing = false;
+  	togglePlayMyRecordingButtonStatus(is_my_recording_playing);
+  	showVideoToogleOptions();
+ }
+

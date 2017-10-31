@@ -47,7 +47,9 @@ var en = {
     "recording_list_title" : "My Recording",
     "recording_log_title" : "Recording log",
     "view_original_video" : "View original video",
-    "view_edited_video" : "View edited video"
+    "view_edited_video" : "View edited video",
+    "play_my_recording" : "View My Recording",
+    "pause_my_recording" : "Pause My Recording"
 };
 
 var es = {
@@ -94,7 +96,9 @@ var es = {
     "recording_list_title" : "Mi Grabación",
     "recording_log_title" : "Log de grabaciones",
     "view_original_video" : "Ver video original",
-    "view_edited_video" : "Ver video editado"
+    "view_edited_video" : "Ver video editado",
+    "play_my_recording" : "Ver Mi Grabación",
+    "pause_my_recording" : "Pausar mi Grabación"
 };
 
 //todo translate to Deutsch
@@ -142,7 +146,9 @@ var de = {
     "recording_list_title" : "My Recording",
     "recording_log_title" : "Recording log",
     "view_original_video" : "View original video",
-    "view_edited_video" : "View edited video"
+    "view_edited_video" : "View edited video",
+    "play_my_recording" : "Play My Recording",
+    "pause_my_recording" : "Pause My Recording"
 };
 
 var eu = {
@@ -189,7 +195,9 @@ var eu = {
     "recording_list_title" : "Nire Grabazioa",
     "recording_log_title" : "Grabazio historikoa",
     "view_original_video" : "Ikusi originala",
-    "view_edited_video" : "Ikusi editatua"
+    "view_edited_video" : "Ikusi editatua",
+    "play_my_recording" : "Nire Grabazioa Ikusi",
+    "pause_my_recording" : "Nire Grabazioa Eten"
 };
 
 var languages = {

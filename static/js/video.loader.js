@@ -170,6 +170,22 @@ function autoPauseVideo() {
     }
 }
 
+function autoMuteVideo() {
+    debug("babelium.core.js::autoPlayVideo()");
+    var video = document.getElementById('submission_video');
+    if (video !== undefined && video !== null) {
+        video.muted = true;
+    }
+}
+
+function autoUnmuteVideo() {
+    debug("babelium.core.js::autoPlayVideo()");
+    var video = document.getElementById('submission_video');
+    if (video !== undefined && video !== null) {
+        video.muted = false;
+    }
+}
+
 function getMP4video(videoId, type) {
     debug("video.loader.js::getMP4video()");
     if(type === "edited"){

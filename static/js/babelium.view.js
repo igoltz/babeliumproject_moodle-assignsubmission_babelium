@@ -112,6 +112,10 @@ function setButtonsText(){
     if(stop){
         stop.innerHTML = getString("stop");
     }
+    var myRecording = document.getElementsByClassName('playMyRecording')[0];
+    if(myRecording){
+    	myRecording.innerHTML = getString("play_my_recording");
+    }
 }
 
 function setTitle(){
@@ -207,6 +211,17 @@ function toggleStartRecordingButtonStatus(isRecording){
 		}
 	}
 }
+function togglePlayMyRecordingButtonStatus(isPlaying){
+	debug("babelium.view.js::togglePlayMyRecordingButtonStatus()");
+	var button = document.getElementsByClassName('playMyRecording')[0];
+	if(button){
+		if(isPlaying){
+			button.innerHTML = getString("pause_my_recording");
+		}else{
+			button.innerHTML = getString("play_my_recording");
+		}
+	}
+}
 function showVideoToogleOptions(){
 	document.getElementsByClassName( "video-toogle-container" )[0].style.opacity = 1;
 }
@@ -218,4 +233,10 @@ function showStopButton(){
 }
 function hideStopButton(){
 	document.getElementsByClassName( "stopRecord" )[0].style.display = 'none';
+}
+function showPlayMyRecordingButton(){
+	document.getElementsByClassName('playMyRecording')[0].style.display = 'inherit';
+}
+function hidePlayMyRecordingButton(){
+	document.getElementsByClassName('playMyRecording')[0].style.display = 'none';
 }

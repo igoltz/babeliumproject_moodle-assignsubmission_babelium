@@ -141,12 +141,20 @@ function onRecordingButtonPress() {
         toggleStartRecordingButtonStatus(false, true);
     }
     
-    
-    
-    
+    hidePlayMyRecordingButton();
     hideVideoToogleOptions();
 }
-
+function onPlayMyRecording(){
+	var audio = document.getElementById('my_recording_audio');
+	if(!is_my_recording_playing){
+		is_my_recording_playing = true;
+		audio.play();
+	}else if(is_my_recording_playing){
+		is_my_recording_playing = false;
+		audio.pause();
+	}
+	togglePlayMyRecordingButtonStatus(is_my_recording_playing);
+}
 function createDownloadLink() {
     debug("babelium.core.js::createDownloadLink()");
     recorder && recorder.exportWAV(function(blob) {
@@ -155,6 +163,7 @@ function createDownloadLink() {
         var au = document.createElement('audio');
         var hf = document.createElement('a');
 
+        au.id = "my_recording_audio";
         au.controls = true;
         au.src = url;
         hf.href = url;
@@ -176,6 +185,8 @@ function createDownloadLink() {
         
         if (url !== undefined) {
             getRecordedAudioStream(blob, url, onAudioStreamReceived);
+            showPlayMyRecordingButton();
+            initMyRecordingListeners();
         }
     });
 }
@@ -510,6 +521,7 @@ function showRecordingMode(isRecording, isPaused){
     
     //set recording color
     var color = isRecording ? "red" : "black";
+    var video = document.getElementById('submission_video');
     setStatusColor(color);
     setCounterColor(isRecording);
     if(isRecording){
@@ -634,6 +646,13 @@ function updateCueInfo(){
         	console.log('Recording status changed', tmpStatus);
         	showRecordingMode((tmpStatus === 'recording')? true : false, is_recording_paused);
         	recording_cue_status = tmpStatus;
+        	if(tmpStatus === 'recording' || tmpStatus === 'my_recording_active'){
+                //mute video
+        		autoMuteVideo();
+        	}else{
+        		//mute video
+        		autoUnmuteVideo();
+        	}
         }
     }
 
@@ -651,6 +670,13 @@ function checkRecordingStatus(video_current_time){
 		for (var i = 0; i < exsubs.length; i++){
 			if(video_current_time > exsubs[i]['showTime'] && video_current_time < exsubs[i]['hideTime'] + 1){ //Add 1 sec of recording after sbttle hides  
 				status = 'recording';
+				break;
+			}
+		}
+	}else if(is_my_recording_playing){
+		for (var i = 0; i < exsubs.length; i++){
+			if(video_current_time > exsubs[i]['showTime'] && video_current_time < exsubs[i]['hideTime'] + 1){ //Add 1 sec of recording after sbttle hides  
+				status = 'my_recording_active';
 				break;
 			}
 		}
