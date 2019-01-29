@@ -18,7 +18,7 @@
  * Strings for component 'assignsubmission_babelium', language 'fr'
  *
  * @package   assignsubmission_babelium
- * @copyright 2012 Babelium Project {@link http://babeliumproject.com}
+ * @copyright Original from 2012 Babelium Project {@link http://babeliumproject.com} modified by Elurnet Informatika Zerbitzuak S.L  {@link http://elurnet.net/es} and Irontec S.L {@link https://www.irontec.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,17 +30,26 @@
  $string['babelium'] = 'Dépôt Babelium';
  $string['loginfo'] = 'Enregistrement ResponseID: {$a->responseid}, ResponseHash: {$a->responsehash}';
 
+/*
  $string['forcertmpt'] = 'Force RTMPT';
  $string['forcertmpt_help'] = 'Activer cette option force le reproducteur à utiliser RTMPT (RTMP encapsulé) par défaut. Autrement,le reproducteur essaie d\'abord de se connecter en utilisant le port RTMP (1935)';
+*/
 
  $string['serverdomain'] = 'Domaine du serveur';
  $string['serverdomain_help'] = 'Domaine du serveur Babelium sur lequel sont conservés les exercices et les enregistrements';
+ /*
  $string['serverport'] = 'Port du serveur';
  $string['serverport_help'] = 'Numéro de port par lequel on accède au serveur';
  $string['apidomain'] = 'Domaine de l\'API';
  $string['apidomain_help'] = 'Domaine de l\'API-RPC permettant à l\'usager l\'accès aux données entreposées sur le serveur Babelium';
+ */
+
  $string['apiendpoint'] = 'Endpoint de l\'API';
  $string['apiendpoint_help'] = 'Chemin appartenant au domaine de l\'API utilisée pour gérer toutes les demandes';
+
+ $string['newapiendpoint'] = 'Endpoint de l\'API v3';
+ $string['newapiendpoint_help'] = 'Chemin appartenant au domaine de l\'API v3 utilisée pour gérer toutes les demandes';
+
  $string['accesskey'] = 'Code d\'accès';
  $string['accesskey_help'] = 'Code unique identifiant toutes les demandes que l\'usager fait à l\'API-RPC sur le serveur Babelium';
  $string['secretaccesskey'] = 'Code d\'accès secret';
@@ -67,3 +76,13 @@
  $string['babeliumApiErrorCode403']='Babelium Error 403. Documents d\'autorisation incorrects';
  $string['babeliumApiErrorCode404']='Babelium Error 404. Méthode non trouvée. Paramètres non valides';
  $string['babeliumApiErrorCode500']='Babelium Error 500. Erreur interne du serveur';
+
+ //todo
+$string['title_not_load_exercise'] = "Could not load an exercise preview";
+$string['msg_not_load_exercise'] = "An error happen while loading the exercise preview. Please contact your teacher or system administrator";
+$string['video_queued'] = "Submitted video is added to processing queue, please wait...";
+$string['video_processing'] = "Submitted video is being processing, please wait...";
+$string['video_ready'] = "Exercise preview is ready.";
+
+$string['connectivity_error_title'] = 'Connectivity error';
+$string['connectivity_error_subtitle'] = 'Could not retrieve exercise data due to remote issue with babelium platform.';

@@ -18,7 +18,7 @@
  * Strings for component 'assignsubmission_babelium', language 'eu'
  *
  * @package   assignsubmission_babelium
- * @copyright 2012 Babelium Project {@link http://babeliumproject.com}
+ * @copyright Original from 2012 Babelium Project {@link http://babeliumproject.com} modified by Elurnet Informatika Zerbitzuak S.L  {@link http://elurnet.net/es} and Irontec S.L {@link https://www.irontec.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,17 +30,25 @@ $string['pluginname'] = 'Babelium bidalketa';
 $string['babelium'] = 'Babelium bidalketa';
 $string['loginfo'] = 'Babelium GrabaketaId: {$a->responseid}, GrabaketaHash: {$a->responsehash}';
 
+/*
 $string['forcertmpt'] = 'RTMPT Derrigortu';
 $string['forcertmpt_help'] = 'Aukera hau gaitzeak erreproduzigailua defektuz RTMPT (kapsulatutako RMTP) erabiltzera derrigortzen du. Bestela, erreproduzigailua lehendabizi RTMP portua erabiliz konektatzen saiatzen da (1935)';
+*/
 
 $string['serverdomain'] = 'Zerbitzari domeinua';
 $string['serverdomain_help'] = 'Ariketak zein grabazioak gordetzeko erabiliko den Babelium zerbitzariaren domeinua';
+/*
 $string['serverport'] = 'Zerbitzari portua';
 $string['serverport_help'] = 'Zerbitzarira atzitzeko erabiltzen den portu zenbakia';
 $string['apidomain'] = 'API domeinua';
 $string['apidomain_help'] = 'Erabiltzaileari Babelium zerbitzarian dauden datuak atzitzea ahalbidetzen duen RPC-APIaren domeinua';
+*/
 $string['apiendpoint'] = 'APIaren endpointa';
 $string['apiendpoint_help'] = 'Eskaera guztiak kudeatzeko erabiltzen den APIaren domeinuaren barneko helbidea';
+
+$string['newapiendpoint'] = 'API v3aren endpointa';
+$string['newapiendpoint_help'] = 'Eskaera guztiak kudeatzeko erabiltzen den API v3aren domeinuaren barneko helbidea';
+
 $string['accesskey'] = 'Atzipen gakoa';
 $string['accesskey_help'] = 'Erabiltzaileak Babelium zerbitzariaren aurka RPC-APIaren bitartez egiten dituen eskaera guztiak identifikatzen dituen gako unibokoa';
 $string['secretaccesskey'] = 'Atzipen gako sekretua';
@@ -67,3 +75,12 @@ $string['babeliumApiErrorCode400']='Babelium 400 Errorea. Eskaera gaizki eraikia
 $string['babeliumApiErrorCode403']='Babelium 403 Errorea. Autorizazio kredentzial desegokia';
 $string['babeliumApiErrorCode404']='Babelium 404 Errorea. Metodoa ezezaguna. Baliogabeko parametroak';
 $string['babeliumApiErrorCode500']='Babelium 500 Errorea. Zerbitzariko barne errorea';
+
+$string['title_not_load_exercise'] = "Ariketaren aurreikuspena ezin da kargatu";
+$string['msg_not_load_exercise'] = "Errore bat gertatu da ariketa-aurrebista kargatzean. Mesedez, zure irakaslearekin edo sistemako administratzailearekin jarri harremanetan.";
+$string['video_queued'] = "Bidalitako bideoa bizpahiru minututan prozezatuko da, mesedez itxaron ...";
+$string['video_processing'] = "Bidalitako bideoa prozesatzen ari da, mesedez itxaron ...";
+$string['video_ready'] = "Ariketaren aurreikuspena prest dago";
+
+$string['connectivity_error_title'] = 'Konexio errorea';
+$string['connectivity_error_subtitle'] = 'Ezinezkoa izan da ariketaren datuak jasotzea Babelium plataformaren arazo batengatik';

@@ -1,3 +1,9 @@
+#exclude audio/video files
+
+*.wav
+*.mp3
+*.old
+
 #Ignore config files
 build.properties
 Config.php
@@ -10,4 +16,7 @@ Config.php
 .settings/
 bin-debug/
 bin-release/
-dist/
+
+#ignore phpintel folder
+\.phpintel/
+.project

@@ -18,52 +18,86 @@
  * This file defines the admin settings for this plugin
  *
  * @package   assignsubmission_babelium
- * @copyright 2013 Babelium Project {@link http://babeliumproject.com}
+ * @copyright Original from 2012 Babelium Project {@link http://babeliumproject.com} modified by Elurnet Informatika Zerbitzuak S.L  {@link http://elurnet.net/es} and Irontec S.L {@link https://www.irontec.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once($CFG->dirroot . '/mod/assign/submission/babelium/Logging.php');
+
+Logging::logBabelium("Loading plugin settings and configuration parameters...");
 
 // Note this is on by default
-$settings->add(new admin_setting_configcheckbox('assignsubmission_babelium/default',
-                   				new lang_string('default', 'assignsubmission_babelium'),
-                   				new lang_string('default_help', 'assignsubmission_babelium'), 
-						0));
+$settings->add(
+  new admin_setting_configcheckbox(
+    'assignsubmission_babelium/default',
+    new lang_string('default', 'assignsubmission_babelium'),
+    new lang_string('default_help', 'assignsubmission_babelium'),
+    0
+  )
+);
 
-$settings->add(new admin_setting_configtext('assignsubmission_babelium/serverdomain',
-					    new lang_string('serverdomain','assignsubmission_babelium'),
-					    new lang_string('serverdomain_help','assignsubmission_babelium'),
-					    'babeliumproject.com',
-					    PARAM_TEXT));
+$settings->add(
+  new admin_setting_configtext(
+    'assignsubmission_babelium/serverdomain',
+    new lang_string('serverdomain','assignsubmission_babelium'),
+    new lang_string('serverdomain_help','assignsubmission_babelium'),
+    'babeliumproject.com',
+    PARAM_TEXT
+  )
+);
 
-$settings->add(new admin_setting_configtext('assignsubmission_babelium/serverport',
-					    new lang_string('serverport','assignsubmission_babelium'),
-					    new lang_string('serverport_help','assignsubmission_babelium'),
-					    '80',
-					    PARAM_INT));
+/*$settings->add(new admin_setting_configtext('assignsubmission_babelium/serverport',
+                        new lang_string('serverport','assignsubmission_babelium'),
+                        new lang_string('serverport_help','assignsubmission_babelium'),
+                        '80',
+                        PARAM_INT));*/
 
-$settings->add(new admin_setting_configcheckbox('assignsubmission_babelium/forcertmpt',
-					new lang_string('forcertmpt', 'assignsubmission_babelium'),
-					new lang_string('forcertmpt_help', 'assignsubmission_babelium'),
-					0));
+/*$settings->add(new admin_setting_configcheckbox('assignsubmission_babelium/forcertmpt',
+                    new lang_string('forcertmpt', 'assignsubmission_babelium'),
+                    new lang_string('forcertmpt_help', 'assignsubmission_babelium'),
+                    0));*/
 
-$settings->add(new admin_setting_configtext('assignsubmission_babelium/apidomain',
-					    new lang_string('apidomain','assignsubmission_babelium'),
-					    new lang_string('apidomain_help','assignsubmission_babelium'),
-					    'babeliumproject.com/api/v2',
-					    PARAM_TEXT));
-					    
-$settings->add(new admin_setting_configtext('assignsubmission_babelium/apiendpoint',
-					    new lang_string('apiendpoint','assignsubmission_babelium'),
-					    new lang_string('apiendpoint_help','assignsubmission_babelium'),
-					    'rest.php',
-					    PARAM_TEXT));
+/*$settings->add(new admin_setting_configtext('assignsubmission_babelium/apidomain',
+                        new lang_string('apidomain','assignsubmission_babelium'),
+                        new lang_string('apidomain_help','assignsubmission_babelium'),
+                        'babeliumproject.com/api/v2',
+                        PARAM_TEXT));*/
 
-$settings->add(new admin_setting_configpasswordunmask('assignsubmission_babelium/accesskey',
-					    	      new lang_string('accesskey','assignsubmission_babelium'),
-					    	      new lang_string('accesskey_help','assignsubmission_babelium'),
-						      ''));
+/*$settings->add(
+  new admin_setting_configtext(
+    'assignsubmission_babelium/apiendpoint',
+    new lang_string('apiendpoint','assignsubmission_babelium'),
+    new lang_string('apiendpoint_help','assignsubmission_babelium'),
+    '/api/v2/rest.php',
+    PARAM_TEXT
+  )
+);*/
 
-$settings->add(new admin_setting_configpasswordunmask('assignsubmission_babelium/secretaccesskey',
-					    	      new lang_string('secretaccesskey','assignsubmission_babelium'),
-					    	      new lang_string('secretaccesskey_help','assignsubmission_babelium'),
-						      ''));
+$settings->add(
+  new admin_setting_configtext(
+    'assignsubmission_babelium/newapiendpoint',
+    new lang_string('newapiendpoint','assignsubmission_babelium'),
+    new lang_string('newapiendpoint_help','assignsubmission_babelium'),
+    '/api/v3',
+    PARAM_TEXT
+  )
+);
 
+$settings->add(
+  new admin_setting_configpasswordunmask(
+    'assignsubmission_babelium/accesskey',
+    new lang_string('accesskey','assignsubmission_babelium'),
+    new lang_string('accesskey_help','assignsubmission_babelium'),
+    ''
+  )
+);
+
+$settings->add(
+  new admin_setting_configpasswordunmask(
+    'assignsubmission_babelium/secretaccesskey',
+    new lang_string('secretaccesskey','assignsubmission_babelium'),
+    new lang_string('secretaccesskey_help','assignsubmission_babelium'),
+    ''
+  )
+);
+
+Logging::logBabelium("Settings reading DONE!");

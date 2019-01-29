@@ -18,14 +18,18 @@
  * This file contains the version information for the babelium submission plugin
  *
  * @package    assignsubmission_babelium
- * @copyright  2013 Babelium Project {@link http://babeliumproject.com}
+ * @copyright Original from 2012 Babelium Project {@link http://babeliumproject.com} modified by Elurnet Informatika Zerbitzuak S.L  {@link http://elurnet.net/es} and Irontec S.L {@link https://www.irontec.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot.'/mod/assign/submission/babelium/Logging.php');
+
+Logging::logBabelium("Reading plugin version parameters...");
 
 $plugin->version   = 2015120500;
-$plugin->release   = '1.0.1';
+$plugin->release   = '2.0';
 
 //Moodle 2.7
 $plugin->requires  = 2014051200;
@@ -33,3 +37,5 @@ $plugin->requires  = 2014051200;
 $plugin->component = 'assignsubmission_babelium';
 $plugin->cron      = 0;
 $plugin->maturity  = MATURITY_STABLE;
+
+Logging::logBabelium("Plugin parameters read DONE!");

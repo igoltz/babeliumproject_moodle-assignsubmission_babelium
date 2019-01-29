@@ -1,0 +1,15 @@
+::cue(v[voice='NPC']) {
+  color:yellow;
+  background: transparent;
+  background-color: tranparent;
+  text-shadow: transparent 0 0 0.2em;
+  font: 1.2em sans-serif;
+}
+
+::cue(v[voice='Yourself']) {
+  color:red;
+  background: transparent;
+  background-color: tranparent;
+  text-shadow: transparent 0 0 0.2em;
+  font: 1.2em sans-serif;
+}
